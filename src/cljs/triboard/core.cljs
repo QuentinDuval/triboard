@@ -75,10 +75,6 @@
     :on-click #(js/alert (str "Got click on " [x y]))
     ))
 
-(defn blocked-cell
-  [x y]
-  (rect-cell x y "gray"))
-
 (defn greeting []
   [:h1 "Triboard"
    (into
@@ -88,10 +84,10 @@
        ^{:key [x y]}
        (case (get-in @app-state [:board x y])
          :empty  [empty-cell x y]
-         :blue [empty-cell x y]
-         :red [empty-cell x y]
-         :green [empty-cell x y]
-         :gray [blocked-cell x y])
+         :blue [rect-cell x y "blue"]
+         :red [rect-cell x y "red"]
+         :green [rect-cell x y "green"]
+         :gray [rect-cell x y "gray"])
        ))
    ])
 
