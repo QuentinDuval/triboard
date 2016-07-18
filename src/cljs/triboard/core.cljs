@@ -13,13 +13,35 @@
 
 ;; -----------------------------------------
 
+(def empty-board
+  (let [column (vec (repeat board-height :empty))]
+    (vec (repeat board-width column))))
+
+(def all-positions
+  (vec
+    (for [x (range board-width)
+          y (range board-height)]
+      [x y])))
+
+(defn random-positions
+  "Draw n * m distincts random position"
+  [n m]
+  (let [pos (shuffle all-positions)
+        cut #(subvec pos (* % n) (* (inc %) n))]
+    (map cut (range m))))
+
+(defn init-positions
+  []
+  (let [pos (random-positions init-block-count 4)]
+    {:blue (nth pos 0)
+     :red (nth pos 1)
+     :green (nth pos 2)
+     :gray (nth pos 3)}))
+
 (defn new-board
   "Create a new board"
   []
-  (vec
-    (repeat board-width
-      (vec (repeat board-height :empty))
-      )))
+  empty-board)
 
 ;; -----------------------------------------
 
@@ -43,8 +65,7 @@
    (into
      [:svg#board
       {:view-box (str "0 0 " board-width " " board-height)}]
-     (for [x (range board-width)
-           y (range board-height)]
+     (for [[x y] all-positions]
        ^{:key [x y]}
        (case (get-in @app-state [:board x y])
          :empty  [empty-cell x y])
