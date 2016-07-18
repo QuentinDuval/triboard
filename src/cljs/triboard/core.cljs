@@ -80,19 +80,26 @@
   [board [x y] [dx dy]]
   (eduction
     (comp
-      (map #(get-in board %))
-      (take-while is-cell-owned?)) ;; TODO - Use partition ? And bring take 2 here?
+      (take-while #(is-cell-owned? (get-in board %)))
+      (partition-by #(get-in board %))
+      (map
+        (juxt #(get-in board (first %)) identity)
+        ))
     (range-coord [x y] [dx dy])))
 
 (defn convertible-cells
-  "Indicates the convertible cells for the provided player - when clicking at [x y]"
+  "Indicates the convertible cells for the provided player - when clicking at [x y]
+   Returns an object of the form
+		{:winner :blue,
+		 :looser :red,
+		 :cells [[8 5] [9 5]]}"
   [board [x y] [dx dy] player] ;; TODO - Instead, return the player that can do a thing here
-  (let [cells (range-cells board [(+ x dx) (+ y dy)] [dx dy])
-        [head tail :as cell-groups] (take 2 (partition-by identity cells))]
-    (cond
-      (<= (count cell-groups) 1) []
-      (= player (first tail)) (vec head)
-      :else [])))
+  (let [[head tail :as cells] (take 2 (range-cells board [(+ x dx) (+ y dy)] [dx dy]))]
+    (when (= 2 (count cells))
+      {:winner (first tail) ;; Who wins the cells
+       :looser (first head) ;; Who looses the cells
+       :cells (second head)};; Which cells are taken
+      )))
 
 ;; -----------------------------------------
 
