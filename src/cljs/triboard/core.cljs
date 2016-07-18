@@ -9,8 +9,6 @@
 (def board-height 11)
 (def init-block-count 12) ;; Init blocks for red, blue, green, gray
 
-(def scale-factor 100)
-
 ;; -----------------------------------------
 
 (def empty-board
