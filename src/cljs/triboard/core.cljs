@@ -84,6 +84,15 @@
       (take-while is-cell-owned?)) ;; TODO - Use partition ?
     (range-coord [x y] [dx dy])))
 
+(defn convertible-cells
+  [board [x y] [dx dy] player]
+  (let [cells (range-cells board [(+ x dx) (+ y dy)] [dx dy])
+        [head tail :as cell-groups] (partition-by identity cells)]
+    (cond
+      (<= (count cell-groups) 1) []
+      (= player (first tail)) (vec head)
+      :else [])))
+
 ;; -----------------------------------------
 
 (defonce app-state (atom (new-game)))
