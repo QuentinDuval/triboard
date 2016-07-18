@@ -26,7 +26,7 @@
 (defn draw-slices
   "Draw n * m slices from the collection"
   [n slices positions]
-  (map
+  (mapcat
     (fn [k] (map vector
               (repeat (nth slices k))
               (subvec positions (* k n) (* (inc k) n))
@@ -42,7 +42,10 @@
 (defn new-board
   "Create a new board"
   []
-  empty-board)
+  (reduce (fn [r [color [x y]]]
+            (prn [x y])
+            (assoc-in r [x y] color))
+    empty-board (init-positions)))
 
 ;; -----------------------------------------
 
@@ -53,7 +56,7 @@
 
 (defn empty-cell
   "Draws an empty cell"
-  [x y]
+  [x y color]
   [:rect {:width 0.9
           :height 0.9
           :x (+ 0.05 x)
@@ -69,7 +72,11 @@
      (for [[x y] all-positions]
        ^{:key [x y]}
        (case (get-in @app-state [:board x y])
-         :empty  [empty-cell x y])
+         :empty  [empty-cell x y]
+         :blue [empty-cell x y]
+         :red [empty-cell x y]
+         :green [empty-cell x y]
+         :gray [empty-cell x y])
        ))
    ])
 
