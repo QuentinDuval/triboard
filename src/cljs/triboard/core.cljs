@@ -60,7 +60,7 @@
 (defn range-single-coord
   "Creates a range along one coordinate"
   [x dx max-val]
-  (let [end-range (if (neg? dx) 0 max-val)]
+  (let [end-range (if (neg? dx) -1 max-val)]
     (range x end-range dx)))
 
 (defn range-coord
@@ -80,26 +80,41 @@
   [board [x y] [dx dy]]
   (eduction
     (comp
-      (take-while #(is-cell-owned? (get-in board %)))
-      (partition-by #(get-in board %))
-      (map
-        (juxt #(get-in board (first %)) identity)
-        ))
+      (map (juxt #(get-in board %) identity))
+      (take-while (comp is-cell-owned? first))
+      (partition-by first)
+      (map (juxt #(-> % first first) #(mapv second %))))
     (range-coord [x y] [dx dy])))
 
-(defn convertible-cells
+(defn available-cells-by-dir
   "Indicates the convertible cells for the provided player - when clicking at [x y]
    Returns an object of the form
 		{:winner :blue,
 		 :looser :red,
-		 :cells [[8 5] [9 5]]}"
-  [board [x y] [dx dy] player] ;; TODO - Instead, return the player that can do a thing here
+		 :taken [[8 5] [9 5]]}"
+  [board [x y] [dx dy]]
   (let [[head tail :as cells] (take 2 (range-cells board [(+ x dx) (+ y dy)] [dx dy]))]
     (when (= 2 (count cells))
-      {:winner (first tail) ;; Who wins the cells
-       :looser (first head) ;; Who looses the cells
-       :cells (second head)};; Which cells are taken
+      {:winner (first tail)  ;; Who wins the cells
+       :looser (first head)  ;; Who looses the cells
+       :taken (second head)} ;; Which cells are taken
       )))
+
+(defn available-moves-at
+  "Provides the list of moves that can be done from a cell
+   Return an object of the form:
+		{:blue
+		 [{:winner :blue,
+		   :looser :red,
+		   :taken [[8 5] [9 5]]}]}"
+  [board [x y]]
+  (group-by :winner
+    (keep #(available-cells-by-dir board [x y] %)
+     [[-1 0] [1 0]
+      [0 -1] [0 1]
+      [-1 1] [1 1]
+      [-1 -1] [1 -1]]
+     )))
 
 ;; -----------------------------------------
 
