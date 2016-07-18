@@ -86,7 +86,7 @@
 
 (defn convertible-cells
   "Indicates the convertible cells for the provided player - when clicking at [x y]"
-  [board [x y] [dx dy] player]
+  [board [x y] [dx dy] player] ;; TODO - Instead, return the player that can do a thing here
   (let [cells (range-cells board [(+ x dx) (+ y dy)] [dx dy])
         [head tail :as cell-groups] (partition-by identity cells)]
     (cond
