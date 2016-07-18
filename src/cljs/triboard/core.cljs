@@ -85,6 +85,7 @@
     (range-coord [x y] [dx dy])))
 
 (defn convertible-cells
+  "Indicates the convertible cells for the provided player - when clicking at [x y]"
   [board [x y] [dx dy] player]
   (let [cells (range-cells board [(+ x dx) (+ y dy)] [dx dy])
         [head tail :as cell-groups] (partition-by identity cells)]
