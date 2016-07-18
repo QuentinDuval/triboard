@@ -57,6 +57,20 @@
 
 ;; -----------------------------------------
 
+(defn range-single-coord
+  [x dx max-val]
+  (let [end-range (if (neg? dx) 0 max-val)]
+    (range x end-range dx)))
+
+(defn range-coord
+  "Give all the coordinate in the provided direction"
+  [[xi yi] [dx dy]]
+  (map vector
+    (range-single-coord xi dx board-width)
+    (range-single-coord yi dy board-height)))
+
+;; -----------------------------------------
+
 (defonce app-state (atom (new-game)))
 
 ;; -----------------------------------------
