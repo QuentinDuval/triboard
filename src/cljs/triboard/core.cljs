@@ -57,7 +57,7 @@
 ;; -----------------------------------------
 
 (defn rect-cell
-  [x y color & options]
+  [x y color options]
   [:rect
    (merge
      {:width 0.9
@@ -65,14 +65,13 @@
       :x (+ 0.05 x)
       :y (+ 0.05 y)
       :fill color}
-     #_(into {} options)
-     )
+     options)
    ])
 
 (defn empty-cell
   [x y]
   (rect-cell x y "lightgray"
-    :on-click #(js/alert (str "Got click on " [x y]))
+    {:on-click #(prn [x y])}
     ))
 
 (defn greeting []
