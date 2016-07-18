@@ -25,17 +25,19 @@
 
 (defn draw-slices
   "Draw n * m slices from the collection"
-  [n m positions]
+  [n slices positions]
   (map
-    (fn [k] (subvec positions (* k n) (* (inc k) n)))
-    (range m)))
+    (fn [k] (map vector
+              (repeat (nth slices k))
+              (subvec positions (* k n) (* (inc k) n))
+              ))
+    (range (count slices))))
 
 (defn init-positions
   "Create random initial positions for the players"
   []
-  (->> (shuffle all-positions)
-       (draw-slices init-block-count 4)
-       (map vector [:blue :red :green :gray])))
+  (draw-slices init-block-count
+    [:blue :red :green :gray] (shuffle all-positions)))
 
 (defn new-board
   "Create a new board"
