@@ -36,7 +36,7 @@
   "Create random initial positions for the players"
   []
   (draw-slices init-block-count
-    (conj players :gray)
+    (conj players :wall)
     (shuffle all-positions)))
 
 (defn new-board []
@@ -58,6 +58,7 @@
 ;; -----------------------------------------
 
 (defn range-single-coord
+  "Creates a range along one coordinate"
   [x dx max-val]
   (let [end-range (if (neg? dx) 0 max-val)]
     (range x end-range dx)))
@@ -69,9 +70,24 @@
     (range-single-coord xi dx board-width)
     (range-single-coord yi dy board-height)))
 
+(defn is-cell-owned?
+  "Indicates whether a cell is owned by any player"
+  [cell]
+  (and (not= cell :empty) (not= cell :wall)))
+
+(defn range-cells ;; TODO - Use the concept of sentinel for the walls?
+  "Give all the cells in the provided direction - until you reach an empty / blocked / wall cell"
+  [board [x y] [dx dy]]
+  (eduction
+    (comp
+      (map #(get-in board %))
+      (take-while is-cell-owned?)) ;; TODO - Use partition ?
+    (range-coord [x y] [dx dy])))
+
 ;; -----------------------------------------
 
 (defonce app-state (atom (new-game)))
+(def board (reagent/cursor app-state [:board]))
 
 ;; -----------------------------------------
 
@@ -105,7 +121,7 @@
          :blue [rect-cell x y "blue"]
          :red [rect-cell x y "red"]
          :green [rect-cell x y "green"]
-         :gray [rect-cell x y "gray"])
+         :wall [rect-cell x y "gray"])
        ))
    ])
 
