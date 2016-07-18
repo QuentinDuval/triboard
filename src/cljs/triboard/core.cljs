@@ -81,14 +81,14 @@
   (eduction
     (comp
       (map #(get-in board %))
-      (take-while is-cell-owned?)) ;; TODO - Use partition ?
+      (take-while is-cell-owned?)) ;; TODO - Use partition ? And bring take 2 here?
     (range-coord [x y] [dx dy])))
 
 (defn convertible-cells
   "Indicates the convertible cells for the provided player - when clicking at [x y]"
   [board [x y] [dx dy] player] ;; TODO - Instead, return the player that can do a thing here
   (let [cells (range-cells board [(+ x dx) (+ y dy)] [dx dy])
-        [head tail :as cell-groups] (partition-by identity cells)]
+        [head tail :as cell-groups] (take 2 (partition-by identity cells))]
     (cond
       (<= (count cell-groups) 1) []
       (= player (first tail)) (vec head)
