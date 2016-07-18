@@ -54,15 +54,30 @@
     {:board (new-board)
      }))
 
+;; -----------------------------------------
+
+(defn rect-cell
+  [x y color & options]
+  [:rect
+   (merge
+     {:width 0.9
+      :height 0.9
+      :x (+ 0.05 x)
+      :y (+ 0.05 y)
+      :fill color}
+     #_(into {} options)
+     )
+   ])
+
 (defn empty-cell
-  "Draws an empty cell"
-  [x y color]
-  [:rect {:width 0.9
-          :height 0.9
-          :x (+ 0.05 x)
-          :y (+ 0.05 y)
-          :fill "lightgrey"
-          }])
+  [x y]
+  (rect-cell x y "lightgray"
+    :on-click #(js/alert (str "Got click on " [x y]))
+    ))
+
+(defn blocked-cell
+  [x y]
+  (rect-cell x y "gray"))
 
 (defn greeting []
   [:h1 "Triboard"
@@ -76,7 +91,7 @@
          :blue [empty-cell x y]
          :red [empty-cell x y]
          :green [empty-cell x y]
-         :gray [empty-cell x y])
+         :gray [blocked-cell x y])
        ))
    ])
 
