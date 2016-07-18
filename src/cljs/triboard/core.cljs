@@ -55,6 +55,8 @@
     :red 12
     :green 12}})
 
+;; TODO - Enhance the display to show the available moves (compute them once)
+
 ;; -----------------------------------------
 
 (defn range-single-coord
