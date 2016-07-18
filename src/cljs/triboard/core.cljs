@@ -23,20 +23,19 @@
           y (range board-height)]
       [x y])))
 
-(defn random-positions
-  "Draw n * m distincts random position"
-  [n m]
-  (let [pos (shuffle all-positions)
-        cut #(subvec pos (* % n) (* (inc %) n))]
-    (map cut (range m))))
+(defn draw-slices
+  "Draw n * m slices from the collection"
+  [n m positions]
+  (map
+    (fn [k] (subvec positions (* k n) (* (inc k) n)))
+    (range m)))
 
 (defn init-positions
+  "Create random initial positions for the players"
   []
-  (let [pos (random-positions init-block-count 4)]
-    {:blue (nth pos 0)
-     :red (nth pos 1)
-     :green (nth pos 2)
-     :gray (nth pos 3)}))
+  (->> (shuffle all-positions)
+       (draw-slices init-block-count 4)
+       (map vector [:blue :red :green :gray])))
 
 (defn new-board
   "Create a new board"
