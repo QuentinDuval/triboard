@@ -3,6 +3,9 @@
 
 (enable-console-print!)
 
+
+;; -----------------------------------------
+;; GAME PARAMETERS
 ;; -----------------------------------------
 
 (def board-width 16)
@@ -10,6 +13,9 @@
 (def init-block-count 12) ;; Init blocks for red, blue, green, gray
 (def players [:blue :red :green])
 
+
+;; -----------------------------------------
+;; INIT THE BOARD
 ;; -----------------------------------------
 
 (def empty-board
@@ -50,13 +56,15 @@
    :turn 0
    ;; From the turn you can deduce the number of turn left
    ;; There is an invariant holding: total score = 12 * 3 + turn
+   ;; TODO - Enhance the display to show the available moves (compute them once)
    :scores
    {:blue 12
     :red 12
     :green 12}})
 
-;; TODO - Enhance the display to show the available moves (compute them once)
 
+;; -----------------------------------------
+;; TAKING CELLS
 ;; -----------------------------------------
 
 (defn range-single-coord
@@ -116,6 +124,9 @@
       [-1 1] [1 1] [-1 -1] [1 -1]]
      )))
 
+
+;; -----------------------------------------
+;; ON PLAYER MOVE
 ;; -----------------------------------------
 
 (defn- apply-move
@@ -131,11 +142,17 @@
     (reduce apply-move (assoc-in board [x y] player) moves)
     ))
 
+
+;; -----------------------------------------
+;; GAME STATE
 ;; -----------------------------------------
 
 (defonce app-state (atom (new-game)))
 (def board (reagent/cursor app-state [:board]))
 
+
+;; -----------------------------------------
+;; DISPLAY
 ;; -----------------------------------------
 
 (defn rect-cell
@@ -174,8 +191,6 @@
          :wall [rect-cell x y "gray"])
        ))
    ])
-
-;; -----------------------------------------
 
 (reagent/render [greeting]
   (js/document.getElementById "app"))
