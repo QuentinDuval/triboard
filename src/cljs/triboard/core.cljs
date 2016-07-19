@@ -185,9 +185,10 @@
 
 (defn greeting []
   [:h1 "Triboard"
-   [:div.scores
-    (for [[k v] @scores]
-      [:div.score (str (name k) ":" v)])]
+   (into [:div.scores]
+     (for [[k v] @scores]
+       ^{:key k}
+       [:div.score (str (name k) ":" v)]))
    (into
      [:svg#board
       {:view-box (str "0 0 " board-width " " board-height)}]
