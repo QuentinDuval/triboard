@@ -57,6 +57,7 @@
    ;; From the turn you can deduce the number of turn left
    ;; There is an invariant holding: total score = 12 * 3 + turn
    ;; TODO - Enhance the display to show the available moves (compute them once)
+   :player (rand-nth players)
    :scores
    {:blue 12
     :red 12
@@ -137,16 +138,20 @@
     :green :blue))
 
 (defn- apply-move
-  [board {:keys [winner taken] :as move}]
-  (reduce #(assoc-in %1 %2 winner) board taken))
+  [game {:keys [winner looser taken] :as move}]
+  (-> game
+    (assoc :board (reduce #(assoc-in %1 %2 winner) (:board game) taken))
+    (update-in [:scores winner] + (count taken))
+    (update-in [:scores looser] - (count taken))
+    ))
 
 (defn play-move
   "On player playing the move [x y]" ;; TODO - Handle the scores
-  [board [x y] player]
-  (let [moves (get (available-moves-at board [x y]) player nil)]
+  [{:keys [player board] :as game} [x y]]
+  (let [moves (get (available-moves-at board [x y]) player)]
     (if moves
-      (reduce apply-move (assoc-in board [x y] player) moves)
-      board)))
+      (reduce apply-move (assoc-in game [:board x y] player) moves)
+      game)))
 
 
 ;; -----------------------------------------
@@ -180,7 +185,7 @@
     {:on-click
      (fn []
        (prn [x y])
-       (swap! board play-move [x y] :blue))
+       (swap! app-state play-move [x y]))
      }))
 
 (defn greeting []
