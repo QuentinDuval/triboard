@@ -155,6 +155,7 @@
 
 (defonce app-state (atom (new-game)))
 (def board (reagent/cursor app-state [:board]))
+(def scores (reagent/cursor app-state [:scores]))
 
 
 ;; -----------------------------------------
@@ -184,6 +185,9 @@
 
 (defn greeting []
   [:h1 "Triboard"
+   [:div.scores
+    (for [[k v] @scores]
+      [:div.score (str (name k) ":" v)])]
    (into
      [:svg#board
       {:view-box (str "0 0 " board-width " " board-height)}]

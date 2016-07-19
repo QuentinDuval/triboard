@@ -1,3 +1,28 @@
-h1 {
-  text-decoration: none;
+h1
+{
+	text-align: center;
+	text-decoration: none;
+}
+
+body
+{
+  	background: #f9f9f9;
+  	font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
+  	font-weight: 100;
+  	font-size: 14px;
+}
+
+.scores
+{
+	text-align: center;
+	margin: 10px 10px;
+	width: 100%;
+	font-size: 18px;
+}
+
+.score
+{
+	position: relative;
+	margin: 10px 30px;
+	display: inline-block;
 }
