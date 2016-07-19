@@ -5,6 +5,40 @@
 
 
 ;; -----------------------------------------
+;; TODO - Performance can be increased by using deftype / defrecord
+;; TODO - Define a point
+;; TODO - Define a move
+;; -----------------------------------------
+
+(defrecord B [x y])
+
+(defn perf-test
+  []
+  (let [r (vec (range 10000))]
+    (time
+      (doall
+        (map #(.-x %) (map #(B. %1 %2) r r))
+        ))
+    (time
+      (doall
+        (map #(:x %) (map #(B. %1 %2) r r))
+        ))
+    (time
+      (doall
+        (map #(first %) (map vector r r))
+        ))
+    (time
+      (doall
+        (map #(:x %) (map (fn [a b] {:x a :y b}) r r))
+        ))
+		;;"Elapsed time: 14.975000 msecs"
+		;;"Elapsed time: 20.245000 msecs"
+		;;"Elapsed time: 21.190000 msecs"
+		;;"Elapsed time: 22.085000 msecs"
+    nil))
+
+
+;; -----------------------------------------
 ;; GAME PARAMETERS
 ;; -----------------------------------------
 
