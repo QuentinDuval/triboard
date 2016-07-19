@@ -138,9 +138,10 @@
 (defn play-move
   "On player playing the move [x y]" ;; TODO - Handle the scores
   [board [x y] player]
-  (let [moves (get (available-moves-at board [x y]) player)]
-    (reduce apply-move (assoc-in board [x y] player) moves)
-    ))
+  (let [moves (get (available-moves-at board [x y]) player nil)]
+    (if moves
+      (reduce apply-move (assoc-in board [x y] player) moves)
+      board)))
 
 
 ;; -----------------------------------------
