@@ -161,7 +161,7 @@
 (defonce app-state (atom (new-game)))
 (def board (reagent/cursor app-state [:board]))
 (def scores (reagent/cursor app-state [:scores]))
-
+(def current-player (reagent/cursor app-state [:player]))
 
 ;; -----------------------------------------
 ;; DISPLAY
@@ -188,12 +188,18 @@
        (swap! app-state play-move [x y]))
      }))
 
+(defn show-scores
+  [{:keys [blue red green] :as scores} player]
+  (let [style #(if (= player %) :div.score--is-current :div.score)]
+    [:div.scores
+     [(style :blue) (str "Blue: " blue)]
+     [(style :red) (str "Red: " red)]
+     [(style :green) (str "Green: " green)]
+    ]))
+
 (defn greeting []
   [:h1 "Triboard"
-   (into [:div.scores]
-     (for [[k v] @scores]
-       ^{:key k}
-       [:div.score (str (name k) ":" v)]))
+   [show-scores @scores @current-player]
    (into
      [:svg#board
       {:view-box (str "0 0 " board-width " " board-height)}]
