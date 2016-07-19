@@ -125,17 +125,16 @@
        :looser :red,
        :taken [[0 4]]})}}"
   [{:keys [board] :as game}]
-  (time
-    (merge game
-     {:moves
+  (assoc game :moves
+    (time
       (transduce
         (comp
           (filter #(= (get-in board %) :empty))
           (mapcat #(available-moves-at board %)))
         #(update-in %1 [(:winner %2) (:move %2)] conj %2)
         {}
-        all-positions)} ;; TODO - To optimize, just consider the move of the current player?
-     )))
+        all-positions)) ;; TODO - To optimize, just consider the move of the current player?
+    ))
 
 
 ;; -----------------------------------------
