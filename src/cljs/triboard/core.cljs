@@ -119,17 +119,19 @@
    :looser :empty
    :taken [pos]})
 
-(defn with-available-moves ;; TODO - This should be optimized: much too slow (50-60 ms)
+(defn with-available-moves ;; TODO - This should be optimized: much too slow (35-60 ms)
   "Compute all available moves on the board"
   [{:keys [board] :as game}]
-  (merge game
-    {:moves
-     (into {}
-       (comp
-         (filter #(= (get-in board %) :empty))
-         (map (juxt identity #(available-moves-at board %))))
-       all-positions)}
-    ))
+  (time
+    (merge game
+     {:moves
+      (into {}
+        (comp
+          (filter #(= (get-in board %) :empty))
+          (map (juxt identity #(available-moves-at board %)))
+          (filter (comp not-empty second)))
+        all-positions)}
+     )))
 
 
 ;; -----------------------------------------
