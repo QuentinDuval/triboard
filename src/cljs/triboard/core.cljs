@@ -125,6 +125,13 @@
       [-1 1] [1 1] [-1 -1] [1 -1]]
      )))
 
+(defn take-empty-cell-move
+  "Create a move to take an empty cell" 
+  [player pos]
+  {:winner player
+   :looser :empty
+   :taken [pos]})
+
 
 ;; -----------------------------------------
 ;; ON PLAYER MOVE
@@ -145,13 +152,18 @@
     (update-in [:scores looser] - (count taken))
     ))
 
+(defn- apply-moves
+  [game moves]
+  (reduce apply-move game moves))
+
 (defn play-move
-  "On player playing the move [x y]" ;; TODO - Handle the scores
+  "On player playing the move [x y]"
   [{:keys [player board] :as game} [x y]]
-  (let [moves (get (available-moves-at board [x y]) player)]
-    (if moves
-      (reduce apply-move (assoc-in game [:board x y] player) moves)
-      game)))
+  (if-let [moves (get (available-moves-at board [x y]) player)]
+    (-> game
+      (apply-moves (conj moves (take-empty-cell-move player [x y])))
+      (update-in [:player] next-player))
+    game))
 
 
 ;; -----------------------------------------
@@ -189,12 +201,12 @@
      }))
 
 (defn show-scores
-  [{:keys [blue red green] :as scores} player]
+  [scores player]
   (into [:div.scores]
-    (for [[p v] scores]
+    (for [p players]
       ^{:key p}
       [(if (= player p) :div.score--is-current :div.score)
-       (str (name p) ": " v)])
+       (str (name p) ": " (get scores p))])
     ))
 
 (defn greeting []
