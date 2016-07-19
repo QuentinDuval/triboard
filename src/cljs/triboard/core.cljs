@@ -118,6 +118,21 @@
 
 ;; -----------------------------------------
 
+(defn- apply-move
+  [board {:keys [winner taken] :as move}]
+  (reduce
+    (fn [b pos] (assoc-in b pos winner))
+    board taken))
+
+(defn play-move
+  "On player playing the move [x y]" ;; TODO - Handle the scores
+  [board [x y] player]
+  (let [moves (get (available-moves-at board [x y]) player)]
+    (reduce apply-move (assoc-in board [x y] player) moves)
+    ))
+
+;; -----------------------------------------
+
 (defonce app-state (atom (new-game)))
 (def board (reagent/cursor app-state [:board]))
 
@@ -138,8 +153,11 @@
 (defn empty-cell
   [x y]
   (rect-cell x y "lightgray"
-    {:on-click #(prn [x y])}
-    ))
+    {:on-click
+     (fn []
+       (prn [x y])
+       (swap! board play-move [x y] :blue))
+     }))
 
 (defn greeting []
   [:h1 "Triboard"
