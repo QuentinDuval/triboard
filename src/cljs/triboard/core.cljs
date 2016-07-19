@@ -50,21 +50,9 @@
     (fn [r [color [x y]]] (assoc-in r [x y] color))
     empty-board (init-positions)))
 
-(defn new-game []
-  {:board (new-board)
-   :turn 0
-   ;; From the turn you can deduce the number of turn left
-   ;; There is an invariant holding: total score = 12 * 3 + turn
-   ;; TODO - Enhance the display to show the available moves (compute them once)
-   :player (rand-nth players)
-   :scores
-   {:blue 12
-    :red 12
-    :green 12}})
-
 
 ;; -----------------------------------------
-;; TAKING CELLS
+;; IDENTIFY CONVERTIBLE CELLS
 ;; -----------------------------------------
 
 (defn range-single-coord
@@ -131,6 +119,16 @@
    :looser :empty
    :taken [pos]})
 
+(defn with-available-moves
+  "Compute all available moves on the board"
+  [{:keys [board] :as game}]
+  (merge game
+    {:moves
+     (into {}
+       (map (juxt identity #(available-moves-at board %)))
+       all-positions)}
+    ))
+
 
 ;; -----------------------------------------
 ;; ON PLAYER MOVE
@@ -158,9 +156,10 @@
 (defn play-move
   "On player playing the move [x y]"
   [{:keys [player board] :as game} [x y]]
-  (if-let [moves (get (available-moves-at board [x y]) player)]
+  (if-let [moves (get-in game [:moves [x y] player])]
     (-> game
       (apply-moves (conj moves (take-empty-cell-move player [x y])))
+      (with-available-moves)
       (update-in [:player] next-player)) ;; TODO - We must compute the available moves to switch player
     game))
 
@@ -168,6 +167,15 @@
 ;; -----------------------------------------
 ;; GAME STATE
 ;; -----------------------------------------
+
+(defn new-game []
+  (with-available-moves
+    {:board (new-board)
+     :player (rand-nth players)
+     :scores
+     {:blue 12
+      :red 12
+      :green 12}}))
 
 (defonce app-state (atom (new-game)))
 (def board (reagent/cursor app-state [:board]))
