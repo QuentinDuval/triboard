@@ -162,7 +162,7 @@
   (if-let [moves (get (available-moves-at board [x y]) player)]
     (-> game
       (apply-moves (conj moves (take-empty-cell-move player [x y])))
-      (update-in [:player] next-player))
+      (update-in [:player] next-player)) ;; TODO - We must compute the available moves to switch player
     game))
 
 
