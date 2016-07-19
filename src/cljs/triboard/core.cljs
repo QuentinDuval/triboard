@@ -115,7 +115,15 @@
    :taken [pos]})
 
 (defn with-available-moves ;; TODO - This should be optimized: much too slow (40-60 ms)
-  "Compute all available moves on the board"
+  "Compute all available moves on the board.
+   And group these positions by player then by position
+   Example:
+   {:blue
+    {[0 5]
+     ({:move [0 5],
+       :winner :blue,
+       :looser :red,
+       :taken [[0 4]]})}}"
   [{:keys [board] :as game}]
   (time
     (merge game
@@ -141,6 +149,14 @@
     :red :green
     :green :blue))
 
+(defn- with-next-player
+  "Find the next player to act"
+  [{:keys [moves player] :as game}]
+  (let [nexts (take 3 (iterate next-player (next-player player)))]
+    (assoc game :player
+      (some #(if (get moves %) % false) nexts))
+    ))
+
 (defn- apply-move
   [game {:keys [winner looser taken] :as move}]
   (-> game
@@ -160,7 +176,9 @@
     (-> game
       (apply-moves (conj moves (take-empty-cell-move player [x y])))
       (with-available-moves)
-      (update-in [:player] next-player)) ;; TODO - Use available moves to switch player
+      ;(update-in [:player] next-player)
+      (with-next-player)
+      ) ;; TODO - Use available moves to switch player
     game))
 
 
