@@ -134,7 +134,7 @@
           (mapcat #(available-moves-at board %)))
         #(update-in %1 [(:winner %2) (:move %2)] conj %2)
         {}
-        all-positions)}
+        all-positions)} ;; TODO - To optimize, just consider the move of the current player?
      )))
 
 
