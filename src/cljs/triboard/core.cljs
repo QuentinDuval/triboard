@@ -12,7 +12,7 @@
 (def board-height 11)
 (def init-block-count 12) ;; Init blocks for red, blue, green, gray
 (def players [:blue :red :green])
-
+(def directions [[-1 0] [1 0] [0 -1] [0 1] [-1 1] [1 1] [-1 -1] [1 -1]])
 
 ;; -----------------------------------------
 ;; INIT THE BOARD
@@ -75,14 +75,14 @@
 
 (defn range-cells ;; TODO - Use the concept of sentinel for the walls?
   "Give all the cells in the provided direction - until you reach an empty / blocked / wall cell"
-  [board [x y] [dx dy]]
+  [board pos dir]
   (eduction
     (comp
       (map (juxt #(get-in board %) identity))
       (take-while (comp is-cell-owned? first))
       (partition-by first)
       (map (juxt #(-> % first first) #(mapv second %))))
-    (range-coord [x y] [dx dy])))
+    (range-coord pos dir)))
 
 (defn available-cells-by-dir
   "Indicates the convertible cells for the provided player - when clicking at [x y]
@@ -91,8 +91,8 @@
      :winner :blue,
 		 :looser :red,
 		 :taken [[8 5] [9 5]]}"
-  [board [x y :as pos] [dx dy]]
-  (let [[head tail :as cells] (take 2 (range-cells board [(+ x dx) (+ y dy)] [dx dy]))]
+  [board [x y :as pos] [dx dy :as dir]]
+  (let [[head tail :as cells] (take 2 (range-cells board [(+ x dx) (+ y dy)] dir))]
     (when (= 2 (count cells))
       {:move pos             ;; Where the move took place
        :winner (first tail)  ;; Who wins the cells
@@ -103,9 +103,7 @@
 (defn available-moves-at
   "Provides the list of moves that can be done from a cell"
   [board [x y]]
-  (eduction
-    (keep #(available-cells-by-dir board [x y] %))
-    [[-1 0] [1 0] [0 -1] [0 1] [-1 1] [1 1] [-1 -1] [1 -1]]))
+  (eduction (keep #(available-cells-by-dir board [x y] %)) directions))
 
 (defn take-empty-cell-move
   "Create a move to take an empty cell" 
