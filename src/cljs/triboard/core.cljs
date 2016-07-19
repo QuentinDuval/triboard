@@ -150,7 +150,7 @@
     :green :blue))
 
 (defn- with-next-player
-  "Find the next player to act"
+  "Find the next player to act - dismiss those that cannot play any move"
   [{:keys [moves player] :as game}]
   (let [nexts (take 3 (iterate next-player (next-player player)))]
     (assoc game :player
@@ -165,20 +165,15 @@
     (update-in [:scores looser] - (count taken))
     ))
 
-(defn- apply-moves
-  [game moves]
-  (reduce apply-move game moves))
-
 (defn play-move
   "On player playing the move [x y]"
   [{:keys [player board] :as game} [x y]]
   (if-let [moves (get-in game [:moves player [x y]])]
-    (-> game
-      (apply-moves (conj moves (take-empty-cell-move player [x y])))
+    (->
+      (reduce apply-move game moves)
+      (apply-move (take-empty-cell-move player [x y]))
       (with-available-moves)
-      ;(update-in [:player] next-player)
-      (with-next-player)
-      ) ;; TODO - Use available moves to switch player
+      (with-next-player))
     game))
 
 
