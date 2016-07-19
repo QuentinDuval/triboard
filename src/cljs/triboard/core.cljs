@@ -87,30 +87,25 @@
 (defn available-cells-by-dir
   "Indicates the convertible cells for the provided player - when clicking at [x y]
    Returns an object of the form
-		{:winner :blue,
+		{:move [7 5]
+     :winner :blue,
 		 :looser :red,
 		 :taken [[8 5] [9 5]]}"
-  [board [x y] [dx dy]]
+  [board [x y :as pos] [dx dy]]
   (let [[head tail :as cells] (take 2 (range-cells board [(+ x dx) (+ y dy)] [dx dy]))]
     (when (= 2 (count cells))
-      {:winner (first tail)  ;; Who wins the cells
+      {:move pos             ;; Where the move took place
+       :winner (first tail)  ;; Who wins the cells
        :looser (first head)  ;; Who looses the cells
        :taken (second head)} ;; Which cells are taken
       )))
 
 (defn available-moves-at
-  "Provides the list of moves that can be done from a cell
-   Return an object of the form:
-		{:blue
-		 [{:winner :blue,
-		   :looser :red,
-		   :taken [[8 5] [9 5]]}]}"
+  "Provides the list of moves that can be done from a cell"
   [board [x y]]
-  (group-by :winner
-    (keep #(available-cells-by-dir board [x y] %)
-     [[-1 0] [1 0] [0 -1] [0 1]
-      [-1 1] [1 1] [-1 -1] [1 -1]]
-     )))
+  (eduction
+    (keep #(available-cells-by-dir board [x y] %))
+    [[-1 0] [1 0] [0 -1] [0 1] [-1 1] [1 1] [-1 -1] [1 -1]]))
 
 (defn take-empty-cell-move
   "Create a move to take an empty cell" 
@@ -119,17 +114,18 @@
    :looser :empty
    :taken [pos]})
 
-(defn with-available-moves ;; TODO - This should be optimized: much too slow (35-60 ms)
+(defn with-available-moves ;; TODO - This should be optimized: much too slow (40-60 ms)
   "Compute all available moves on the board"
   [{:keys [board] :as game}]
   (time
     (merge game
      {:moves
-      (into {}
+      (transduce
         (comp
           (filter #(= (get-in board %) :empty))
-          (map (juxt identity #(available-moves-at board %)))
-          (filter (comp not-empty second)))
+          (mapcat #(available-moves-at board %)))
+        #(update-in %1 [(:winner %2) (:move %2)] conj %2)
+        {}
         all-positions)}
      )))
 
@@ -160,7 +156,7 @@
 (defn play-move
   "On player playing the move [x y]"
   [{:keys [player board] :as game} [x y]]
-  (if-let [moves (get-in game [:moves [x y] player])]
+  (if-let [moves (get-in game [:moves player [x y]])]
     (-> game
       (apply-moves (conj moves (take-empty-cell-move player [x y])))
       (with-available-moves)
