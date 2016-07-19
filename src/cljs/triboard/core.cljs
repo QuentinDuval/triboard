@@ -68,7 +68,7 @@
     (range-single-coord xi dx board-width)
     (range-single-coord yi dy board-height)))
 
-(defn is-cell-owned?
+(defn ^boolean is-cell-owned?
   "Indicates whether a cell is owned by any player"
   [cell]
   (and (not= cell :empty) (not= cell :wall)))
@@ -79,7 +79,7 @@
   (eduction
     (comp
       (map (juxt #(get-in board %) identity))
-      (take-while (comp is-cell-owned? first))
+      (take-while #(-> % first is-cell-owned?))
       (partition-by first)
       (map (juxt #(-> % first first) #(mapv second %))))
     (range-coord pos dir)))
