@@ -162,7 +162,7 @@
     (-> game
       (apply-moves (conj moves (take-empty-cell-move player [x y])))
       (with-available-moves)
-      (update-in [:player] next-player)) ;; TODO - We must compute the available moves to switch player
+      (update-in [:player] next-player)) ;; TODO - Use available moves to switch player
     game))
 
 
