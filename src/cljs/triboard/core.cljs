@@ -190,12 +190,12 @@
 
 (defn show-scores
   [{:keys [blue red green] :as scores} player]
-  (let [style #(if (= player %) :div.score--is-current :div.score)]
-    [:div.scores
-     [(style :blue) (str "Blue: " blue)]
-     [(style :red) (str "Red: " red)]
-     [(style :green) (str "Green: " green)]
-    ]))
+  (into [:div.scores]
+    (for [[p v] scores]
+      ^{:key p}
+      [(if (= player p) :div.score--is-current :div.score)
+       (str (name p) ": " v)])
+    ))
 
 (defn greeting []
   [:h1 "Triboard"
