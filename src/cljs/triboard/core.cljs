@@ -46,9 +46,8 @@
     (shuffle all-positions)))
 
 (defn new-board []
-  (reduce (fn [r [color [x y]]]
-            (prn [x y])
-            (assoc-in r [x y] color))
+  (reduce
+    (fn [r [color [x y]]] (assoc-in r [x y] color))
     empty-board (init-positions)))
 
 (defn new-game []
@@ -194,11 +193,8 @@
 (defn empty-cell
   [x y]
   (rect-cell x y "lightgray"
-    {:on-click
-     (fn []
-       (prn [x y])
-       (swap! app-state play-move [x y]))
-     }))
+    {:on-click #(swap! app-state play-move [x y])}
+    ))
 
 (defn show-scores
   [scores player]
