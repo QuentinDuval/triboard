@@ -129,11 +129,16 @@
 ;; ON PLAYER MOVE
 ;; -----------------------------------------
 
+(defn- next-player
+  [player]
+  (case player
+    :blue :red
+    :red :green
+    :green :blue))
+
 (defn- apply-move
   [board {:keys [winner taken] :as move}]
-  (reduce
-    (fn [b pos] (assoc-in b pos winner))
-    board taken))
+  (reduce #(assoc-in %1 %2 winner) board taken))
 
 (defn play-move
   "On player playing the move [x y]" ;; TODO - Handle the scores
