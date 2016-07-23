@@ -62,35 +62,29 @@
   [cell]
   (or (= cell :empty) (= cell :wall)))
 
-(defn range-cells
-  "Give all the pairs [cell coordinate] in the provided direction"
+(defn available-cells-by-dir
+  "Indicates the convertible cells when clicking at [x y], and returns:
+	{:move [7 5]
+   :winner :blue,
+   :looser :red,
+   :taken [[8 5] [9 5]]}"
   [board [xi yi] [dx dy]]
-  (loop [x xi, y yi,
-         taken nil,
-         res []]
+  (loop [x (+ xi dx)
+         y (+ yi dy)
+         looser nil
+         taken []]
     (if-let [c (get-in board [x y])]
       (cond
         (is-cell-empty? c) nil ;; No move: reached end and only 1 type of cell
-        (and taken (not= taken c)) {:winner c     ;; Who wins the cells
-                                    :looser taken ;; Who looses the cells
-                                    :taken res}
+        (and looser (not= looser c)) {:winner c      ;; Who wins the cells
+                                      :looser looser ;; Who looses the cells
+                                      :move [xi yi]  ;; The move performed 
+                                      :taken taken}  ;; The cells taken
         :else (recur
                 (+ x dx) (+ y dy)
-                (or taken c) 
-                (conj res [x y])))
-      res)))
-
-(defn available-cells-by-dir
-  "Indicates the convertible cells for the provided player - when clicking at [x y]
-   Returns an object of the form
-		{:move [7 5]
-     :winner :blue,
-		 :looser :red,
-		 :taken [[8 5] [9 5]]}"
-  [board [x y :as pos] [dx dy :as dir]]
-  (when-let [m (range-cells board [(+ x dx) (+ y dy)] dir)]
-    (conj m [:move pos]) 
-    ))
+                (or looser c) 
+                (conj taken [x y])))
+      nil)))
 
 (defn available-moves-at
   "Provides the list of moves that can be done from a cell"
