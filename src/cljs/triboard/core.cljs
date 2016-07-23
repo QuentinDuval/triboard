@@ -73,16 +73,16 @@
          y (+ yi dy)
          looser nil
          taken []]
-    (let [c (get-in board [x y])]
+    (let [cell (get-in board [x y])]
       (cond
-        (is-cell-empty? c) nil ;; No move: reached end and only 1 type of cell
-        (and looser (not= looser c)) {:winner c      ;; Who wins the cells
-                                      :looser looser ;; Who looses the cells
-                                      :move [xi yi]  ;; The move performed 
-                                      :taken taken}  ;; The cells taken
+        (is-cell-empty? cell) nil ;; No move: reached end and only 1 type of cell
+        (and looser (not= looser cell)) {:winner cell   ;; Who wins the cells
+                                         :looser looser ;; Who looses the cells
+                                         :move [xi yi]  ;; The move performed 
+                                         :taken taken}  ;; The cells taken
         :else (recur
                 (+ x dx) (+ y dy)
-                (or looser c) 
+                (or looser cell) 
                 (conj taken [x y])))
       )))
 
