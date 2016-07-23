@@ -18,8 +18,6 @@
 ;; INIT THE BOARD
 ;; -----------------------------------------
 
-;; (defrecord Point [x y])
-
 (def empty-board
   (let [column (vec (repeat board-height :empty))]
     (vec (repeat board-width column))))
@@ -68,7 +66,7 @@
    :winner :blue,
    :looser :red,
    :taken [[8 5] [9 5]]}"
-  [board [xi yi] [dx dy]]
+  [board [xi yi :as move] [dx dy]]
   (loop [x (+ xi dx)
          y (+ yi dy)
          looser nil
@@ -78,12 +76,11 @@
         (is-cell-empty? cell) nil ;; No move: reached end and only 1 type of cell
         (and looser (not= looser cell)) {:winner cell   ;; Who wins the cells
                                          :looser looser ;; Who looses the cells
-                                         :move [xi yi]  ;; The move performed 
+                                         :move move     ;; The move performed 
                                          :taken taken}  ;; The cells taken
         :else (recur
                 (+ x dx) (+ y dy)
-                (or looser cell) 
-                (conj taken [x y])))
+                cell (conj taken [x y])))
       )))
 
 (defn available-moves-at
@@ -124,12 +121,6 @@
         #(update-in %1 [(:winner %2) (:move %2)] conj %2)
         {}
         all-positions)) ;; TODO - To optimize, just consider the move of the current player?
-    ))
-
-(defn bench-test
-  [app-state]
-  (dotimes [n 10]
-    (do (with-available-moves app-state) nil)
     ))
 
 
