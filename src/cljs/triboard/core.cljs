@@ -62,25 +62,23 @@
   [cell]
   (or (= cell :empty) (= cell :wall)))
 
-(defn range-coord
+(defn range-cells
   "Give all the pairs [cell coordinate] in the provided direction"
   [board [xi yi] [dx dy]]
-  (loop [x xi, y yi, res []]
+  (loop [x xi, y yi,
+         taken nil,
+         res []]
     (if-let [c (get-in board [x y])]
-      (if (is-cell-empty? c) res
-        (recur
-          (+ x dx) (+ y dy)
-          (conj res [c [x y]])))
+      (cond
+        (is-cell-empty? c) nil ;; No move: reached end and only 1 type of cell
+        (and taken (not= taken c)) {:winner c     ;; Who wins the cells
+                                    :looser taken ;; Who looses the cells
+                                    :taken res}
+        :else (recur
+                (+ x dx) (+ y dy)
+                (or taken c) 
+                (conj res [x y])))
       res)))
-
-(defn range-cells ;; TODO - Use the concept of sentinel for the walls?
-  "Give all the cells in the provided direction - until you reach an empty / blocked / wall cell"
-  [board pos dir]
-  (eduction
-    (comp
-      (partition-by first)
-      (map (juxt #(-> % first first) #(mapv second %))))
-    (range-coord board pos dir)))
 
 (defn available-cells-by-dir
   "Indicates the convertible cells for the provided player - when clicking at [x y]
@@ -90,13 +88,9 @@
 		 :looser :red,
 		 :taken [[8 5] [9 5]]}"
   [board [x y :as pos] [dx dy :as dir]]
-  (let [[head tail :as cells] (take 2 (range-cells board [(+ x dx) (+ y dy)] dir))]
-    (when (= 2 (count cells))
-      {:move pos             ;; Where the move took place
-       :winner (first tail)  ;; Who wins the cells
-       :looser (first head)  ;; Who looses the cells
-       :taken (second head)} ;; Which cells are taken
-      )))
+  (when-let [m (range-cells board [(+ x dx) (+ y dy)] dir)]
+    (conj m [:move pos]) 
+    ))
 
 (defn available-moves-at
   "Provides the list of moves that can be done from a cell"
@@ -136,6 +130,12 @@
         #(update-in %1 [(:winner %2) (:move %2)] conj %2)
         {}
         all-positions)) ;; TODO - To optimize, just consider the move of the current player?
+    ))
+
+(defn bench-test
+  [app-state]
+  (dotimes [n 10]
+    (do (with-available-moves app-state) nil)
     ))
 
 
