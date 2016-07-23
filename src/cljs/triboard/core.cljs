@@ -114,6 +114,14 @@
    :looser :empty
    :taken [pos]})
 
+(defn available-moves-xf
+  "Transducer to get available moves on the map"
+  [board]
+  (comp
+    (filter #(= (get-in board %) :empty))
+    (mapcat #(available-moves-at board %))
+    ))
+
 (defn with-available-moves ;; TODO - This should be optimized: much too slow (40-60 ms)
   "Compute all available moves on the board.
    And group these positions by player then by position
@@ -126,14 +134,11 @@
        :taken [[0 4]]})}}"
   [{:keys [board] :as game}]
   (assoc game :moves
-    (time
-      (transduce
-        (comp
-          (filter #(= (get-in board %) :empty))
-          (mapcat #(available-moves-at board %)))
-        #(update-in %1 [(:winner %2) (:move %2)] conj %2)
-        {}
-        all-positions)) ;; TODO - To optimize, just consider the move of the current player?
+    (transduce
+      (available-moves-xf board)
+      #(update-in %1 [(:winner %2) (:move %2)] conj %2)
+      {}
+      all-positions) ;; TODO - To optimize, just consider the move of the current player?
     ))
 
 
