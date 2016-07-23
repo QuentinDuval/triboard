@@ -57,30 +57,35 @@
 ;; IDENTIFY CONVERTIBLE CELLS
 ;; -----------------------------------------
 
-(defn range-coord
-  "Give all the coordinate in the provided direction"
-  [[xi yi] [dx dy]]
-  (loop [x xi, y yi, res []]
-    (if (or (neg? x) (neg? y) (> x board-width) (> y board-height))
-      res
-      (recur (+ x dx) (+ y dy) (conj res [x y])))
-    ))
+(defn ^boolean not_in-board?
+  [x y]
+  (or (neg? x) (neg? y) (> x board-width) (> y board-height)))
 
-(defn ^boolean is-cell-owned?
+(defn ^boolean is-cell-empty?
   "Indicates whether a cell is owned by any player"
   [cell]
-  (and (not= cell :empty) (not= cell :wall)))
+  (or (= cell :empty) (= cell :wall)))
+
+(defn range-coord
+  "Give all the pairs [cell coordinate] in the provided direction"
+  [board [xi yi] [dx dy]]
+  (loop [x xi, y yi, res []]
+    (if (or (not_in-board? x y) (is-cell-empty? (get-in board [x y])))
+      res
+      (recur
+        (+ x dx)
+        (+ y dy)
+        (conj res [(get-in board [x y]) [x y]])))
+    ))
 
 (defn range-cells ;; TODO - Use the concept of sentinel for the walls?
   "Give all the cells in the provided direction - until you reach an empty / blocked / wall cell"
   [board pos dir]
   (eduction
     (comp
-      (map (juxt #(get-in board %) identity))
-      (take-while #(-> % first is-cell-owned?))
       (partition-by first)
       (map (juxt #(-> % first first) #(mapv second %))))
-    (range-coord pos dir)))
+    (range-coord board pos dir)))
 
 (defn available-cells-by-dir
   "Indicates the convertible cells for the provided player - when clicking at [x y]
