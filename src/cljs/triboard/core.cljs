@@ -60,7 +60,7 @@
 (defn ^boolean is-cell-empty?
   "Indicates whether a cell is owned by any player"
   [cell]
-  (or (= cell :empty) (= cell :wall)))
+  (or (nil? cell) (= cell :empty) (= cell :wall)))
 
 (defn available-cells-by-dir
   "Indicates the convertible cells when clicking at [x y], and returns:
@@ -73,7 +73,7 @@
          y (+ yi dy)
          looser nil
          taken []]
-    (if-let [c (get-in board [x y])]
+    (let [c (get-in board [x y])]
       (cond
         (is-cell-empty? c) nil ;; No move: reached end and only 1 type of cell
         (and looser (not= looser c)) {:winner c      ;; Who wins the cells
@@ -84,7 +84,7 @@
                 (+ x dx) (+ y dy)
                 (or looser c) 
                 (conj taken [x y])))
-      nil)))
+      )))
 
 (defn available-moves-at
   "Provides the list of moves that can be done from a cell"
