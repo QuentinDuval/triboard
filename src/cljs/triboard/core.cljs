@@ -57,18 +57,14 @@
 ;; IDENTIFY CONVERTIBLE CELLS
 ;; -----------------------------------------
 
-(defn range-single-coord
-  "Creates a range along one coordinate"
-  [x dx max-val]
-  (let [end-range (if (neg? dx) -1 max-val)]
-    (range x end-range dx)))
-
 (defn range-coord
   "Give all the coordinate in the provided direction"
   [[xi yi] [dx dy]]
-  (map vector
-    (range-single-coord xi dx board-width)
-    (range-single-coord yi dy board-height)))
+  (loop [x xi, y yi, res []]
+    (if (or (neg? x) (neg? y) (> x board-width) (> y board-height))
+      res
+      (recur (+ x dx) (+ y dy) (conj res [x y])))
+    ))
 
 (defn ^boolean is-cell-owned?
   "Indicates whether a cell is owned by any player"
@@ -134,11 +130,12 @@
        :taken [[0 4]]})}}"
   [{:keys [board] :as game}]
   (assoc game :moves
-    (transduce
-      (available-moves-xf board)
-      #(update-in %1 [(:winner %2) (:move %2)] conj %2)
-      {}
-      all-positions) ;; TODO - To optimize, just consider the move of the current player?
+    (time
+      (transduce
+        (available-moves-xf board)
+        #(update-in %1 [(:winner %2) (:move %2)] conj %2)
+        {}
+        all-positions)) ;; TODO - To optimize, just consider the move of the current player?
     ))
 
 
