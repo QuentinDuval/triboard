@@ -5,40 +5,6 @@
 
 
 ;; -----------------------------------------
-;; TODO - Performance can be increased by using deftype / defrecord
-;; TODO - Define a point
-;; TODO - Define a move
-;; -----------------------------------------
-
-(defrecord B [x y])
-
-(defn perf-test
-  []
-  (let [r (vec (range 10000))]
-    (time
-      (doall
-        (map #(.-x %) (map #(B. %1 %2) r r))
-        ))
-    (time
-      (doall
-        (map #(:x %) (map #(B. %1 %2) r r))
-        ))
-    (time
-      (doall
-        (map #(first %) (map vector r r))
-        ))
-    (time
-      (doall
-        (map #(:x %) (map (fn [a b] {:x a :y b}) r r))
-        ))
-		;;"Elapsed time: 14.975000 msecs"
-		;;"Elapsed time: 20.245000 msecs"
-		;;"Elapsed time: 21.190000 msecs"
-		;;"Elapsed time: 22.085000 msecs"
-    nil))
-
-
-;; -----------------------------------------
 ;; GAME PARAMETERS
 ;; -----------------------------------------
 
@@ -51,6 +17,8 @@
 ;; -----------------------------------------
 ;; INIT THE BOARD
 ;; -----------------------------------------
+
+;; (defrecord Point [x y])
 
 (def empty-board
   (let [column (vec (repeat board-height :empty))]
@@ -81,7 +49,7 @@
 
 (defn new-board []
   (reduce
-    (fn [r [color [x y]]] (assoc-in r [x y] color))
+    (fn [r [color point]] (assoc-in r point color))
     empty-board (init-positions)))
 
 
@@ -136,8 +104,8 @@
 
 (defn available-moves-at
   "Provides the list of moves that can be done from a cell"
-  [board [x y]]
-  (eduction (keep #(available-cells-by-dir board [x y] %)) directions))
+  [board point]
+  (eduction (keep #(available-cells-by-dir board point %)) directions))
 
 (defn take-empty-cell-move
   "Create a move to take an empty cell" 
@@ -198,11 +166,11 @@
 
 (defn play-move
   "On player playing the move [x y]"
-  [{:keys [player board] :as game} [x y]]
-  (if-let [moves (get-in game [:moves player [x y]])]
+  [{:keys [player board] :as game} point]
+  (if-let [moves (get-in game [:moves player point])]
     (->
       (reduce apply-move game moves)
-      (apply-move (take-empty-cell-move player [x y]))
+      (apply-move (take-empty-cell-move player point))
       (with-available-moves)
       (with-next-player))
     game))
@@ -257,7 +225,7 @@
        (str (name p) ": " (get scores p))])
     ))
 
-(defn greeting []
+(defn run-game []
   [:h1 "Triboard"
    [show-scores @scores @current-player]
    (into
@@ -274,5 +242,5 @@
        ))
    ])
 
-(reagent/render [greeting]
+(reagent/render [run-game]
   (js/document.getElementById "app"))
