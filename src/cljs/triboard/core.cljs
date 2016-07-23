@@ -1,5 +1,7 @@
 (ns triboard.core
-  (:require [reagent.core :as reagent :refer [atom]]))
+  (:require
+    [reagent.core :as reagent :refer [atom]]
+    [clojure.string :as str]))
 
 (enable-console-print!)
 
@@ -209,11 +211,11 @@
     (for [p players]
       ^{:key p}
       [(if (= player p) :div.score--is-current :div.score)
-       (str (name p) ": " (get scores p))])
+       (str (str/capitalize (name p)) ": " (get scores p))])
     ))
 
 (defn run-game []
-  [:h1 "Triboard"
+  [:div
    [show-scores @scores @current-player]
    (into
      [:svg#board

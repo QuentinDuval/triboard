@@ -17,7 +17,7 @@ body
 	text-align: center;
 	margin: 10px 10px;
 	width: 100%;
-	font-size: 18px;
+	font-size: 20px;
 }
 
 .score
@@ -26,6 +26,8 @@ body
 	margin: 10px 30px;
 	padding: 10px 10px;
 	display: inline-block;
+	border: 2px solid #e5e5df;
+	border-radius: 8px;
 }
 
 .score--is-current
@@ -34,6 +36,6 @@ body
 	margin: 10px 30px;
 	padding: 10px 10px;
 	display: inline-block;
-	border: 2px solid #e5e5df;
+	border: 2px solid #B7B7B7;
 	border-radius: 8px;
 }
