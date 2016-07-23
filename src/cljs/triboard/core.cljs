@@ -105,7 +105,7 @@
     (mapcat #(available-moves-at board %))
     ))
 
-(defn with-available-moves ;; TODO - This should be optimized: much too slow (40-60 ms)
+(defn with-available-moves
   "Compute all available moves on the board.
    And group these positions by player then by position
    Example:
@@ -122,7 +122,7 @@
         (available-moves-xf board)
         #(update-in %1 [(:winner %2) (:move %2)] conj %2)
         {}
-        all-positions)) ;; TODO - To optimize, just consider the move of the current player?
+        all-positions))
     ))
 
 
