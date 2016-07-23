@@ -23,11 +23,24 @@ body
 .score
 {
 	position: relative;
-	margin: 10px 30px;
+	margin: 10px 10px;
 	padding: 10px 10px;
 	display: inline-block;
 	border: 2px solid #e5e5df;
 	border-radius: 8px;
+}
+
+.help-button
+{
+    background-color: #2192E4;
+    border: none;
+    color: white;
+    margin: 10px 10px;
+    padding: 5px 10px;
+    text-align: center;
+    display: inline-block;
+    font-size: 20px;
+    border-radius: 8px;
 }
 
 .score--is-current

@@ -206,30 +206,38 @@
      options)
    ])
 
+(defn ^boolean show-help?
+  [game x y]
+  (and (:help game) (get-move-at game (:player game) [x y])))
+
 (defn empty-cell
   [x y game]
   (rect-cell x y
-    (if-not
-      (and (:help game) (get-move-at game (:player game) [x y]))
-      "lightgray"
-      "lightblue")
+    (if-not (show-help? game x y) "lightgray" "lightblue")
     {:on-click #(swap! app-state play-move [x y])}
     ))
 
 (defn show-scores
   [scores player]
-  (into [:div.scores]
-    (for [p players]
-      ^{:key p}
-      [(if (= player p) :div.score--is-current :div.score)
-       (str (str/capitalize (name p)) ": " (get scores p))])
+  (for [p players]
+    ^{:key p}
+    [(if (= player p)
+       :div.score--is-current :div.score)
+     (str (str/capitalize (name p)) ": " (get scores p))]
+    ))
+
+(defn show-top-panel
+  [scores player]
+  (into
+    [:div.scores
+     [:button.help-button
+      {:on-click #(swap! app-state update :help not)} "Help"]]
+    (show-scores scores player)
     ))
 
 (defn run-game []
   [:div
-   [show-scores @scores @current-player]
-   [:button
-    {:on-click #(swap! app-state update :help not)} "Help"]
+   [show-top-panel @scores @current-player]
    (into
      [:svg#board
       {:view-box (str "0 0 " board-width " " board-height)}]
