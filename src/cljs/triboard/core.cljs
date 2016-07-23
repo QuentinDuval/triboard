@@ -153,10 +153,15 @@
     (update-in [:scores looser] - (count taken))
     ))
 
+(defn- get-move-at
+  "Access the available moves for the provided player at the provided point"
+  [game player point]
+  (get-in game [:moves player point]))
+
 (defn play-move
   "On player playing the move [x y]"
   [{:keys [player board] :as game} point]
-  (if-let [moves (get-in game [:moves player point])]
+  (if-let [moves (get-move-at game player point)]
     (->
       (reduce apply-move game moves)
       (apply-move (take-empty-cell-move player point))
@@ -173,6 +178,8 @@
   (with-available-moves
     {:board (new-board)
      :player (rand-nth players)
+     :moves {}
+     :help false
      :scores
      {:blue 12
       :red 12
@@ -200,8 +207,12 @@
    ])
 
 (defn empty-cell
-  [x y]
-  (rect-cell x y "lightgray"
+  [x y game]
+  (rect-cell x y
+    (if-not
+      (and (:help game) (get-move-at game (:player game) [x y]))
+      "lightgray"
+      "lightblue")
     {:on-click #(swap! app-state play-move [x y])}
     ))
 
@@ -217,13 +228,15 @@
 (defn run-game []
   [:div
    [show-scores @scores @current-player]
+   [:button
+    {:on-click #(swap! app-state update :help not)} "Help"]
    (into
      [:svg#board
       {:view-box (str "0 0 " board-width " " board-height)}]
      (for [[x y] all-positions]
        ^{:key [x y]}
        (case (get-in @app-state [:board x y])
-         :empty  [empty-cell x y]
+         :empty [empty-cell x y @app-state]
          :blue [rect-cell x y "blue"]
          :red [rect-cell x y "red"]
          :green [rect-cell x y "green"]
