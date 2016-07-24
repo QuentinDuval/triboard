@@ -178,7 +178,7 @@
    * For the provided player
    * And with move scope limitation"
   [game player move-filter]
-  (apply max-key
+  (apply max-key ;; TODO - max key is slow: it will recompute the same stuff over and over
     #(transduce
        (comp
          (filter move-filter)
@@ -206,12 +206,14 @@
   [game player]
   (let [moves (get-in game [:moves player])
         outcomes (map (fn [[m _]] [m (play-move game m)]) moves)]
-    (map
-      (fn [[m outcome]]
-        [m (-
-             (get-in outcome [:scores player])
-             (worst-immediate-loss outcome player))])
-      outcomes)
+    (first
+      (apply max-key second
+        (map
+          (fn [[m outcome]]
+            [m (-
+                 (get-in outcome [:scores player])
+                 (worst-immediate-loss outcome player))])
+          outcomes)))
     ))
 
 
@@ -257,8 +259,15 @@
   [x y game]
   (rect-cell x y
     (if-not (show-help? game x y) "lightgray" "lightblue")
-    {:on-click #(swap! app-state play-move [x y])}
-    ))
+    {:on-click
+     #_(swap! app-state play-move [x y])
+     (fn on-click [] ;; TODO - UGLY FOR TEST ONLY
+       (swap! app-state play-move [x y])
+       (while (and (:player @app-state) (not= :blue (:player @app-state)))
+         (let [auto-move (best-move @app-state (:player @app-state))]
+            (swap! app-state play-move auto-move))
+         ))
+     }))
 
 (defn show-scores
   [scores player]
