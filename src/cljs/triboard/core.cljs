@@ -194,7 +194,10 @@
 (defn worst-immediate-loss
   "Return the next game move that would reduce the score the most for the provided player"
   [game player]
-  (best-immediate-move-with game (:player game) #(= player (:looser %))))
+  (let [move-filter #(= player (:looser %))
+        move (best-immediate-move-with game (:player game) move-filter)]
+    (transduce (map (comp count :taken)) + (second move))
+    ))
 
 
 ;; -----------------------------------------
