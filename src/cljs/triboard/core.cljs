@@ -235,7 +235,7 @@
   [scores player]
   [:div.scores
    (concat
-     [[top-panel-button #(swap! app-state update :help not) (special-char "&#x21bb;")]]
+     [[top-panel-button #(reset! app-state (new-game)) (special-char "&#x21bb;")]]
      (show-scores scores player)
      [[top-panel-button #(swap! app-state update :help not) "?"]]
      )])
