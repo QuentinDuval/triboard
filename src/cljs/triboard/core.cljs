@@ -233,13 +233,12 @@
 
 (defn show-top-panel
   [scores player]
-  (into
-    [:div.scores]
-    (concat
-      [[top-panel-button #(swap! app-state update :help not) (special-char "&#x21bb;")]]
-      (show-scores scores player)
-      [[top-panel-button #(swap! app-state update :help not) "?"]]
-      )))
+  [:div.scores
+   (concat
+     [[top-panel-button #(swap! app-state update :help not) (special-char "&#x21bb;")]]
+     (show-scores scores player)
+     [[top-panel-button #(swap! app-state update :help not) "?"]]
+     )])
 
 (defn run-game []
   [:div
