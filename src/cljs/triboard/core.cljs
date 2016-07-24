@@ -173,25 +173,28 @@
 ;; ARTIFICIAL INTELLIGENCE
 ;; -----------------------------------------
 
+(defn- best-immediate-move-with
+  "Return the move with the highest immediate score increase:
+   * For the provided player
+   * And with move scope limitation"
+  [game player move-filter]
+  (apply max-key
+    #(transduce
+       (comp
+         (filter move-filter)
+         (map (comp count :taken)))
+       + (second %))
+    (get-in game [:moves player])))
+
 (defn best-immediate-move
   "Return the move with the highest immediate score increase for the provided player"
   [game player]
-  (apply max-key
-    (fn [[_ v]]
-      (transduce (map (comp count :taken)) + v))
-    (get-in game [:moves player])))
+  (best-immediate-move-with game player identity))
 
 (defn worst-immediate-loss
   "Return the next game move that would reduce the score the most for the provided player"
   [game player]
-  (apply max-key
-    (fn [[_ v]]
-      (transduce
-        (comp
-          (filter #(= player (:looser %)))
-          (map (comp count :taken)))
-        + v))
-    (get-in game [:moves (:player game)])))
+  (best-immediate-move-with game (:player game) #(= player (:looser %))))
 
 
 ;; -----------------------------------------
