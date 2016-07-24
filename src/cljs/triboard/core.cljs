@@ -170,6 +170,19 @@
 
 
 ;; -----------------------------------------
+;; ARTIFICIAL INTELLIGENCE
+;; -----------------------------------------
+
+(defn best-immediate-move
+  "Return the move with the highest immediate score increase for the provided player"
+  [game player]
+  (let [moves (get-in game [:moves player])]
+    (apply max-key
+      #(transduce (map (comp count :taken)) + (second %))
+      moves)))
+
+
+;; -----------------------------------------
 ;; GAME STATE
 ;; -----------------------------------------
 
