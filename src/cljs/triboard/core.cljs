@@ -117,12 +117,11 @@
        :taken [[0 4]]})}}"
   [{:keys [board] :as game}]
   (assoc game :moves
-    (time
-      (transduce
-        (available-moves-xf board)
-        #(update-in %1 [(:winner %2) (:move %2)] conj %2)
-        {}
-        all-positions))
+    (transduce
+      (available-moves-xf board)
+      #(update-in %1 [(:winner %2) (:move %2)] conj %2)
+      {}
+      all-positions)
     ))
 
 
