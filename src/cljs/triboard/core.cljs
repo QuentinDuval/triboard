@@ -227,25 +227,18 @@
   [str-code]
   [:div {:dangerouslySetInnerHTML {:__html str-code}}])
 
-(defn restart-button
-  []
-  [:button.help-button
-   {:on-click #(swap! app-state update :help not)}
-   [special-char "&#x21bb;"]])
-
-(defn help-button
-  []
-  [:button.help-button
-   {:on-click #(swap! app-state update :help not)} "?"])
+(defn top-panel-button
+  [on-click txt]
+  [:button.help-button {:on-click on-click} txt])
 
 (defn show-top-panel
   [scores player]
   (into
     [:div.scores]
     (concat
-      [[restart-button]]
+      [[top-panel-button #(swap! app-state update :help not) (special-char "&#x21bb;")]]
       (show-scores scores player)
-      [[help-button]]
+      [[top-panel-button #(swap! app-state update :help not) "?"]]
       )))
 
 (defn run-game []
