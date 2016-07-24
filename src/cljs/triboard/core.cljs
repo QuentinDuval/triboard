@@ -176,10 +176,22 @@
 (defn best-immediate-move
   "Return the move with the highest immediate score increase for the provided player"
   [game player]
-  (let [moves (get-in game [:moves player])]
-    (apply max-key
-      #(transduce (map (comp count :taken)) + (second %))
-      moves)))
+  (apply max-key
+    (fn [[_ v]]
+      (transduce (map (comp count :taken)) + v))
+    (get-in game [:moves player])))
+
+(defn worst-immediate-loss
+  "Return the next game move that would reduce the score the most for the provided player"
+  [game player]
+  (apply max-key
+    (fn [[_ v]]
+      (transduce
+        (comp
+          (filter #(= player (:looser %)))
+          (map (comp count :taken)))
+        + v))
+    (get-in game [:moves (:player game)])))
 
 
 ;; -----------------------------------------
