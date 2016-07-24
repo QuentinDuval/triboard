@@ -23,10 +23,20 @@ body
 .score
 {
 	position: relative;
-	margin: 10px 10px;
+	margin: 10px 20px;
 	padding: 10px 10px;
 	display: inline-block;
 	border: 2px solid #e5e5df;
+	border-radius: 8px;
+}
+
+.score--is-current
+{
+	position: relative;
+	margin: 10px 20px;
+	padding: 10px 10px;
+	display: inline-block;
+	border: 2px solid #B7B7B7;
 	border-radius: 8px;
 }
 
@@ -41,14 +51,4 @@ body
     display: inline-block;
     font-size: 20px;
     border-radius: 8px;
-}
-
-.score--is-current
-{
-	position: relative;
-	margin: 10px 30px;
-	padding: 10px 10px;
-	display: inline-block;
-	border: 2px solid #B7B7B7;
-	border-radius: 8px;
 }

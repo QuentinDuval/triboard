@@ -198,10 +198,8 @@
   [x y color options]
   [:rect
    (merge
-     {:width 0.9
-      :height 0.9
-      :x (+ 0.05 x)
-      :y (+ 0.05 y)
+     {:x (+ 0.05 x) :width  0.9
+      :y (+ 0.05 y) :height 0.9
       :fill color}
      options)
    ])
@@ -221,19 +219,19 @@
   [scores player]
   (for [p players]
     ^{:key p}
-    [(if (= player p)
-       :div.score--is-current :div.score)
+    [(if (= player p) :div.score--is-current :div.score)
      (str (str/capitalize (name p)) ": " (get scores p))]
     ))
 
 (defn show-top-panel
   [scores player]
   (into
-    [:div.scores
-     [:button.help-button
-      {:on-click #(swap! app-state update :help not)} "Help"]]
-    (show-scores scores player)
-    ))
+    [:div.scores]
+    (concat
+      [[:button.help-button {:on-click #(swap! app-state update :help not)} "+"]]
+      (show-scores scores player)
+      [[:button.help-button {:on-click #(swap! app-state update :help not)} "?"]]
+      )))
 
 (defn run-game []
   [:div
