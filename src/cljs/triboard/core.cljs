@@ -223,14 +223,29 @@
      (str (str/capitalize (name p)) ": " (get scores p))]
     ))
 
+(defn special-char
+  [str-code]
+  [:div {:dangerouslySetInnerHTML {:__html str-code}}])
+
+(defn restart-button
+  []
+  [:button.help-button
+   {:on-click #(swap! app-state update :help not)}
+   [special-char "&#x21bb;"]])
+
+(defn help-button
+  []
+  [:button.help-button
+   {:on-click #(swap! app-state update :help not)} "?"])
+
 (defn show-top-panel
   [scores player]
   (into
     [:div.scores]
     (concat
-      [[:button.help-button {:on-click #(swap! app-state update :help not)} "+"]]
+      [[restart-button]]
       (show-scores scores player)
-      [[:button.help-button {:on-click #(swap! app-state update :help not)} "?"]]
+      [[help-button]]
       )))
 
 (defn run-game []
