@@ -182,7 +182,7 @@
     #(transduce
        (comp
          (filter move-filter)
-         (map (comp count :taken)))
+         (map (comp count :taken))) ;; TODO - Count taken is bad: select a better evaluation
        + (second %))
     (get-in game [:moves player])))
 
@@ -197,6 +197,21 @@
   (let [move-filter #(= player (:looser %))
         move (best-immediate-move-with game (:player game) move-filter)]
     (transduce (map (comp count :taken)) + (second move))
+    ))
+
+(defn best-move
+  "[SIMPLISTIC] Return the best move for a player based on:
+   * The immediate gain
+   * The worse immediate lost afterwards"
+  [game player]
+  (let [moves (get-in game [:moves player])
+        outcomes (map (fn [[m _]] [m (play-move game m)]) moves)]
+    (map
+      (fn [[m outcome]]
+        [m (-
+             (get-in outcome [:scores player])
+             (worst-immediate-loss outcome player))])
+      outcomes)
     ))
 
 
