@@ -241,7 +241,7 @@
 
 (defn rect-cell
   [x y color options]
-  [:rect
+  [:rect.cell
    (merge
      {:x (+ 0.05 x) :width  0.9
       :y (+ 0.05 y) :height 0.9

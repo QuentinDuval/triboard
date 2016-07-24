@@ -12,6 +12,12 @@ body
   	font-size: 14px;
 }
 
+.cell
+{
+	//transition-delay: 0.1s;
+	transition-duration: 0.5s;
+}
+
 .scores
 {
 	text-align: center;
