@@ -186,15 +186,17 @@
        + (second %))
     (get-in game [:moves player])))
 
-(defn best-immediate-move
-  "Return the move with the highest immediate score increase for the provided player"
-  [game player]
-  (best-immediate-move-with game player identity))
+#_(defn best-immediate-move
+   "Return the move with the highest immediate score increase for the provided player"
+   [game player]
+   (best-immediate-move-with game player identity))
 
 (defn worst-immediate-loss
-  "Return the next game move that would reduce the score the most for the provided player"
-  [game player]
-  (let [move-filter #(= player (:looser %))
+  "Return the next game move:
+   * Executed by the 'player'
+   * That would reduce the score for 'looser'"
+  [game player looser]
+  (let [move-filter #(= looser (:looser %))
         move (best-immediate-move-with game (:player game) move-filter)]
     (transduce (map (comp count :taken)) + (second move))
     ))
@@ -205,6 +207,7 @@
    * The worse immediate lost afterwards"
   [game player]
   (let [moves (get-in game [:moves player])
+        others (remove #{player} players)
         outcomes (map (fn [[m _]] [m (play-move game m)]) moves)]
     (first
       (apply max-key second
@@ -212,7 +215,14 @@
           (fn [[m outcome]]
             [m (-
                  (get-in outcome [:scores player])
-                 (worst-immediate-loss outcome player))])
+                 
+                 ;;Compute the values for the other players
+                 (apply max
+                   (map
+                     #(worst-immediate-loss outcome % player)
+                     others))
+                 
+                 )])
           outcomes)))
     ))
 
