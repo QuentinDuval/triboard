@@ -180,31 +180,21 @@
 
 (defn move-strength
   "Compute the strength of a move, based on the converted cells"
-  [move-filter [move converted]]
+  [converted-filter [move converted]]
   (transduce
     (comp
-      (filter move-filter)
-      (map (comp count :taken)))
+      (filter converted-filter)
+      (map (comp count :taken))) ;; Enhance this heuristic to consider map connections
     + converted))
 
-(defn- best-immediate-move-with
-  "Return the move with the highest immediate score increase:
-   * For the provided player
-   * And with move scope limitation"
-  [moves move-filter]
-  (fast-max-key
-    (partial move-strength move-filter)
-    moves))
-
 (defn worst-immediate-loss
-  "Return the next game move:
-   * Executed by the 'player'
-   * That would reduce the score for 'looser'"
+  "Return the next worse lost game move for 'looser' if 'player' plays"
   [game player looser]
-  (let [move-filter #(= looser (:looser %))
-        all-moves (get-in game [:moves player])
-        move (best-immediate-move-with all-moves move-filter)]
-    (move-strength move-filter move)))
+  (let [converted-filter #(= looser (:looser %))
+        all-moves (get-in game [:moves player])]
+    (transduce
+      (map #(move-strength converted-filter %))
+      max all-moves)))
 
 (defn best-move
   "[SIMPLISTIC] Return the best move for a player based on:
