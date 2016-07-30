@@ -202,18 +202,14 @@
       #(assoc %1 %2 (compute-cell-strength board %2))
       {} all-positions)))
 
-#_(defn sum-strength
-   "Compute total strength of taking the provided cells"
-   [cells-strength taken-cells]
-   (transduce (map cells-strength) + taken-cells))
-
 (defn move-strength
   "Compute the strength of a move, based on the converted cells"
   [cells-strength converted-filter [move converted]]
   (transduce
     (comp
       (filter converted-filter)
-      (map (comp count :taken))) ;; Enhance this heuristic to consider map connections
+      (mapcat :taken)
+      (map cells-strength))
     + converted))
 
 (defn worst-immediate-loss
