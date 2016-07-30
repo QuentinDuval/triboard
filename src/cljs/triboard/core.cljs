@@ -187,7 +187,7 @@
 ;; ARTIFICIAL INTELLIGENCE
 ;; -----------------------------------------
 
-(defn compute-cell-strength
+(defn- compute-cell-strength
   "Compute a cell strength based on the number of walls it has"
   [board point]
   (let [neighbors (coord-neighbors point)
@@ -202,24 +202,25 @@
       #(assoc %1 %2 (compute-cell-strength board %2))
       {} all-positions)))
 
-(defn move-strength
+(defn- move-strength
   "Compute the strength of a move, based on the converted cells"
   [cells-strength converted-filter [move converted]]
   (transduce
     (comp
-      (filter converted-filter)
+      (filter converted-filter) ;; TODO - Extract this part (specific to worst move)
       (mapcat :taken)
       (map cells-strength))
     + converted))
 
-(defn worst-immediate-loss
+(defn- worst-immediate-loss
   "Return the next worse lost game move for 'looser' if 'player' plays"
   [game player looser]
   (let [converted-filter #(= looser (:looser %))
         all-moves (get-in game [:moves player])]
     (transduce
       (map #(move-strength (:cells-strength game) converted-filter %))
-      max all-moves)))
+      max
+      all-moves)))
 
 (defn best-move
   "[SIMPLISTIC] Return the best move for a player based on:
