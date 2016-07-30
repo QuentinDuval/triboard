@@ -6,7 +6,7 @@
 (enable-console-print!)
 
 ;; TODO - Try to plug the history of brower for "back"
-
+;; TODO - Try to bring some domain vocabular here: it gets too complicated to trace
 
 ;; -----------------------------------------
 ;; GAME PARAMETERS
