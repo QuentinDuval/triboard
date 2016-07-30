@@ -213,17 +213,12 @@
       (apply max-key second
         (map
           (fn [[m outcome]]
-            [m (-
-                 (get-in outcome [:scores player])
-                 
-                 ;;Compute the values for the other players
-                 (apply max
-                   (map
-                     #(worst-immediate-loss outcome % player)
-                     others))
-                 
-                 )])
-          outcomes)))
+            (let [score (get-in outcome [:scores player])
+                  losses (map #(worst-immediate-loss outcome % player) others)]
+              [m (- score (apply max losses))]
+              ))
+          outcomes)
+        ))
     ))
 
 
