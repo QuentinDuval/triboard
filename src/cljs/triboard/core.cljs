@@ -35,10 +35,10 @@
 
 (defn move? [m]
   (and
-    (:move m)
+    (coord? (:move m))
     (every? coord? (:taken m))
-    (:winner m)
-    (:looser m)))
+    (player? (:winner m))
+    (cell? (:looser m))))
 
 
 ;; -----------------------------------------
