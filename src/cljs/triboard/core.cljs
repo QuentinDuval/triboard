@@ -173,23 +173,23 @@
 ;; ARTIFICIAL INTELLIGENCE
 ;; -----------------------------------------
 
+(defn move-strength ;; TODO - Count taken is bad: select a better evaluation
+  "Compute the strength value of a move"
+  [move]
+  (count (:taken move)))
+
 (defn- best-immediate-move-with
   "Return the move with the highest immediate score increase:
    * For the provided player
    * And with move scope limitation"
-  [game player move-filter]
+  [moves move-filter]
   (apply max-key ;; TODO - max key is slow: it will recompute the same stuff over and over
     #(transduce
        (comp
          (filter move-filter)
-         (map (comp count :taken))) ;; TODO - Count taken is bad: select a better evaluation
+         (map move-strength))
        + (second %))
-    (get-in game [:moves player])))
-
-#_(defn best-immediate-move
-   "Return the move with the highest immediate score increase for the provided player"
-   [game player]
-   (best-immediate-move-with game player identity))
+    moves))
 
 (defn worst-immediate-loss
   "Return the next game move:
@@ -197,7 +197,8 @@
    * That would reduce the score for 'looser'"
   [game player looser]
   (let [move-filter #(= looser (:looser %))
-        move (best-immediate-move-with game (:player game) move-filter)]
+        all-moves (get-in game [:moves player])
+        move (best-immediate-move-with all-moves move-filter)]
     (transduce (map (comp count :taken)) + (second move))
     ))
 
