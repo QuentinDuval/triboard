@@ -67,6 +67,7 @@
   [[x y]]
   (map (fn [[dx dy]] [(+ x dx) (+ y dy)]) directions))
 
+
 ;; -----------------------------------------
 ;; INIT THE BOARD
 ;; -----------------------------------------
@@ -104,7 +105,6 @@
 
 (defn ^boolean is-cell-empty?
   "Indicates whether a cell is owned by any player"
-  {:pre [(or (nil? cell) (cell? cell))]} 
   [cell]
   (or (nil? cell) (= cell :empty) (= cell :wall)))
 
