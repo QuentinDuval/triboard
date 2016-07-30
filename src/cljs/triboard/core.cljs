@@ -173,6 +173,11 @@
 ;; ARTIFICIAL INTELLIGENCE
 ;; -----------------------------------------
 
+(defn fast-max-key
+  "Fast max key that avoids recomputing things several times"
+  [key-fn coll]
+  (apply max-key (memoize key-fn) coll))
+
 (defn move-strength ;; TODO - Count taken is bad: select a better evaluation
   "Compute the strength value of a move"
   [move]
@@ -183,7 +188,7 @@
    * For the provided player
    * And with move scope limitation"
   [moves move-filter]
-  (apply max-key ;; TODO - max key is slow: it will recompute the same stuff over and over
+  (fast-max-key
     #(transduce
        (comp
          (filter move-filter)
@@ -211,7 +216,7 @@
         others (remove #{player} players)
         outcomes (map (fn [[m _]] [m (play-move game m)]) moves)]
     (first
-      (apply max-key
+      (fast-max-key
         (fn [[m outcome]]
           (let [score (get-in outcome [:scores player])
                 losses (map #(worst-immediate-loss outcome % player) others)]
