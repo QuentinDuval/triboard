@@ -215,14 +215,15 @@
   [game player]
   (let [moves (get-in game [:moves player])
         others (remove #{player} players)
-        outcomes (map (fn [[m _]] [m (play-move game m)]) moves)]
+        score (get-in game [:scores player])]
     (first
       (fast-max-key
-        (fn [[m outcome]]
-          (let [score (get-in outcome [:scores player])
-                losses (map #(worst-immediate-loss outcome % player) others)]
-            (- score (apply max losses))))
-        outcomes))
+        (fn [[m converted]]
+          (let [new-game (play-move game m)
+                new-score (get-in new-game [:scores player]) ;; TODO - Use score heuristic here
+                losses (map #(worst-immediate-loss new-game % player) others)]
+            (- new-score (apply max losses))))
+        moves))
     ))
 
 
