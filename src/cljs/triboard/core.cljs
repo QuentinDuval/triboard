@@ -40,6 +40,11 @@
     (player? (:winner m))
     (cell? (:looser m))))
 
+(defn scores? [s]
+  (and
+    (<= 0 (reduce + (vals s)) 164)
+    (every? s players)))
+
 
 ;; -----------------------------------------
 ;; UTILS
@@ -323,6 +328,7 @@
 
 (defn show-scores
   [scores player]
+  {:pre [(scores? scores)]} 
   (for [p players]
     ^{:key p}
     [(if (= player p) :div.score--is-current :div.score)
