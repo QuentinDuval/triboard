@@ -4,6 +4,7 @@
     [clojure.string :as str]))
 
 (enable-console-print!)
+(set! *assert* true)
 
 ;; TODO - Try to plug the history of brower for "back"
 ;; TODO - Try to bring some domain vocabular here: it gets too complicated to trace
@@ -20,11 +21,20 @@
 
 
 ;; -----------------------------------------
+;; EXTRINSIC TYPES
+;; -----------------------------------------
+
+(def player? (set players))
+(def cell-types? (conj player? :wall :empty))
+
+
+;; -----------------------------------------
 ;; UTILS
 ;; -----------------------------------------
 
 (defn fast-max-key
   "Fast max key that avoids recomputing things several times"
+  {:pre [(fn? key-fn) (seq? coll)]}
   [key-fn coll]
   (apply max-key (memoize key-fn) coll))
 
@@ -76,6 +86,7 @@
 
 (defn ^boolean is-cell-empty?
   "Indicates whether a cell is owned by any player"
+  {:pre (or (nil? cell) (cell-types? cell))} 
   [cell]
   (or (nil? cell) (= cell :empty) (= cell :wall)))
 
@@ -144,7 +155,7 @@
 ;; -----------------------------------------
 
 (defn- next-player
-  [player]
+  [player] 
   (case player
     :blue :red
     :red :green
@@ -214,6 +225,7 @@
 
 (defn- worst-immediate-loss
   "Return the next worse lost game move for 'looser' if 'player' plays"
+  {:pre [(player? player) (player? looser)]}
   [game player looser]
   (let [converted-filter #(= looser (:looser %))
         all-moves (get-in game [:moves player])]
@@ -226,6 +238,7 @@
   "[SIMPLISTIC] Return the best move for a player based on:
    * The immediate gain
    * The worse immediate lost afterwards"
+  {:pre (player? player)}
   [game player]
   (let [moves (get-in game [:moves player])
         others (remove #{player} players)]
@@ -288,7 +301,7 @@
      (fn on-click [] ;; TODO - UGLY FOR TEST ONLY
        (swap! app-state play-move [x y])
        (while (and (:player @app-state) (not= :blue (:player @app-state)))
-         (let [auto-move (best-move @app-state (:player @app-state))]
+         (let [auto-move (time (best-move @app-state (:player @app-state)))]
             (swap! app-state play-move auto-move))
          ))
      }))
