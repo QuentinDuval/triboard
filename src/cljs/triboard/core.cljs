@@ -210,15 +210,12 @@
         others (remove #{player} players)
         outcomes (map (fn [[m _]] [m (play-move game m)]) moves)]
     (first
-      (apply max-key second
-        (map
-          (fn [[m outcome]]
-            (let [score (get-in outcome [:scores player])
-                  losses (map #(worst-immediate-loss outcome % player) others)]
-              [m (- score (apply max losses))]
-              ))
-          outcomes)
-        ))
+      (apply max-key
+        (fn [[m outcome]]
+          (let [score (get-in outcome [:scores player])
+                losses (map #(worst-immediate-loss outcome % player) others)]
+            (- score (apply max losses))))
+        outcomes))
     ))
 
 
