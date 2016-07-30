@@ -4,10 +4,10 @@
     [clojure.string :as str]))
 
 (enable-console-print!)
-(set! *assert* true)
+(set! *assert* false) ;; Set to true for the debug mode
 
 ;; TODO - Try to plug the history of brower for "back"
-;; TODO - Try to bring some domain vocabular here: it gets too complicated to trace
+;; TODO - Try to bring some domain vocabulary here: it gets too complicated to trace
 
 ;; -----------------------------------------
 ;; GAME PARAMETERS
@@ -25,7 +25,20 @@
 ;; -----------------------------------------
 
 (def player? (set players))
-(def cell-types? (conj player? :wall :empty))
+(def cell? (conj player? :wall :empty))
+
+(defn coord? [p]
+  (and
+    (integer? (first p))
+    (integer? (second p))
+    (= 2 (count p))))
+
+(defn move? [m]
+  (and
+    (:move m)
+    (every? coord? (:taken m))
+    (:winner m)
+    (:looser m)))
 
 
 ;; -----------------------------------------
@@ -86,7 +99,7 @@
 
 (defn ^boolean is-cell-empty?
   "Indicates whether a cell is owned by any player"
-  {:pre (or (nil? cell) (cell-types? cell))} 
+  {:pre [(or (nil? cell) (cell? cell))]} 
   [cell]
   (or (nil? cell) (= cell :empty) (= cell :wall)))
 
@@ -200,6 +213,7 @@
 
 (defn- compute-cell-strength
   "Compute a cell strength based on the number of walls it has"
+  {:pre [(coord? point)]}
   [board point]
   (let [neighbors (coord-neighbors point)
         walls (filter #(= :wall (get-in board % :wall)) neighbors)]
@@ -216,6 +230,7 @@
 (defn- move-strength
   "Compute the strength of a move, based on the converted cells"
   [cells-strength converted-filter [move converted]]
+  {:pre [(fn? converted-filter) (every? move? converted)]}
   (transduce
     (comp
       (filter converted-filter) ;; TODO - Extract this part (specific to worst move)
@@ -231,14 +246,13 @@
         all-moves (get-in game [:moves player])]
     (transduce
       (map #(move-strength (:cells-strength game) converted-filter %))
-      max
-      all-moves)))
+      max all-moves)))
 
 (defn best-move
   "[SIMPLISTIC] Return the best move for a player based on:
    * The immediate gain
    * The worse immediate lost afterwards"
-  {:pre (player? player)}
+  {:pre [(player? player)]}
   [game player]
   (let [moves (get-in game [:moves player])
         others (remove #{player} players)]
@@ -273,6 +287,7 @@
 (def board (reagent/cursor app-state [:board]))
 (def scores (reagent/cursor app-state [:scores]))
 (def current-player (reagent/cursor app-state [:player]))
+
 
 ;; -----------------------------------------
 ;; DISPLAY
