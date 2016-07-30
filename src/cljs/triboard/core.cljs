@@ -5,6 +5,8 @@
 
 (enable-console-print!)
 
+;; TODO - Try to plug the history of brower for "back"
+
 
 ;; -----------------------------------------
 ;; GAME PARAMETERS
@@ -16,6 +18,27 @@
 (def players [:blue :red :green])
 (def directions [[-1 0] [1 0] [0 -1] [0 1] [-1 1] [1 1] [-1 -1] [1 -1]])
 
+
+;; -----------------------------------------
+;; UTILS
+;; -----------------------------------------
+
+(defn fast-max-key
+  "Fast max key that avoids recomputing things several times"
+  [key-fn coll]
+  (apply max-key (memoize key-fn) coll))
+
+(def all-positions
+  (vec
+    (for [x (range board-width)
+          y (range board-height)]
+      [x y])))
+
+(defn coord-neighbors
+  "All neighbors of a given coordinate"
+  [[x y]]
+  (map (fn [[dx dy]] [(+ x dx) (+ y dy)]) directions))
+
 ;; -----------------------------------------
 ;; INIT THE BOARD
 ;; -----------------------------------------
@@ -23,12 +46,6 @@
 (def empty-board
   (let [column (vec (repeat board-height :empty))]
     (vec (repeat board-width column))))
-
-(def all-positions
-  (vec
-    (for [x (range board-width)
-          y (range board-height)]
-      [x y])))
 
 (defn draw-slices
   "Draw n * m slices from the collection"
@@ -120,10 +137,7 @@
     (transduce
       (available-moves-xf board)
       #(update-in %1 [(:winner %2) (:move %2)] conj %2)
-      {}
-      all-positions)
-    ))
-
+      {} all-positions)))
 
 ;; -----------------------------------------
 ;; ON PLAYER MOVE
@@ -173,14 +187,29 @@
 ;; ARTIFICIAL INTELLIGENCE
 ;; -----------------------------------------
 
-(defn fast-max-key
-  "Fast max key that avoids recomputing things several times"
-  [key-fn coll]
-  (apply max-key (memoize key-fn) coll))
+(defn compute-cell-strength
+  "Compute a cell strength based on the number of walls it has"
+  [board point]
+  (let [neighbors (coord-neighbors point)
+        walls (filter #(= :wall (get-in board % :wall)) neighbors)]
+    (+ 1 (* (count walls) 0.25))))
+
+(defn with-cells-strength
+  "Adds to a given game the strength of each of its cells"
+  [{:keys [board] :as game}]
+  (assoc game :cells-strength
+    (reduce
+      #(assoc %1 %2 (compute-cell-strength board %2))
+      {} all-positions)))
+
+#_(defn sum-strength
+   "Compute total strength of taking the provided cells"
+   [cells-strength taken-cells]
+   (transduce (map cells-strength) + taken-cells))
 
 (defn move-strength
   "Compute the strength of a move, based on the converted cells"
-  [converted-filter [move converted]]
+  [cells-strength converted-filter [move converted]]
   (transduce
     (comp
       (filter converted-filter)
@@ -193,7 +222,7 @@
   (let [converted-filter #(= looser (:looser %))
         all-moves (get-in game [:moves player])]
     (transduce
-      (map #(move-strength converted-filter %))
+      (map #(move-strength (:cells-strength game) converted-filter %))
       max all-moves)))
 
 (defn best-move
@@ -207,7 +236,7 @@
       (fast-max-key
         (fn [[m converted :as move]]
           (let [new-game (play-move game m)
-                diff-score (move-strength identity move)
+                diff-score (move-strength (:cells-strength game) identity move)
                 losses (map #(worst-immediate-loss new-game % player) others)]
             (- diff-score (apply max losses))))
         moves))
@@ -220,14 +249,15 @@
 
 (defn new-game []
   (with-available-moves
-    {:board (new-board)
-     :player (rand-nth players)
-     :moves {}
-     :help false
-     :scores
-     {:blue 12
-      :red 12
-      :green 12}}))
+    (with-cells-strength
+      {:board (new-board)
+       :player (rand-nth players)
+       :moves {}
+       :help false
+       :scores
+       {:blue 12
+        :red 12
+        :green 12}})))
 
 (defonce app-state (atom (new-game)))
 (def board (reagent/cursor app-state [:board]))
