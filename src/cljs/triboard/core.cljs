@@ -178,7 +178,9 @@
   [key-fn coll]
   (apply max-key (memoize key-fn) coll))
 
-(defn move-strength ;; TODO - Count taken is bad: select a better evaluation
+(defn move-strength
+  ;; TODO - Count taken is bad: select a better evaluation
+  ;; TODO - It requires however to change the initial scoring as well
   "Compute the strength value of a move"
   [move]
   (count (:taken move)))
