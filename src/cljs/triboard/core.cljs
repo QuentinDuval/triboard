@@ -191,11 +191,10 @@
    * And with move scope limitation"
   [moves move-filter]
   (fast-max-key
-    #(transduce
-       (comp
-         (filter move-filter)
-         (map move-strength))
-       + (second %))
+    (fn [[point converted]]
+      (transduce
+        (comp (filter move-filter) (map move-strength))
+        + converted))
     moves))
 
 (defn worst-immediate-loss
