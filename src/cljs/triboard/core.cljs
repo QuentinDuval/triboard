@@ -179,11 +179,13 @@
   (apply max-key (memoize key-fn) coll))
 
 (defn move-strength
-  ;; TODO - Count taken is bad: select a better evaluation
-  ;; TODO - It requires however to change the initial scoring as well
-  "Compute the strength value of a move"
-  [move]
-  (count (:taken move)))
+  "Compute the strength of a move, based on the converted cells"
+  [move-filter [move converted]]
+  (transduce
+    (comp
+      (filter move-filter)
+      (map (comp count :taken)))
+    + converted))
 
 (defn- best-immediate-move-with
   "Return the move with the highest immediate score increase:
@@ -191,10 +193,7 @@
    * And with move scope limitation"
   [moves move-filter]
   (fast-max-key
-    (fn [[point converted]]
-      (transduce
-        (comp (filter move-filter) (map move-strength))
-        + converted))
+    (partial move-strength move-filter)
     moves))
 
 (defn worst-immediate-loss
@@ -205,8 +204,7 @@
   (let [move-filter #(= looser (:looser %))
         all-moves (get-in game [:moves player])
         move (best-immediate-move-with all-moves move-filter)]
-    (transduce (map (comp count :taken)) + (second move))
-    ))
+    (move-strength move-filter move)))
 
 (defn best-move
   "[SIMPLISTIC] Return the best move for a player based on:
@@ -214,15 +212,14 @@
    * The worse immediate lost afterwards"
   [game player]
   (let [moves (get-in game [:moves player])
-        others (remove #{player} players)
-        score (get-in game [:scores player])]
+        others (remove #{player} players)]
     (first
       (fast-max-key
-        (fn [[m converted]]
+        (fn [[m converted :as move]]
           (let [new-game (play-move game m)
-                new-score (get-in new-game [:scores player]) ;; TODO - Use score heuristic here
+                diff-score (move-strength identity move)
                 losses (map #(worst-immediate-loss new-game % player) others)]
-            (- new-score (apply max losses))))
+            (- diff-score (apply max losses))))
         moves))
     ))
 
