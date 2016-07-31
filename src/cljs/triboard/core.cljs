@@ -27,6 +27,9 @@
 (def player? (set players))
 (def cell? (conj player? :wall :empty))
 
+(defn board? [b]
+  (every? #(every? cell? %) b))
+
 (defn coord? [p]
   (and
     (integer? (first p))
@@ -94,6 +97,7 @@
     (shuffle all-positions)))
 
 (defn new-board []
+  {:post [(board? %)]}
   (reduce
     (fn [r [color point]] (assoc-in r point color))
     empty-board (init-positions)))
@@ -133,15 +137,16 @@
 
 (defn available-moves-at
   "Provides the list of moves that can be done from a cell"
+  {:pre [(board? board) (coord? point)]}
   [board point]
   (eduction (keep #(available-cells-by-dir board point %)) directions))
 
 (defn take-empty-cell-move
   "Create a move to take an empty cell" 
-  [player pos]
+  [player point]
   {:winner player
    :looser :empty
-   :taken [pos]})
+   :taken [point]})
 
 (defn available-moves-xf
   "Transducer to get available moves on the map"
@@ -190,6 +195,7 @@
 
 (defn- apply-move
   [game {:keys [winner looser taken] :as move}]
+  {:pre [(move? move)]} 
   (-> game
     (assoc :board (reduce #(assoc-in %1 %2 winner) (:board game) taken))
     (update-in [:scores winner] + (count taken))

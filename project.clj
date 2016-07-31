@@ -7,6 +7,7 @@
   :dependencies [[org.clojure/clojure "1.8.0"]
                  [org.clojure/clojurescript "1.9.89" :scope "provided"]
                  [org.clojure/core.async "0.2.374"]
+                 [org.clojure/test.check "0.9.0"]
                  [com.cognitect/transit-clj "0.8.285"]
                  [ring "1.4.0"]
                  [ring/ring-defaults "0.2.0"]
