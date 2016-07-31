@@ -340,6 +340,7 @@
           (condp = msg
             :start-ai (let [auto-move (time (best-move @app-state (:player @app-state)))]
                         (swap! app-state play-move auto-move)
+                        (<! (async/timeout 500))
                         (put! ai-events :start-ai))
             )))
       
