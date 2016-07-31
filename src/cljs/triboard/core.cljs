@@ -1,7 +1,12 @@
 (ns triboard.core
   (:require
-    [reagent.core :as reagent :refer [atom]]
-    [clojure.string :as str]))
+    [clojure.string :as str]
+    [cljs.core.async :as async :refer [put! chan <! >!]]
+    [reagent.core :as reagent :refer [atom]])
+  (:require-macros
+    [cljs.core.async.macros :refer [go go-loop alt!]]
+    [reagent.ratom :refer [reaction]]))
+
 
 (enable-console-print!)
 (set! *assert* false) ;; Set to true for the debug mode
@@ -144,7 +149,8 @@
 (defn take-empty-cell-move
   "Create a move to take an empty cell" 
   [player point]
-  {:winner player
+  {:move point
+   :winner player
    :looser :empty
    :taken [point]})
 
@@ -195,7 +201,7 @@
 
 (defn- apply-move
   [game {:keys [winner looser taken] :as move}]
-  {:pre [(move? move)]} 
+  {:pre [(move? move)]}
   (-> game
     (assoc :board (reduce #(assoc-in %1 %2 winner) (:board game) taken))
     (update-in [:scores winner] + (count taken))
@@ -300,6 +306,49 @@
 (def scores (reagent/cursor app-state [:scores]))
 (def current-player (reagent/cursor app-state [:player]))
 
+(def player-is-blue (reaction (= @current-player :blue)))
+(def end-of-game (reaction (nil? @current-player)))
+
+;; -----------------------------------------
+;; GAME LOOP
+;; -----------------------------------------
+
+(defn start-game-loop
+  "Attempt at creating a game loop to manage the animation and game state"
+  []
+  (let [is-human (fn [_] @player-is-blue)
+        is-ai (fn [_] (and (not @end-of-game) (not @player-is-blue)))
+        ai-events (chan 1 (filter is-ai))
+        player-events (chan 1 (filter is-human))
+        game-events (chan 1)]
+    
+    (go-loop []
+      (alt!
+        player-events
+        ([coord]
+          (swap! app-state play-move coord)
+          (put! ai-events :start-ai))
+        
+        game-events
+        ([msg]
+          (when (= msg :new-game)
+            (reset! app-state (new-game))
+            (put! ai-events :start-ai)))
+        
+        ai-events
+        ([msg]
+          (condp = msg
+            :start-ai (let [auto-move (time (best-move @app-state (:player @app-state)))]
+                        (swap! app-state play-move auto-move)
+                        (put! ai-events :start-ai))
+            )))
+      
+      (recur))
+    {:game-events game-events
+     :player-events player-events}))
+
+(defonce game-loop (start-game-loop))
+
 
 ;; -----------------------------------------
 ;; DISPLAY
@@ -323,15 +372,8 @@
   [x y game]
   (rect-cell x y
     (if-not (show-help? game x y) "lightgray" "lightblue")
-    {:on-click
-     #_(swap! app-state play-move [x y])
-     (fn on-click [] ;; TODO - UGLY FOR TEST ONLY
-       (swap! app-state play-move [x y])
-       (while (and (:player @app-state) (not= :blue (:player @app-state)))
-         (let [auto-move (time (best-move @app-state (:player @app-state)))]
-            (swap! app-state play-move auto-move))
-         ))
-     }))
+    {:on-click #(put! (:player-events game-loop) [x y])}
+    ))
 
 (defn show-scores
   [scores player]
@@ -353,7 +395,7 @@
 (defn show-top-panel
   [scores player]
   [:div.scores
-   [top-panel-button #(reset! app-state (new-game)) (special-char "&#x21bb;")]
+   [top-panel-button #(put! (:game-events game-loop) :new-game) (special-char "&#x21bb;")]
    (show-scores scores player)
    [top-panel-button #(swap! app-state update :help not) "?"]])
 
