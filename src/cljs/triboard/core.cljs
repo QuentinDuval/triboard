@@ -313,6 +313,10 @@
 ;; GAME LOOP
 ;; -----------------------------------------
 
+(defn- handle-ai []
+  (let [move (time (best-move @app-state (:player @app-state)))]
+    (swap! app-state play-move move)))
+
 (defn start-game-loop
   "Attempt at creating a game loop to manage the animation and game state"
   []
@@ -322,29 +326,20 @@
         player-events (chan 1 (filter is-human))
         game-events (chan 1)]
     
-    (go-loop []
-      (alt!
-        player-events
-        ([coord]
-          (swap! app-state play-move coord)
-          (put! ai-events :start-ai))
-        
-        game-events
-        ([msg]
-          (when (= msg :new-game)
-            (reset! app-state (new-game))
-            (put! ai-events :start-ai)))
-        
-        ai-events
-        ([msg]
-          (condp = msg
-            :start-ai (let [auto-move (time (best-move @app-state (:player @app-state)))]
-                        (swap! app-state play-move auto-move)
-                        (<! (async/timeout 500))
-                        (put! ai-events :start-ai))
-            )))
-      
-      (recur))
+    (go
+      (while true
+        (alt!
+          player-events ([coord] (swap! app-state play-move coord))
+          game-events ([msg] (when (= msg :new-game) (reset! app-state (new-game))))
+          ai-events ([msg] (when (= msg :start-ai) (handle-ai)))
+          )))
+    
+    (go
+      (while true
+        (<! (async/timeout 1000))
+        (put! ai-events :start-ai)
+        ))
+    
     {:game-events game-events
      :player-events player-events}))
 
