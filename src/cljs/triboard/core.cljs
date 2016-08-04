@@ -331,14 +331,9 @@
         (alt!
           player-events ([coord] (swap! app-state play-move coord))
           game-events ([msg] (when (= msg :new-game) (reset! app-state (new-game))))
-          ai-events ([msg] (when (= msg :start-ai) (handle-ai)))
+          ai-events ([msg] (when (= msg :ai-play) (handle-ai)))
+          (async/timeout 1000) ([_] (put! ai-events :ai-play))
           )))
-    
-    (go
-      (while true
-        (<! (async/timeout 1000))
-        (put! ai-events :start-ai)
-        ))
     
     {:game-events game-events
      :player-events player-events}))
