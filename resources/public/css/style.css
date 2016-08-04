@@ -26,7 +26,8 @@ body
 
 .scores
 {
-	background-color: #2192E4;
+	background-color: #111;
+	//background-color: #2192E4;
 	text-align: center;
 	//margin: 10px 10px;
 	width: 100%;
@@ -35,29 +36,34 @@ body
 
 .score, .score--is-current
 {
-	background-color: #91c8ff;
+	background-color: #818181;
+	//background-color: #91c8ff;
 	position: relative;
 	margin: 10px 20px;
 	padding: 8px 10px;
 	display: inline-block;
+	width: 120px;
 	border-radius: 8px;
 } 
 
 .score
 {
-	border: 2px solid #2192E4;
+	border: 1px solid #818181;
+	//border: 2px solid #2192E4;
 }
 
 .score--is-current
 {
-	border: 2px solid black;
+	border: 1px solid #f1f1f1;
+	background-color: #f1f1f1;
+	//border: 2px solid black;
 }
 
 .help-button
 {
-    background-color: #91c8ff;
+	background-color: #111;
     border: none;
-    color: #2192E4;
+    color: #818181;
     margin: 10px 10px;
     text-align: center;
     display: inline-block;
@@ -65,7 +71,6 @@ body
     font-weight: bold;
     width: 40px;
     height: 38px;
-    border-radius: 8px;
 }
 
 .help-button:hover
