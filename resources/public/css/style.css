@@ -26,7 +26,7 @@ body
 
 .scores
 {
-	background-color: #111;
+	background-color: #222;
 	//background-color: #2192E4;
 	text-align: center;
 	//margin: 10px 10px;
@@ -43,7 +43,7 @@ body
 	padding: 8px 10px;
 	display: inline-block;
 	width: 120px;
-	border-radius: 8px;
+	border-radius: 4px;
 } 
 
 .score
@@ -54,14 +54,14 @@ body
 
 .score--is-current
 {
-	border: 1px solid #f1f1f1;
-	background-color: #f1f1f1;
+	border: 1px solid #c0c0c0;
+	background-color: #c0c0c0;
 	//border: 2px solid black;
 }
 
 .help-button
 {
-	background-color: #111;
+	background-color: #222;
     border: none;
     color: #818181;
     margin: 10px 10px;
@@ -71,10 +71,11 @@ body
     font-weight: bold;
     width: 40px;
     height: 38px;
+    outline: none;
 }
 
 .help-button:hover
 {
-    color: #f1f1f1;
+    color: #c0c0c0;
 }
 
