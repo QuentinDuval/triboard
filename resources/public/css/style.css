@@ -67,3 +67,9 @@ body
     height: 38px;
     border-radius: 8px;
 }
+
+.help-button:hover
+{
+    color: #f1f1f1;
+}
+
