@@ -10,51 +10,60 @@ body
   	font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
   	font-weight: 100;
   	font-size: 14px;
+  	margin: 0px 0px;
+}
+
+.board
+{
+	margin: 10px 10px;
 }
 
 .cell
 {
 	//transition-delay: 0.1s;
-	transition-duration: 0.5s;
+	transition-duration: 0.75s;
 }
 
 .scores
 {
+	background-color: #2192E4;
 	text-align: center;
-	margin: 10px 10px;
+	//margin: 10px 10px;
 	width: 100%;
 	font-size: 20px;
 }
 
-.score
+.score, .score--is-current
 {
+	background-color: #91c8ff;
 	position: relative;
 	margin: 10px 20px;
-	padding: 10px 10px;
+	padding: 8px 10px;
 	display: inline-block;
-	border: 2px solid #e5e5df;
 	border-radius: 8px;
+} 
+
+.score
+{
+	border: 2px solid #2192E4;
 }
 
 .score--is-current
 {
-	position: relative;
-	margin: 10px 20px;
-	padding: 10px 10px;
-	display: inline-block;
-	border: 2px solid #B7B7B7;
-	border-radius: 8px;
+	border: 2px solid black;
 }
 
 .help-button
 {
-    background-color: #2192E4;
+    background-color: #91c8ff;
     border: none;
-    color: white;
+    color: #2192E4;
     margin: 10px 10px;
-    padding: 5px 10px;
     text-align: center;
     display: inline-block;
-    font-size: 20px;
+    font-size: 24px;
+    font-weight: bold;
+    width: 40px;
+    height: 38px;
     border-radius: 8px;
 }

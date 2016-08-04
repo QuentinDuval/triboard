@@ -14,6 +14,7 @@
 
 ;; TODO - Try to plug the history of brower for "back"
 ;; TODO - Try to bring some domain vocabulary here: it gets too complicated to trace
+;; TODO - http://www.w3schools.com/howto/howto_js_sidenav.asp
 
 ;; -----------------------------------------
 ;; GAME PARAMETERS
