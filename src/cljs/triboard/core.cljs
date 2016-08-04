@@ -2,6 +2,7 @@
   (:require
     [clojure.string :as str]
     [cljs.core.async :as async :refer [put! chan <! >!]]
+    [goog.dom :as dom]
     [reagent.core :as reagent :refer [atom]])
   (:require-macros
     [cljs.core.async.macros :refer [go go-loop alt!]]
@@ -390,12 +391,16 @@
    (show-scores scores player)
    [top-panel-button #(swap! app-state update :help not) "?"]])
 
+(defn max-board-height []
+  (* 0.8 (-> (dom/getWindow) dom/getViewportSize .-height)))
+
 (defn run-game []
-  [:div
+  [:div.game-panel
    [show-top-panel @scores @current-player]
    (into
-     [:svg#board
-      {:view-box (str "0 0 " board-width " " board-height)}]
+     [:svg.board
+      {:view-box (str "0 0 " board-width " " board-height)
+       :style {:max-height (str (max-board-height) "px")}}]
      (for [[x y] all-positions]
        ^{:key [x y]}
        (case (get-in @app-state [:board x y])
