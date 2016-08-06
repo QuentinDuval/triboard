@@ -423,7 +423,7 @@
    [top-panel-button #(put! (:game-events game-loop) :new-game) (special-char "&#x21bb;")]
    (show-scores scores player)
    [top-panel-button #(swap! app-state update :help not) "?"]
-   [top-panel-button cancel-last-move! (special-char "&#x2190;")]])
+   [top-panel-button cancel-last-move! (special-char "&#x21A9;")]])
 
 (defn max-board-height []
   (- (-> (dom/getWindow) dom/getViewportSize .-height) 100))
