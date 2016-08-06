@@ -391,7 +391,10 @@
 
 (defn ^boolean show-help?
   [game x y]
-  (and (:help @app-state) (get-move-at game (:player game) [x y])))
+  (and
+    (:help @app-state) ;; TODO - Refactor not to use globals
+    (not (is-ai? (:player game)))
+    (get-move-at game (:player game) [x y])))
 
 (defn empty-cell
   [x y game]
