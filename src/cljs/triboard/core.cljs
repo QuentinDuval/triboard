@@ -264,11 +264,11 @@
 (defn- worst-immediate-loss
   "Return the next worse lost game move for 'looser' if 'player' plays"
   {:pre [(player? player) (player? looser)]}
-  [game player looser]
+  [cells-strength game player looser]
   (let [converted-filter #(= looser (:looser %))
         all-moves (get-in game [:moves player])]
     (transduce
-      (map #(move-strength (:cells-strength game) converted-filter %))
+      (map #(move-strength cells-strength converted-filter %))
       max all-moves)))
 
 (defn best-move
@@ -276,15 +276,15 @@
    * The immediate gain
    * The worse immediate lost afterwards"
   {:pre [(player? player)]}
-  [game player]
+  [cells-strength game player]
   (let [moves (get-in game [:moves player])
         others (remove #{player} players)]
     (first
       (fast-max-key
         (fn [[m converted :as move]]
           (let [new-game (play-move game m)
-                diff-score (move-strength (:cells-strength game) identity move)
-                losses (map #(worst-immediate-loss new-game % player) others)]
+                diff-score (move-strength cells-strength identity move)
+                losses (map #(worst-immediate-loss cells-strength new-game % player) others)]
             (- diff-score (apply max losses))))
         moves))
     ))
@@ -299,9 +299,11 @@
     (with-available-moves
       {:board board
        :player (rand-nth players)
-       :cells-strength (compute-cells-strength board)
        :moves {}
        :help false
+       :ai-players
+       {:red (partial best-move (compute-cells-strength board))
+        :green (partial best-move (compute-cells-strength board))}
        :scores
        {:blue 12
         :red 12
@@ -311,15 +313,11 @@
 (def board (reagent/cursor app-state [:board]))
 (def scores (reagent/cursor app-state [:scores]))
 (def current-player (reagent/cursor app-state [:player]))
+(def ai-players (reagent/cursor app-state [:ai-players]))
 (def end-of-game (reaction (nil? @current-player)))
 
-(def players-ai-algorithms
-  {:red best-move
-   :green best-move})
-
-(defn is-human?
-  [player]
-  (not (contains? players-ai-algorithms player)))
+(defn is-ai? [player]
+  (contains? @ai-players player))
 
 
 ;; -----------------------------------------
@@ -327,7 +325,7 @@
 ;; -----------------------------------------
 
 (defn- handle-ai []
-  (let [ai-algo (get players-ai-algorithms @current-player)
+  (let [ai-algo (get @ai-players @current-player)
         move (ai-algo @app-state @current-player)]
     (swap! app-state play-move move)))
 
@@ -335,8 +333,8 @@
   "Manage transitions between player moves, ai moves, and generic game events"
   []
   (let [game-on-xf (fn [_] (not @end-of-game))
-        is-human-xf (fn [_] (is-human? @current-player))
-        is-ai-xf (fn [_] (not (is-human? @current-player)))
+        is-human-xf (fn [_] (not (is-ai? @current-player)))
+        is-ai-xf (fn [_] (is-ai? @current-player))
         ai-events (chan 1 (comp (filter game-on-xf) (filter is-ai-xf)))
         player-events (chan 1 (comp (filter game-on-xf) (filter is-human-xf)))
         game-events (chan 1)]
