@@ -339,7 +339,8 @@
       (let [ai-turn? #(contains? (:ai-players %) (:player %))
             new-list (drop-while ai-turn? (drop 1 old-list))]
         (if (empty? new-list)
-          old-list new-list)))
+          (take-last 1 old-list)
+          new-list)))
     ))
 
 
@@ -359,20 +360,17 @@
         is-human-xf (fn [_] (not (is-ai? @current-player)))
         is-ai-xf (fn [_] (is-ai? @current-player))
         ai-events (chan 1 (comp (filter game-on-xf) (filter is-ai-xf)))
-        player-events (chan 1 (comp (filter game-on-xf) (filter is-human-xf)))
-        game-events (chan 1)]
+        player-events (chan 1 (comp (filter game-on-xf) (filter is-human-xf)))]
     
     (go
       (while true
         (alt!
           player-events ([coord] (update-game! play-move coord))
-          game-events ([msg] (when (= msg :new-game) (new-game!)))
           ai-events ([msg] (when (= msg :ai-play) (handle-ai!)))
           (async/timeout ai-move-delay) ([_] (put! ai-events :ai-play))
           )))
     
-    {:game-events game-events
-     :player-events player-events}))
+    player-events))
 
 (defonce game-loop (start-game-loop))
 
@@ -399,7 +397,7 @@
   [x y game]
   (rect-cell x y
     (if-not (show-help? game x y) "lightgray" "lightblue")
-    {:on-click #(put! (:player-events game-loop) [x y])}
+    {:on-click #(put! game-loop [x y])}
     ))
 
 (defn show-scores
@@ -423,7 +421,7 @@
 (defn show-top-panel
   [scores player]
   [:div.scores
-   [top-panel-button #(put! (:game-events game-loop) :new-game) (special-char "&#9733;")]
+   [top-panel-button new-game! (special-char "&#9733;")]
    [top-panel-button #(swap! app-state update :help not) "?"]
    (show-scores scores player)
    [top-panel-button restart-game! (special-char "&#x21bb;")]
