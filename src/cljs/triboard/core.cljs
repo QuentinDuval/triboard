@@ -330,12 +330,21 @@
 (defn is-ai? [player]
   (contains? @ai-players player))
 
+(defn cancel-last-move! []
+  (swap! app-state update-in [:games]
+    (fn [old-list]
+      (let [ai-turn? #(contains? (:ai-players %) (:player %))
+            new-list (drop-while ai-turn? (drop 1 old-list))]
+        (if (empty? new-list)
+          old-list new-list)))
+    ))
+
 
 ;; -----------------------------------------
 ;; GAME LOOP
 ;; -----------------------------------------
 
-(defn- handle-ai []
+(defn- handle-ai! []
   (let [ai-algo (get @ai-players @current-player)
         move (ai-algo @game @current-player)]
     (update-game! play-move move)))
@@ -355,7 +364,7 @@
         (alt!
           player-events ([coord] (update-game! play-move coord))
           game-events ([msg] (when (= msg :new-game) (new-game!)))
-          ai-events ([msg] (when (= msg :ai-play) (handle-ai)))
+          ai-events ([msg] (when (= msg :ai-play) (handle-ai!)))
           (async/timeout ai-move-delay) ([_] (put! ai-events :ai-play))
           )))
     
@@ -413,7 +422,8 @@
   [:div.scores
    [top-panel-button #(put! (:game-events game-loop) :new-game) (special-char "&#x21bb;")]
    (show-scores scores player)
-   [top-panel-button #(swap! app-state update :help not) "?"]])
+   [top-panel-button #(swap! app-state update :help not) "?"]
+   [top-panel-button cancel-last-move! (special-char "&#x2190;")]])
 
 (defn max-board-height []
   (- (-> (dom/getWindow) dom/getViewportSize .-height) 100))
