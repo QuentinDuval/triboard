@@ -27,7 +27,7 @@ body
 .scores
 {
 	background-color: #222;
-	//background-color: #2192E4;
+	//background-color: #0e4670;
 	text-align: center;
 	//margin: 10px 10px;
 	width: 100%;
@@ -36,8 +36,7 @@ body
 
 .score, .score--is-current
 {
-	background-color: #818181;
-	//background-color: #91c8ff;
+	//background-color: #818181;
 	position: relative;
 	margin: 10px 20px;
 	padding: 8px 10px;
@@ -48,22 +47,43 @@ body
 
 .score
 {
-	border: 1px solid #818181;
-	//border: 2px solid #2192E4;
+	//border: 2px solid #818181;
+}
+
+.score--blue
+{
+	//border: 3px solid lightblue;
+	background-color: lightblue;
+	color: #00009b;
+}
+
+.score--red
+{
+	//border: 3px solid #ffaaaa;
+	background-color: #ffaaaa;
+	color: #c40000;
+}
+
+.score--green
+{
+	//border: 3px solid lightgreen;
+	background-color: lightgreen;
+	color: green;
 }
 
 .score--is-current
 {
-	border: 1px solid #c0c0c0;
-	background-color: #c0c0c0;
-	//border: 2px solid black;
+	//border: 3px solid #818181;
+	//background-color: #c0c0c0;
 }
 
 .help-button
 {
 	background-color: #222;
+	//background-color: #0e4670;
     border: none;
-    color: #818181;
+    //color: #818181;
+    color: #c0c0c0;
     margin: 10px 10px;
     text-align: center;
     display: inline-block;
@@ -76,6 +96,7 @@ body
 
 .help-button:hover
 {
-    color: #c0c0c0;
+    //color: #c0c0c0;
+    color: white;
 }
 

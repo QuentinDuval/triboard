@@ -320,7 +320,7 @@
     (swap! app-state play-move move)))
 
 (defn start-game-loop
-  "Attempt at creating a game loop to manage the animation and game state"
+  "Manage transitions between player moves, ai moves, and generic game events"
   []
   (let [is-human (fn [_] @player-is-blue)
         is-ai (fn [_] (and (not @end-of-game) (not @player-is-blue)))
@@ -374,7 +374,8 @@
   (for [p players]
     ^{:key p}
     [(if (= player p) :div.score--is-current :div.score)
-     (str (str/capitalize (name p)) ": " (get scores p))]
+     {:class (str "score--" (name p))}
+     (str (str/capitalize (name p)) " - " (get scores p))]
     ))
 
 (defn special-char
@@ -393,7 +394,7 @@
    [top-panel-button #(swap! app-state update :help not) "?"]])
 
 (defn max-board-height []
-  (* 0.8 (-> (dom/getWindow) dom/getViewportSize .-height)))
+  (- (-> (dom/getWindow) dom/getViewportSize .-height) 100))
 
 (defn run-game []
   [:div.game-panel
