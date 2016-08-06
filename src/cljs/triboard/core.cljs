@@ -310,19 +310,22 @@
         :red init-block-count
         :green init-block-count}})))
 
-(defonce app-state (atom (new-game)))
-(def game (reagent/cursor app-state [])) 
-(def board (reagent/cursor game [:board]))
-(def scores (reagent/cursor game [:scores]))
-(def current-player (reagent/cursor game [:player]))
-(def ai-players (reagent/cursor game [:ai-players]))
+(defonce app-state
+  (atom {:games (list (new-game))
+         :help false}))
+
+(def game (reaction (first (get-in @app-state [:games])))) 
+(def board (reaction (get-in @game [:board])))
+(def scores (reaction (get-in @game [:scores])))
+(def current-player (reaction (get-in @game [:player])))
+(def ai-players (reaction (get-in @game [:ai-players])))
 (def end-of-game (reaction (nil? @current-player)))
 
 (defn update-game! [f & args]
-  (swap! app-state #(apply f % args)))
+  (swap! app-state update-in [:games] conj (apply f @game args)))
 
 (defn new-game! []
-  (reset! app-state (new-game)))
+  (swap! app-state assoc-in [:games] (list (new-game))))
 
 (defn is-ai? [player]
   (contains? @ai-players player))
@@ -378,7 +381,7 @@
 
 (defn ^boolean show-help?
   [game x y]
-  (and (:help game) (get-move-at game (:player game) [x y])))
+  (and (:help @app-state) (get-move-at game (:player game) [x y])))
 
 (defn empty-cell
   [x y game]
