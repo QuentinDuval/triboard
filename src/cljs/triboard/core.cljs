@@ -25,7 +25,7 @@
 (def init-block-count 12) ;; Init blocks for red, blue, green, gray
 (def players [:blue :red :green])
 (def directions [[-1 0] [1 0] [0 -1] [0 1] [-1 1] [1 1] [-1 -1] [1 -1]])
-
+(def max-score (- (* 16 11) 12))
 
 ;; -----------------------------------------
 ;; EXTRINSIC TYPES
@@ -52,7 +52,7 @@
 
 (defn scores? [s]
   (and
-    (<= 0 (reduce + (vals s)) 164)
+    (<= 0 (reduce + (vals s)) max-score)
     (every? s players)))
 
 
@@ -236,8 +236,9 @@
   {:pre [(coord? point)]}
   [board point]
   (let [neighbors (coord-neighbors point)
-        walls (filter #(= :wall (get-in board % :wall)) neighbors)]
-    (+ 1 (* (count walls) 0.25))))
+        walls (filter #(= :wall (get-in board % :wall)) neighbors)
+        count-wall (count walls)]
+    (+ 1 (* count-wall count-wall 0.25))))
 
 (defn with-cells-strength
   "Adds to a given game the strength of each of its cells"
@@ -249,14 +250,16 @@
 
 (defn- move-strength
   "Compute the strength of a move, based on the converted cells"
-  [cells-strength converted-filter [move converted]]
+  [cells-strength converted-filter [point converted]]
   {:pre [(fn? converted-filter) (every? move? converted)]}
   (transduce
     (comp
       (filter converted-filter) ;; TODO - Extract this part (specific to worst move)
       (mapcat :taken)
       (map cells-strength))
-    + converted))
+    +
+    (cells-strength point)
+    converted))
 
 (defn- worst-immediate-loss
   "Return the next worse lost game move for 'looser' if 'player' plays"
