@@ -330,6 +330,9 @@
 (defn is-ai? [player]
   (contains? @ai-players player))
 
+(defn restart-game! []
+  (swap! app-state update-in [:games] #(take-last 1 %)))
+
 (defn cancel-last-move! []
   (swap! app-state update-in [:games]
     (fn [old-list]
@@ -420,9 +423,10 @@
 (defn show-top-panel
   [scores player]
   [:div.scores
-   [top-panel-button #(put! (:game-events game-loop) :new-game) (special-char "&#x21bb;")]
-   (show-scores scores player)
+   [top-panel-button #(put! (:game-events game-loop) :new-game) (special-char "&#9733;")]
    [top-panel-button #(swap! app-state update :help not) "?"]
+   (show-scores scores player)
+   [top-panel-button restart-game! (special-char "&#x21bb;")]
    [top-panel-button cancel-last-move! (special-char "&#x21A9;")]])
 
 (defn max-board-height []
