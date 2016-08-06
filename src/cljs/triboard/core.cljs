@@ -241,13 +241,12 @@
         count-wall (count walls)]
     (+ 1 (* count-wall count-wall 0.25))))
 
-(defn with-cells-strength
+(defn compute-cells-strength
   "Adds to a given game the strength of each of its cells"
-  [{:keys [board] :as game}]
-  (assoc game :cells-strength
-    (reduce
-      #(assoc %1 %2 (compute-cell-strength board %2))
-      {} all-positions)))
+  [board]
+  (reduce
+    #(assoc %1 %2 (compute-cell-strength board %2))
+    {} all-positions))
 
 (defn- move-strength
   "Compute the strength of a move, based on the converted cells"
@@ -296,10 +295,11 @@
 ;; -----------------------------------------
 
 (defn new-game []
-  (with-available-moves
-    (with-cells-strength
-      {:board (new-board)
+  (let [board (new-board)]
+    (with-available-moves
+      {:board board
        :player (rand-nth players)
+       :cells-strength (compute-cells-strength board)
        :moves {}
        :help false
        :scores
