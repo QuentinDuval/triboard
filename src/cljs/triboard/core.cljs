@@ -216,7 +216,7 @@
   (get-in game [:moves player point]))
 
 (defn play-move
-  "On player playing the move [x y]"
+  "On player playing the move [x y] - update all the game state accordingly"
   [{:keys [player board] :as game} point]
   (if-let [moves (get-move-at game player point)]
     (->
