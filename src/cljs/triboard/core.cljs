@@ -15,6 +15,7 @@
 ;; TODO - Try to plug the history of brower for "back"
 ;; TODO - Try to bring some domain vocabulary here: it gets too complicated to trace
 ;; TODO - http://www.w3schools.com/howto/howto_js_sidenav.asp
+;; TODO - http://www.w3schools.com/svg/svg_grad_radial.asp
 
 ;; -----------------------------------------
 ;; GAME PARAMETERS
@@ -25,7 +26,7 @@
 (def init-block-count 12) ;; Init blocks for red, blue, green, gray
 (def players [:blue :red :green])
 (def directions [[-1 0] [1 0] [0 -1] [0 1] [-1 1] [1 1] [-1 -1] [1 -1]])
-(def max-score (- (* 16 11) 12))
+(def max-score (- (* board-width board-height) init-block-count))
 
 ;; -----------------------------------------
 ;; EXTRINSIC TYPES
@@ -310,25 +311,34 @@
 (def board (reagent/cursor app-state [:board]))
 (def scores (reagent/cursor app-state [:scores]))
 (def current-player (reagent/cursor app-state [:player]))
-
-(def player-is-blue (reaction (= @current-player :blue)))
 (def end-of-game (reaction (nil? @current-player)))
+
+(def players-ai-algorithms
+  {:red best-move
+   :green best-move})
+
+(defn is-human?
+  [player]
+  (not (contains? players-ai-algorithms player)))
+
 
 ;; -----------------------------------------
 ;; GAME LOOP
 ;; -----------------------------------------
 
 (defn- handle-ai []
-  (let [move (time (best-move @app-state (:player @app-state)))]
+  (let [ai-algo (get players-ai-algorithms @current-player)
+        move (ai-algo @app-state @current-player)]
     (swap! app-state play-move move)))
 
 (defn start-game-loop
   "Manage transitions between player moves, ai moves, and generic game events"
   []
-  (let [is-human (fn [_] @player-is-blue)
-        is-ai (fn [_] (and (not @end-of-game) (not @player-is-blue)))
-        ai-events (chan 1 (filter is-ai))
-        player-events (chan 1 (filter is-human))
+  (let [game-on-xf (fn [_] (not @end-of-game))
+        is-human-xf (fn [_] (is-human? @current-player))
+        is-ai-xf (fn [_] (not (is-human? @current-player)))
+        ai-events (chan 1 (comp (filter game-on-xf) (filter is-ai-xf)))
+        player-events (chan 1 (comp (filter game-on-xf) (filter is-human-xf)))
         game-events (chan 1)]
     
     (go
