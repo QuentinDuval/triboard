@@ -27,18 +27,15 @@ body
 .scores
 {
 	background-color: #222;
-	//background-color: #0e4670;
 	text-align: center;
-	//margin: 10px 10px;
 	width: 100%;
 	font-size: 20px;
 }
 
 .score, .score--is-current
 {
-	//background-color: #818181;
 	position: relative;
-	margin: 10px 20px;
+	margin: 10px 4%;
 	padding: 8px 10px;
 	display: inline-block;
 	width: 120px;
@@ -47,44 +44,39 @@ body
 
 .score
 {
-	//border: 2px solid #818181;
+	border: 3px solid #222;
+	border-radius: 4px;
 }
 
 .score--blue
 {
-	//border: 3px solid lightblue;
 	background-color: lightblue;
 	color: #00009b;
 }
 
 .score--red
 {
-	//border: 3px solid #ffaaaa;
 	background-color: #ffaaaa;
 	color: #c40000;
 }
 
 .score--green
 {
-	//border: 3px solid lightgreen;
 	background-color: lightgreen;
-	color: green;
+	color: #006600;
 }
 
 .score--is-current
 {
-	//border: 3px solid #818181;
-	//background-color: #c0c0c0;
+	border: 3px solid white;
 }
 
 .help-button
 {
 	background-color: #222;
-	//background-color: #0e4670;
     border: none;
-    //color: #818181;
     color: #c0c0c0;
-    margin: 10px 10px;
+    margin: 10px 2%;
     text-align: center;
     display: inline-block;
     font-size: 24px;
@@ -96,7 +88,6 @@ body
 
 .help-button:hover
 {
-    //color: #c0c0c0;
     color: white;
 }
 
