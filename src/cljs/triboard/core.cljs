@@ -262,7 +262,7 @@
     (cells-strength point)
     converted))
 
-(defn- worst-immediate-loss
+(defn- worst-immediate-loss ;; TODO - Does not take into account the move itself
   "Return the next worse lost game move for 'looser' if 'player' plays"
   {:pre [(player? player) (player? looser)]}
   [cells-strength game player looser]
@@ -311,11 +311,18 @@
         :green init-block-count}})))
 
 (defonce app-state (atom (new-game)))
-(def board (reagent/cursor app-state [:board]))
-(def scores (reagent/cursor app-state [:scores]))
-(def current-player (reagent/cursor app-state [:player]))
-(def ai-players (reagent/cursor app-state [:ai-players]))
+(def game (reagent/cursor app-state [])) 
+(def board (reagent/cursor game [:board]))
+(def scores (reagent/cursor game [:scores]))
+(def current-player (reagent/cursor game [:player]))
+(def ai-players (reagent/cursor game [:ai-players]))
 (def end-of-game (reaction (nil? @current-player)))
+
+(defn update-game! [f & args]
+  (swap! app-state #(apply f % args)))
+
+(defn new-game! []
+  (reset! app-state (new-game)))
 
 (defn is-ai? [player]
   (contains? @ai-players player))
@@ -327,8 +334,8 @@
 
 (defn- handle-ai []
   (let [ai-algo (get @ai-players @current-player)
-        move (ai-algo @app-state @current-player)]
-    (swap! app-state play-move move)))
+        move (ai-algo @game @current-player)]
+    (update-game! play-move move)))
 
 (defn start-game-loop
   "Manage transitions between player moves, ai moves, and generic game events"
@@ -343,8 +350,8 @@
     (go
       (while true
         (alt!
-          player-events ([coord] (swap! app-state play-move coord))
-          game-events ([msg] (when (= msg :new-game) (reset! app-state (new-game))))
+          player-events ([coord] (update-game! play-move coord))
+          game-events ([msg] (when (= msg :new-game) (new-game!)))
           ai-events ([msg] (when (= msg :ai-play) (handle-ai)))
           (async/timeout ai-move-delay) ([_] (put! ai-events :ai-play))
           )))
@@ -417,8 +424,8 @@
        :style {:max-height (str (max-board-height) "px")}}]
      (for [[x y] all-positions]
        ^{:key [x y]}
-       (case (get-in @app-state [:board x y])
-         :empty [empty-cell x y @app-state]
+       (case (get-in @board [x y])
+         :empty [empty-cell x y @game]
          :blue [rect-cell x y "blue"]
          :red [rect-cell x y "red"]
          :green [rect-cell x y "green"]
