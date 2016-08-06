@@ -27,6 +27,7 @@
 (def players [:blue :red :green])
 (def directions [[-1 0] [1 0] [0 -1] [0 1] [-1 1] [1 1] [-1 -1] [1 -1]])
 (def max-score (- (* board-width board-height) init-block-count))
+(def ai-move-delay 1000)
 
 ;; -----------------------------------------
 ;; EXTRINSIC TYPES
@@ -305,9 +306,9 @@
        {:red (partial best-move (compute-cells-strength board))
         :green (partial best-move (compute-cells-strength board))}
        :scores
-       {:blue 12
-        :red 12
-        :green 12}})))
+       {:blue init-block-count
+        :red init-block-count
+        :green init-block-count}})))
 
 (defonce app-state (atom (new-game)))
 (def board (reagent/cursor app-state [:board]))
@@ -345,7 +346,7 @@
           player-events ([coord] (swap! app-state play-move coord))
           game-events ([msg] (when (= msg :new-game) (reset! app-state (new-game))))
           ai-events ([msg] (when (= msg :ai-play) (handle-ai)))
-          (async/timeout 1000) ([_] (put! ai-events :ai-play))
+          (async/timeout ai-move-delay) ([_] (put! ai-events :ai-play))
           )))
     
     {:game-events game-events
