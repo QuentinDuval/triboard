@@ -390,11 +390,9 @@
   [x y player options]
   [:rect.cell
    (merge
-     {:x (+ 0.05 x) :width  0.9
-      :y (+ 0.05 y) :height 0.9
-      ;; :fill color
-      :class (str "cell--" (name player))
-      }
+     {:class (str "cell--" (name player))
+      :x (+ 0.05 x) :width  0.9
+      :y (+ 0.05 y) :height 0.9}
      options)
    ])
 
@@ -449,14 +447,12 @@
      [:svg.board
       {:view-box (str "0 0 " board-width " " board-height)
        :style {:max-height (str (max-board-height) "px")}}]
-     (for [[x y] all-positions]
+     (for [[x y] all-positions
+           :let [cell (get-in @board [x y])]]
        ^{:key [x y]}
-       (case (get-in @board [x y])
+       (case cell
          :empty [empty-cell x y @game] ;; TODO - Help cell somewhere here
-         :blue [rect-cell x y :blue] ;; TODO - Factorize
-         :red [rect-cell x y :red]
-         :green [rect-cell x y :green]
-         :wall [rect-cell x y :wall]
+                [rect-cell x y cell]
          )))
    ])
 
