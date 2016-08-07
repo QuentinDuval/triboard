@@ -12,7 +12,6 @@
 (enable-console-print!)
 (set! *assert* false) ;; Set to true for the debug mode
 
-;; TODO - Try to plug the history of brower for "back"
 ;; TODO - Try to bring some domain vocabulary here: it gets too complicated to trace
 ;; TODO - http://www.w3schools.com/howto/howto_js_sidenav.asp
 ;; TODO - http://www.w3schools.com/svg/svg_grad_radial.asp
@@ -337,23 +336,20 @@
         move (ai-algo @game @current-player)]
     (update-game! play-move move)))
 
-(defn cancel-last-move! []
-  (swap! app-state update-in [:games]
-    (fn [old-list]
-      (let [ai-turn? #(contains? (:ai-players %) (:player %))
-            new-list (drop-while ai-turn? (drop 1 old-list))]
-        (if (empty? new-list)
-          (take-last 1 old-list)
-          new-list)))
-    ))
+(defn cancel-last-move
+  [old-turns]
+  (let [ai-turn? #(contains? (:ai-players %) (:player %))
+        new-turns (drop-while ai-turn? (drop 1 old-turns))]
+    (if (empty? new-turns)
+      (take-last 1 old-turns)
+      new-turns)))
 
 (defn- handle-game-event!
   [msg]
   (case msg
     :new-game (swap! app-state assoc-in [:games] (list (new-game)))
     :restart (swap! app-state update-in [:games] #(take-last 1 %))
-    :undo (cancel-last-move!)
-    ))
+    :undo (swap! app-state update-in [:games] cancel-last-move)))
 
 (defn start-game-loop
   "Manage transitions between player moves, ai moves, and generic game events"
