@@ -370,9 +370,13 @@
           (async/timeout ai-move-delay) ([_] (put! ai-events :ai-play))
           )))
     
-    player-events))
+    {:player-events player-events}
+    ))
 
 (defonce game-loop (start-game-loop))
+
+(def send-player-event!
+  (partial put! (game-loop :player-events)))
 
 
 ;; -----------------------------------------
@@ -400,7 +404,7 @@
   [x y game]
   (rect-cell x y
     (if-not (show-help? game x y) "lightgray" "lightblue")
-    {:on-click #(put! game-loop [x y])}
+    {:on-click #(send-player-event! [x y])}
     ))
 
 (defn show-scores
