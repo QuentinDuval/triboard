@@ -261,7 +261,7 @@
     (cells-strength point)
     converted))
 
-(defn- worst-immediate-loss ;; TODO - Does not take into account the move itself
+(defn- worst-immediate-loss
   "Return the next worse lost game move for 'looser' if 'player' plays"
   {:pre [(player? player) (player? looser)]}
   [cells-strength game player looser]
