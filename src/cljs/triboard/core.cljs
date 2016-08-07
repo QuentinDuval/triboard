@@ -264,7 +264,7 @@
     (cells-strength point)
     converted))
 
-(defn- worst-immediate-loss
+(defn- worst-immediate-loss ;; TODO - It should consider what the other player could win
   "Return the next worse lost game move for 'looser' if 'player' plays"
   {:pre [(player? player) (player? looser)]}
   [cells-strength game player looser]
