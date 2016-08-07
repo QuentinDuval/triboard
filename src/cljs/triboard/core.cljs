@@ -27,6 +27,9 @@
 (def directions [[-1 0] [1 0] [0 -1] [0 1] [-1 1] [1 1] [-1 -1] [1 -1]])
 (def max-score (- (* board-width board-height) init-block-count))
 (def ai-move-delay 1000)
+(defn max-board-height []
+  (* (-> (dom/getWindow) dom/getViewportSize .-height) 0.85))
+
 
 ;; -----------------------------------------
 ;; EXTRINSIC TYPES
@@ -386,6 +389,13 @@
 ;; DISPLAY
 ;; -----------------------------------------
 
+(defn ^boolean show-help?
+  [x y]
+  (and
+    (:help @app-state)
+    (not (is-ai? @current-player))
+    (get-move-at @game @current-player [x y])))
+
 (defn rect-cell
   [x y player options]
   [:rect.cell
@@ -394,13 +404,6 @@
       :x (+ 0.05 x) :width  0.9
       :y (+ 0.05 y) :height 0.9}
      options)])
-
-(defn ^boolean show-help?
-  [x y]
-  (and
-    (:help @app-state)
-    (not (is-ai? @current-player))
-    (get-move-at @game @current-player [x y])))
 
 (defn empty-cell
   [x y player]
@@ -433,9 +436,6 @@
    (show-scores scores player)
    [top-panel-button #(send-game-event! :restart) (special-char "&#x21bb;")]
    [top-panel-button #(send-game-event! :undo) (special-char "&#x21A9;")]])
-
-(defn max-board-height []
-  (* (-> (dom/getWindow) dom/getViewportSize .-height) 0.85))
 
 (defn run-game []
   [:div.game-panel
