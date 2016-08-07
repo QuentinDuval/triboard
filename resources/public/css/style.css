@@ -43,9 +43,10 @@ body
 	fill: lightgray;
 }
 
-.cell--help
+.cell--empty:hover, .cell--help
 {
-	fill: lightblue;
+    fill: lightblue;
+    transition-duration: 0s;
 }
 
 .cell--wall
