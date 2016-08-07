@@ -53,7 +53,7 @@ body
 .cell--empty:hover, .cell--help
 {
     fill: blue;
-    fill-opacity: 0.15;
+    fill-opacity: 0.25;
 }
 
 .cell--empty:hover
