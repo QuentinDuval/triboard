@@ -21,6 +21,7 @@ body
 {
 	//transition-delay: 0.1s;
 	transition-duration: 0.75s;
+	shape-rendering: crispEdges;
 }
 
 .cell--blue
@@ -41,17 +42,28 @@ body
 .cell--empty
 {
 	fill: lightgray;
-}
-
-.cell--empty:hover, .cell--help
-{
-    fill: lightblue;
-    transition-duration: 0s;
+	transition-duration: 0s;
 }
 
 .cell--wall
 {
 	fill: #646464;
+}
+
+.cell--empty:hover, .cell--help
+{
+    fill: blue;
+    fill-opacity: 0.15;
+}
+
+.cell--empty:hover
+{
+    transition-duration: 0s;
+}
+
+.cell--help
+{
+    transition-duration: 1s;
 }
 
 .scores
