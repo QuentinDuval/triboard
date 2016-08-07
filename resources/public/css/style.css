@@ -76,8 +76,8 @@ body
 .score, .score--is-current
 {
 	position: relative;
-	margin: 10px 3%;
-	padding: 8px 10px;
+	margin: 1.0% 2.5%;
+	padding: 0.6% 1%;
 	display: inline-block;
 	width: 12vw;
 	border-radius: 0.75vw;
@@ -114,6 +114,7 @@ body
 .help-button
 {
 	background-color: #222;
+	//font-family: 'Zapf Dingbats';
     border: none;
     color: #c0c0c0;
     margin: 10px 1.2%;

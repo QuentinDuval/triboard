@@ -435,7 +435,9 @@
    [top-panel-button #(swap! app-state update :help not) "?"]
    (show-scores scores player)
    [top-panel-button #(send-game-event! :restart) (special-char "&#x21bb;")]
-   [top-panel-button #(send-game-event! :undo) (special-char "&#x21A9;")]])
+   ;;[top-panel-button #(send-game-event! :undo) (special-char "&#x21A9;")]
+   [top-panel-button #(send-game-event! :undo) (special-char "&larr;")]
+   ])
 
 (defn run-game []
   [:div.game-panel
