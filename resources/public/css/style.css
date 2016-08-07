@@ -23,6 +23,36 @@ body
 	transition-duration: 0.75s;
 }
 
+.cell--blue
+{
+	fill: blue;
+}
+
+.cell--red
+{
+	fill: red;
+}
+
+.cell--green
+{
+	fill: green;
+}
+
+.cell--empty
+{
+	fill: lightgray;
+}
+
+.cell--help
+{
+	fill: lightblue;
+}
+
+.cell--wall
+{
+	fill: gray;
+}
+
 .scores
 {
 	background-color: #222;

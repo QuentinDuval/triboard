@@ -387,12 +387,14 @@
 ;; -----------------------------------------
 
 (defn rect-cell
-  [x y color options]
+  [x y player options]
   [:rect.cell
    (merge
      {:x (+ 0.05 x) :width  0.9
       :y (+ 0.05 y) :height 0.9
-      :fill color}
+      ;; :fill color
+      :class (str "cell--" (name player))
+      }
      options)
    ])
 
@@ -406,7 +408,7 @@
 (defn empty-cell
   [x y game]
   (rect-cell x y
-    (if-not (show-help? game x y) "lightgray" "lightblue")
+    (if-not (show-help? game x y) :empty :help)
     {:on-click #(send-player-event! [x y])}
     ))
 
@@ -450,12 +452,12 @@
      (for [[x y] all-positions]
        ^{:key [x y]}
        (case (get-in @board [x y])
-         :empty [empty-cell x y @game]
-         :blue [rect-cell x y "blue"]
-         :red [rect-cell x y "red"]
-         :green [rect-cell x y "green"]
-         :wall [rect-cell x y "gray"])
-       ))
+         :empty [empty-cell x y @game] ;; TODO - Help cell somewhere here
+         :blue [rect-cell x y :blue] ;; TODO - Factorize
+         :red [rect-cell x y :red]
+         :green [rect-cell x y :green]
+         :wall [rect-cell x y :wall]
+         )))
    ])
 
 (reagent/render [run-game]
