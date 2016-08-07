@@ -321,17 +321,21 @@
 (def ai-players (reaction (get-in @game [:ai-players])))
 (def end-of-game (reaction (nil? @current-player)))
 
-(defn update-game! [f & args]
-  (swap! app-state update-in [:games] conj (apply f @game args)))
-
-(defn new-game! []
-  (swap! app-state assoc-in [:games] (list (new-game))))
-
 (defn is-ai? [player]
   (contains? @ai-players player))
 
-(defn restart-game! []
-  (swap! app-state update-in [:games] #(take-last 1 %)))
+
+;; -----------------------------------------
+;; GAME LOOP
+;; -----------------------------------------
+
+(defn update-game! [f & args]
+  (swap! app-state update-in [:games] conj (apply f @game args)))
+
+(defn- handle-ai! []
+  (let [ai-algo (get @ai-players @current-player)
+        move (ai-algo @game @current-player)]
+    (update-game! play-move move)))
 
 (defn cancel-last-move! []
   (swap! app-state update-in [:games]
@@ -343,15 +347,13 @@
           new-list)))
     ))
 
-
-;; -----------------------------------------
-;; GAME LOOP
-;; -----------------------------------------
-
-(defn- handle-ai! []
-  (let [ai-algo (get @ai-players @current-player)
-        move (ai-algo @game @current-player)]
-    (update-game! play-move move)))
+(defn- handle-game-event!
+  [msg]
+  (case msg
+    :new-game (swap! app-state assoc-in [:games] (list (new-game)))
+    :restart (swap! app-state update-in [:games] #(take-last 1 %))
+    :undo (cancel-last-move!)
+    ))
 
 (defn start-game-loop
   "Manage transitions between player moves, ai moves, and generic game events"
@@ -360,23 +362,28 @@
         is-human-xf (fn [_] (not (is-ai? @current-player)))
         is-ai-xf (fn [_] (is-ai? @current-player))
         ai-events (chan 1 (comp (filter game-on-xf) (filter is-ai-xf)))
-        player-events (chan 1 (comp (filter game-on-xf) (filter is-human-xf)))]
+        player-events (chan 1 (comp (filter game-on-xf) (filter is-human-xf)))
+        game-events (chan 1)]
     
     (go
       (while true
         (alt!
+          game-events ([msg] (handle-game-event! msg))
           player-events ([coord] (update-game! play-move coord))
           ai-events ([msg] (when (= msg :ai-play) (handle-ai!)))
           (async/timeout ai-move-delay) ([_] (put! ai-events :ai-play))
           )))
     
-    {:player-events player-events}
-    ))
+    {:player-events player-events
+     :game-events game-events}))
 
 (defonce game-loop (start-game-loop))
 
 (def send-player-event!
-  (partial put! (game-loop :player-events)))
+  #(put! (game-loop :player-events) %))
+
+(def send-game-event!
+  #(put! (game-loop :game-events) %))
 
 
 ;; -----------------------------------------
@@ -428,11 +435,11 @@
 (defn show-top-panel
   [scores player]
   [:div.scores
-   [top-panel-button new-game! (special-char "&#9733;")]
+   [top-panel-button #(send-game-event! :new-game) (special-char "&#9733;")]
    [top-panel-button #(swap! app-state update :help not) "?"]
    (show-scores scores player)
-   [top-panel-button restart-game! (special-char "&#x21bb;")]
-   [top-panel-button cancel-last-move! (special-char "&#x21A9;")]])
+   [top-panel-button #(send-game-event! :restart) (special-char "&#x21bb;")]
+   [top-panel-button #(send-game-event! :undo) (special-char "&#x21A9;")]])
 
 (defn max-board-height []
   (- (-> (dom/getWindow) dom/getViewportSize .-height) 100))
