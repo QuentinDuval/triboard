@@ -393,22 +393,19 @@
      {:class (str "cell--" (name player))
       :x (+ 0.05 x) :width  0.9
       :y (+ 0.05 y) :height 0.9}
-     options)
-   ])
+     options)])
 
 (defn ^boolean show-help?
-  [game x y]
+  [x y]
   (and
-    (:help @app-state) ;; TODO - Refactor not to use globals
-    (not (is-ai? (:player game)))
-    (get-move-at game (:player game) [x y])))
+    (:help @app-state)
+    (not (is-ai? @current-player))
+    (get-move-at @game @current-player [x y])))
 
 (defn empty-cell
-  [x y game]
-  (rect-cell x y
-    (if-not (show-help? game x y) :empty :help)
-    {:on-click #(send-player-event! [x y])}
-    ))
+  [x y player]
+  (rect-cell x y player
+    {:on-click #(send-player-event! [x y])}))
 
 (defn show-scores
   [scores player]
@@ -450,10 +447,10 @@
      (for [[x y] all-positions
            :let [cell (get-in @board [x y])]]
        ^{:key [x y]}
-       (case cell
-         :empty [empty-cell x y @game] ;; TODO - Help cell somewhere here
-                [rect-cell x y cell]
-         )))
+       (if (= :empty cell)
+         [empty-cell x y (if-not (show-help? x y) :empty :help)]
+         [rect-cell x y cell])
+       ))
    ])
 
 (reagent/render [run-game]
