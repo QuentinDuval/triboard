@@ -30,7 +30,7 @@ body
 
 .cell--red
 {
-	fill: red;
+	fill: #e80000;
 }
 
 .cell--green
@@ -51,7 +51,7 @@ body
 
 .cell--wall
 {
-	fill: gray;
+	fill: #646464;
 }
 
 .scores
