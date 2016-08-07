@@ -438,7 +438,7 @@
    [top-panel-button #(send-game-event! :undo) (special-char "&#x21A9;")]])
 
 (defn max-board-height []
-  (- (-> (dom/getWindow) dom/getViewportSize .-height) 100))
+  (* (-> (dom/getWindow) dom/getViewportSize .-height) 0.85))
 
 (defn run-game []
   [:div.game-panel
