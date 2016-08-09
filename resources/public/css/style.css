@@ -52,15 +52,10 @@ body
 	fill: #646464;
 }
 
-.cell--empty:hover, .cell--help
+.cell--help
 {
     fill: blue;
     fill-opacity: 0.25;
-}
-
-.cell--empty:hover
-{
-    transition-duration: 0s;
 }
 
 .cell--help
