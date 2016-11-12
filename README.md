@@ -4,4 +4,6 @@ This project is aimed at creating a small game based on the old Tribolo DOS game
 
 The goal is basically to change the board into the blue color, through moves over enemy pieces.
 
+You can play the game here: https://quentinduval.github.io/.
+
 Created with [Chestnut](http://plexus.github.io/chestnut/) 0.14.0 (66af6f40).
