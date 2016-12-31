@@ -348,6 +348,9 @@
 (def send-game-event!
   #(put! (game-loop :game-events) %))
 
+(defn toogle-help! []
+  (swap! app-state update :help not))
+
 
 ;; -----------------------------------------
 ;; DISPLAY
@@ -378,7 +381,7 @@
   [scores player]
   [:div.scores
    [panel/top-panel-button #(send-game-event! :new-game) (vutils/special-char "&#9733;")]
-   [panel/top-panel-button #(swap! app-state update :help not) "?"]
+   [panel/top-panel-button toogle-help! "?"]
    (panel/show-scores scores player)
    [panel/top-panel-button #(send-game-event! :restart) (vutils/special-char "&#x21bb;")]
    ;;[panel/top-panel-button #(send-game-event! :undo) (special-char "&#x21A9;")]
