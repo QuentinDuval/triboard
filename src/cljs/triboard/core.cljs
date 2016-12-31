@@ -92,6 +92,7 @@
    :looser :red,
    :taken [[8 5] [9 5]]}"
   [board [xi yi :as move] [dx dy]]
+  {:pre [(board? board)]}
   (loop [x (+ xi dx)
          y (+ yi dy)
          looser nil
@@ -125,6 +126,7 @@
 (defn available-moves-xf
   "Transducer to get available moves on the map"
   [board]
+  {:pre [(board? board)]}
   (comp
     (filter #(= (get-in board %) :empty))
     (mapcat #(available-moves-at board %))
@@ -141,6 +143,7 @@
        :looser :red,
        :taken [[0 4]]})}}"
   [{:keys [board] :as game}]
+  {:pre [(board? board)]}
   (assoc game :moves
     (transduce
       (available-moves-xf board)
@@ -184,6 +187,7 @@
 (defn play-move
   "On player playing the move [x y] - update all the game state accordingly"
   [{:keys [player board] :as game} point]
+  {:pre [(board? board)]}
   (if-let [moves (get-move-at game player point)]
     (->
       (reduce apply-move game moves)
