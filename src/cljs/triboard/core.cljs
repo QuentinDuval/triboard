@@ -3,7 +3,9 @@
     [clojure.string :as str]
     [cljs.core.async :as async :refer [put! chan <! >!]]
     [goog.dom :as dom]
-    [reagent.core :as reagent :refer [atom]])
+    [reagent.core :as reagent :refer [atom]]
+    [triboard.logic.constants :as cst]
+    )
   (:require-macros
     [cljs.core.async.macros :refer [go go-loop alt!]]
     [reagent.ratom :refer [reaction]]))
@@ -16,16 +18,11 @@
 ;; TODO - http://www.w3schools.com/howto/howto_js_sidenav.asp
 ;; TODO - http://www.w3schools.com/svg/svg_grad_radial.asp
 
+
 ;; -----------------------------------------
-;; GAME PARAMETERS
+;; GAME PARAMETERS (AI & UI)
 ;; -----------------------------------------
 
-(def board-width 16)
-(def board-height 11)
-(def init-block-count 12) ;; Init blocks for red, blue, green, gray
-(def players [:blue :red :green])
-(def directions [[-1 0] [1 0] [0 -1] [0 1] [-1 1] [1 1] [-1 -1] [1 -1]])
-(def max-score (- (* board-width board-height) init-block-count))
 (def ai-move-delay 1000)
 (defn max-board-height []
   (* (-> (dom/getWindow) dom/getViewportSize .-height) 0.85))
@@ -35,7 +32,7 @@
 ;; EXTRINSIC TYPES
 ;; -----------------------------------------
 
-(def player? (set players))
+(def player? (set cst/players))
 (def cell? (conj player? :wall :empty))
 
 (defn board? [b]
@@ -56,8 +53,8 @@
 
 (defn scores? [s]
   (and
-    (<= 0 (reduce + (vals s)) max-score)
-    (every? s players)))
+    (<= 0 (reduce + (vals s)) cst/max-score)
+    (every? s cst/players)))
 
 
 ;; -----------------------------------------
@@ -70,16 +67,10 @@
   [key-fn coll]
   (apply max-key (memoize key-fn) coll))
 
-(def all-positions
-  (vec
-    (for [x (range board-width)
-          y (range board-height)]
-      [x y])))
-
 (defn coord-neighbors
   "All neighbors of a given coordinate"
   [[x y]]
-  (map (fn [[dx dy]] [(+ x dx) (+ y dy)]) directions))
+  (map (fn [[dx dy]] [(+ x dx) (+ y dy)]) cst/directions))
 
 
 ;; -----------------------------------------
@@ -87,8 +78,8 @@
 ;; -----------------------------------------
 
 (def empty-board
-  (let [column (vec (repeat board-height :empty))]
-    (vec (repeat board-width column))))
+  (let [column (vec (repeat cst/board-height :empty))]
+    (vec (repeat cst/board-width column))))
 
 (defn draw-slices
   "Draw n * m slices from the collection"
@@ -103,9 +94,9 @@
 (defn init-positions
   "Create random initial positions for the players"
   []
-  (draw-slices init-block-count
-    (conj players :wall)
-    (shuffle all-positions)))
+  (draw-slices cst/init-block-count
+    (conj cst/players :wall)
+    (shuffle cst/all-positions)))
 
 (defn new-board []
   {:post [(board? %)]}
@@ -150,7 +141,7 @@
   "Provides the list of moves that can be done from a cell"
   {:pre [(board? board) (coord? point)]}
   [board point]
-  (eduction (keep #(available-cells-by-dir board point %)) directions))
+  (eduction (keep #(available-cells-by-dir board point %)) cst/directions))
 
 (defn take-empty-cell-move
   "Create a move to take an empty cell" 
@@ -183,7 +174,7 @@
     (transduce
       (available-moves-xf board)
       #(update-in %1 [(:winner %2) (:move %2)] conj %2)
-      {} all-positions)))
+      {} cst/all-positions)))
 
 
 ;; -----------------------------------------
@@ -249,7 +240,7 @@
   [board]
   (reduce
     #(assoc %1 %2 (compute-cell-strength board %2))
-    {} all-positions))
+    {} cst/all-positions))
 
 (defn- move-strength
   "Compute the strength of a move, based on the converted cells"
@@ -281,7 +272,7 @@
   {:pre [(player? player)]}
   [cells-strength game player]
   (let [moves (get-in game [:moves player])
-        others (remove #{player} players)]
+        others (remove #{player} cst/players)]
     (first
       (fast-max-key
         (fn [[m converted :as move]]
@@ -301,16 +292,16 @@
   (let [board (new-board)]
     (with-available-moves
       {:board board
-       :player (rand-nth players)
+       :player (rand-nth cst/players)
        :moves {}
        :help false
        :ai-players
        {:red (partial best-move (compute-cells-strength board))
         :green (partial best-move (compute-cells-strength board))}
        :scores
-       {:blue init-block-count
-        :red init-block-count
-        :green init-block-count}})))
+       {:blue cst/init-block-count
+        :red cst/init-block-count
+        :green cst/init-block-count}})))
 
 (defonce app-state
   (atom {:games (list (new-game))
@@ -413,7 +404,7 @@
 (defn show-scores
   [scores player]
   {:pre [(scores? scores)]} 
-  (for [p players]
+  (for [p cst/players]
     ^{:key p}
     [(if (= player p) :div.score--is-current :div.score)
      {:class (str "score--" (name p))}
@@ -444,9 +435,9 @@
    [show-top-panel @scores @current-player]
    (into
      [:svg.board
-      {:view-box (str "0 0 " board-width " " board-height)
+      {:view-box (str "0 0 " cst/board-width " " cst/board-height)
        :style {:max-height (str (max-board-height) "px")}}]
-     (for [[x y] all-positions
+     (for [[x y] cst/all-positions
            :let [cell (get-in @board [x y])]]
        ^{:key [x y]}
        (if (= :empty cell)
