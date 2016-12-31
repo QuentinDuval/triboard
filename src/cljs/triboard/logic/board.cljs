@@ -56,3 +56,9 @@
 
 (def get-cell-at get-in)
 
+(defn to-iterable
+  [board]
+  (for [[x y :as coord] cst/all-positions]
+    [coord (get-cell-at board coord)]
+    ))
+

@@ -351,8 +351,7 @@
      [:svg.board
       {:view-box (str "0 0 " cst/board-width " " cst/board-height)
        :style {:max-height (str (vutils/max-board-height) "px")}}]
-     (for [[x y] cst/all-positions
-           :let [cell (board/get-cell-at @board [x y])]]
+     (for [[[x y] cell] (board/to-iterable @board)]
        ^{:key [x y]}
        (if (= :empty cell)
          [empty-cell x y (if-not (show-help? x y) :empty :help)]
