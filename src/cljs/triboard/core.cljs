@@ -377,20 +377,13 @@
   (rect-cell x y player
     {:on-click #(send-player-event! [x y])}))
 
-(defn show-top-panel
-  [scores player]
-  [:div.scores
-   [panel/top-panel-button #(send-game-event! :new-game) (vutils/special-char "&#9733;")]
-   [panel/top-panel-button toogle-help! "?"]
-   (panel/show-scores scores player)
-   [panel/top-panel-button #(send-game-event! :restart) (vutils/special-char "&#x21bb;")]
-   ;;[panel/top-panel-button #(send-game-event! :undo) (special-char "&#x21A9;")]
-   [panel/top-panel-button #(send-game-event! :undo) (vutils/special-char "&larr;")]
-   ])
-
 (defn run-game []
   [:div.game-panel
-   [show-top-panel @scores @current-player]
+   [panel/show-top-panel @scores @current-player
+    {:on-new-game #(send-game-event! :new-game)
+     :on-help toogle-help!
+     :on-restart #(send-game-event! :restart)
+     :on-undo #(send-game-event! :undo)}]
    (into
      [:svg.board
       {:view-box (str "0 0 " cst/board-width " " cst/board-height)

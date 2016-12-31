@@ -2,6 +2,7 @@
   (:require
     [clojure.string :as str]
     [triboard.logic.constants :as cst]
+    [triboard.view.utils :as vutils]
     ))
 
 
@@ -28,3 +29,14 @@
   [on-click txt]
   [:button.help-button {:on-click on-click} txt])
 
+
+(defn show-top-panel
+  [scores player {:keys [on-new-game on-help on-restart on-undo]}]
+  [:div.scores
+   [top-panel-button on-new-game (vutils/special-char "&#9733;")]
+   [top-panel-button on-help "?"]
+   (show-scores scores player)
+   [top-panel-button on-restart (vutils/special-char "&#x21bb;")]
+   ;;[panel/top-panel-button on-undo (special-char "&#x21A9;")]
+   [top-panel-button on-undo (vutils/special-char "&larr;")]
+   ])
