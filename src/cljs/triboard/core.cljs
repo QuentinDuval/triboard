@@ -5,6 +5,7 @@
     [triboard.utils :as utils]
     [triboard.logic.constants :as cst]
     [triboard.logic.board :as board]
+    [triboard.view.board :as vboard]
     [triboard.view.panel :as panel]
     [triboard.view.utils :as vutils]
     )
@@ -326,20 +327,6 @@
     (not (is-ai? @current-player))
     (get-move-at @game @current-player [x y])))
 
-(defn rect-cell
-  [x y player options]
-  [:rect.cell
-   (merge
-     {:class (str "cell--" (name player))
-      :x (+ 0.05 x) :width  0.9
-      :y (+ 0.05 y) :height 0.9}
-     options)])
-
-(defn empty-cell
-  [x y player]
-  (rect-cell x y player
-    {:on-click #(send-player-event! [x y])}))
-
 (defn run-game []
   [:div.game-panel
    [panel/show-top-panel @scores @current-player
@@ -347,16 +334,7 @@
      :on-help toogle-help!
      :on-restart #(send-game-event! :restart)
      :on-undo #(send-game-event! :undo)}]
-   (into
-     [:svg.board
-      {:view-box (str "0 0 " cst/board-width " " cst/board-height)
-       :style {:max-height (str (vutils/max-board-height) "px")}}]
-     (for [[[x y] cell] (board/to-iterable @board)]
-       ^{:key [x y]}
-       (if (= :empty cell)
-         [empty-cell x y (if-not (show-help? x y) :empty :help)]
-         [rect-cell x y cell])
-       ))
+   (vboard/render-board @board show-help? send-player-event!)
    ])
 
 (reagent/render [run-game]
