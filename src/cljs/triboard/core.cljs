@@ -3,6 +3,7 @@
     [clojure.string :as str]
     [cljs.core.async :as async :refer [put! chan <! >!]]
     [reagent.core :as reagent :refer [atom]]
+    [triboard.utils :as utils]
     [triboard.logic.constants :as cst]
     [triboard.view.utils :as vutils]
     )
@@ -53,22 +54,6 @@
   (and
     (<= 0 (reduce + (vals s)) cst/max-score)
     (every? s cst/players)))
-
-
-;; -----------------------------------------
-;; UTILS
-;; -----------------------------------------
-
-(defn fast-max-key
-  "Fast max key that avoids recomputing things several times"
-  {:pre [(fn? key-fn) (seq? coll)]}
-  [key-fn coll]
-  (apply max-key (memoize key-fn) coll))
-
-(defn coord-neighbors
-  "All neighbors of a given coordinate"
-  [[x y]]
-  (map (fn [[dx dy]] [(+ x dx) (+ y dy)]) cst/directions))
 
 
 ;; -----------------------------------------
@@ -228,7 +213,7 @@
   "Compute a cell strength based on the number of walls it has"
   {:pre [(coord? point)]}
   [board point]
-  (let [neighbors (coord-neighbors point)
+  (let [neighbors (utils/coord-neighbors point)
         walls (filter #(= :wall (get-in board % :wall)) neighbors)
         count-wall (count walls)]
     (+ 1 (* count-wall count-wall 0.25))))
@@ -272,7 +257,7 @@
   (let [moves (get-in game [:moves player])
         others (remove #{player} cst/players)]
     (first
-      (fast-max-key
+      (utils/fast-max-key
         (fn [[m converted :as move]]
           (let [new-game (play-move game m)
                 diff-score (move-strength cells-strength identity move)
