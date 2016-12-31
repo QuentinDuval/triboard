@@ -5,6 +5,7 @@
     [goog.dom :as dom]
     [reagent.core :as reagent :refer [atom]]
     [triboard.logic.constants :as cst]
+    [triboard.view.utils :as vutils]
     )
   (:require-macros
     [cljs.core.async.macros :refer [go go-loop alt!]]
@@ -411,10 +412,6 @@
      (str (str/capitalize (name p)) " - " (get scores p))]
     ))
 
-(defn special-char
-  [str-code]
-  [:div {:dangerouslySetInnerHTML {:__html str-code}}])
-
 (defn top-panel-button
   [on-click txt]
   [:button.help-button {:on-click on-click} txt])
@@ -422,12 +419,12 @@
 (defn show-top-panel
   [scores player]
   [:div.scores
-   [top-panel-button #(send-game-event! :new-game) (special-char "&#9733;")]
+   [top-panel-button #(send-game-event! :new-game) (vutils/special-char "&#9733;")]
    [top-panel-button #(swap! app-state update :help not) "?"]
    (show-scores scores player)
-   [top-panel-button #(send-game-event! :restart) (special-char "&#x21bb;")]
+   [top-panel-button #(send-game-event! :restart) (vutils/special-char "&#x21bb;")]
    ;;[top-panel-button #(send-game-event! :undo) (special-char "&#x21A9;")]
-   [top-panel-button #(send-game-event! :undo) (special-char "&larr;")]
+   [top-panel-button #(send-game-event! :undo) (vutils/special-char "&larr;")]
    ])
 
 (defn run-game []
