@@ -14,7 +14,7 @@
 
 
 (enable-console-print!)
-(set! *assert* false) ;; Set to true for the debug mode
+(set! *assert* true) ;; Set to true for the debug mode
 
 ;; TODO - Try to bring some domain vocabulary here: it gets too complicated to trace
 ;; TODO - http://www.w3schools.com/howto/howto_js_sidenav.asp
@@ -25,20 +25,12 @@
 ;; EXTRINSIC TYPES
 ;; -----------------------------------------
 
-(defn coord?
-  "A cell is a pair of integer"
-  [p]
-  (and
-    (integer? (first p))
-    (integer? (second p))
-    (= 2 (count p))))
-
 (defn move?
   "A move is a map of coordinate, cell takens, a looser an a winner"
   [m]
   (and
-    (coord? (:move m))
-    (every? coord? (:taken m))
+    (board/coord? (:move m))
+    (every? board/coord? (:taken m))
     (cst/player? (:winner m))
     (cst/cell? (:looser m))))
 
@@ -59,7 +51,7 @@
    :looser :red,
    :taken [[8 5] [9 5]]}"
   [board [xi yi :as coord] [dx dy]]
-  {:pre [(board/board? board) (coord? coord)]}
+  {:pre [(board/board? board) (board/coord? coord)]}
   (loop [x (+ xi dx)
          y (+ yi dy)
          looser nil
