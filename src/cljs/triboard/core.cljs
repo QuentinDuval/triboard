@@ -27,16 +27,22 @@
 (def player? (set cst/players))
 (def cell? (conj player? :wall :empty))
 
-(defn board? [b]
+(defn board?
+  "A board is a vector of vector of cells"
+  [b]
   (every? #(every? cell? %) b))
 
-(defn coord? [p]
+(defn coord?
+  "A cell is a pair of integer"
+  [p]
   (and
     (integer? (first p))
     (integer? (second p))
     (= 2 (count p))))
 
-(defn move? [m]
+(defn move?
+  "A move is a map of coordinate, cell takens, a looser an a winner"
+  [m]
   (and
     (coord? (:move m))
     (every? coord? (:taken m))
