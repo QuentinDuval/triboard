@@ -91,8 +91,8 @@
    :winner :blue,
    :looser :red,
    :taken [[8 5] [9 5]]}"
-  [board [xi yi :as move] [dx dy]]
-  {:pre [(board? board)]}
+  [board [xi yi :as coord] [dx dy]]
+  {:pre [(board? board) (coord? coord)]}
   (loop [x (+ xi dx)
          y (+ yi dy)
          looser nil
@@ -102,7 +102,7 @@
         (is-cell-empty? cell) nil ;; No move: reached end and only 1 type of cell
         (and looser (not= looser cell)) {:winner cell   ;; Who wins the cells
                                          :looser looser ;; Who looses the cells
-                                         :move move     ;; The move performed 
+                                         :move coord    ;; The move performed
                                          :taken taken}  ;; The cells taken
         :else (recur
                 (+ x dx) (+ y dy)
