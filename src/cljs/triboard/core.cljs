@@ -2,7 +2,6 @@
   (:require
     [clojure.string :as str]
     [cljs.core.async :as async :refer [put! chan <! >!]]
-    [goog.dom :as dom]
     [reagent.core :as reagent :refer [atom]]
     [triboard.logic.constants :as cst]
     [triboard.view.utils :as vutils]
@@ -25,8 +24,6 @@
 ;; -----------------------------------------
 
 (def ai-move-delay 1000)
-(defn max-board-height []
-  (* (-> (dom/getWindow) dom/getViewportSize .-height) 0.85))
 
 
 ;; -----------------------------------------
@@ -433,7 +430,7 @@
    (into
      [:svg.board
       {:view-box (str "0 0 " cst/board-width " " cst/board-height)
-       :style {:max-height (str (max-board-height) "px")}}]
+       :style {:max-height (str (vutils/max-board-height) "px")}}]
      (for [[x y] cst/all-positions
            :let [cell (get-in @board [x y])]]
        ^{:key [x y]}
