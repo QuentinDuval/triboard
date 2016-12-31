@@ -4,6 +4,7 @@
     [reagent.core :as reagent :refer [atom]]
     [triboard.utils :as utils]
     [triboard.logic.constants :as cst]
+    [triboard.logic.board :as board]
     [triboard.view.panel :as panel]
     [triboard.view.utils :as vutils]
     )
@@ -24,14 +25,6 @@
 ;; EXTRINSIC TYPES
 ;; -----------------------------------------
 
-(def player? (set cst/players))
-(def cell? (conj player? :wall :empty))
-
-(defn board?
-  "A board is a vector of vector of cells"
-  [b]
-  (every? #(every? cell? %) b))
-
 (defn coord?
   "A cell is a pair of integer"
   [p]
@@ -46,8 +39,8 @@
   (and
     (coord? (:move m))
     (every? coord? (:taken m))
-    (player? (:winner m))
-    (cell? (:looser m))))
+    (cst/player? (:winner m))
+    (cst/cell? (:looser m))))
 
 
 ;; -----------------------------------------
@@ -76,7 +69,7 @@
     (shuffle cst/all-positions)))
 
 (defn new-board []
-  {:post [(board? %)]}
+  {:post [(board/board? %)]}
   (reduce
     (fn [r [color point]] (assoc-in r point color))
     empty-board (init-positions)))
@@ -98,7 +91,7 @@
    :looser :red,
    :taken [[8 5] [9 5]]}"
   [board [xi yi :as coord] [dx dy]]
-  {:pre [(board? board) (coord? coord)]}
+  {:pre [(board/board? board) (coord? coord)]}
   (loop [x (+ xi dx)
          y (+ yi dy)
          looser nil
@@ -132,7 +125,7 @@
 (defn available-moves-xf
   "Transducer to get available moves on the map"
   [board]
-  {:pre [(board? board)]}
+  {:pre [(board/board? board)]}
   (comp
     (filter #(= (get-in board %) :empty))
     (mapcat #(available-moves-at board %))
@@ -149,7 +142,7 @@
        :looser :red,
        :taken [[0 4]]})}}"
   [{:keys [board] :as game}]
-  {:pre [(board? board)]}
+  {:pre [(board/board? board)]}
   (assoc game :moves
     (transduce
       (available-moves-xf board)
@@ -193,7 +186,7 @@
 (defn play-move
   "On player playing the move [x y] - update all the game state accordingly"
   [{:keys [player board] :as game} point]
-  {:pre [(board? board)]}
+  {:pre [(board/board? board)]}
   (if-let [moves (get-move-at game player point)]
     (->
       (reduce apply-move game moves)

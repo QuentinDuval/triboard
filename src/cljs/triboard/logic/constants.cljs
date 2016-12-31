@@ -14,3 +14,5 @@
           y (range board-height)]
       [x y])))
 
+(def player? (set players))
+(def cell? (conj player? :wall :empty))
