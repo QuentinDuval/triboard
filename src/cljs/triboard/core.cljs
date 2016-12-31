@@ -56,7 +56,7 @@
          y (+ yi dy)
          looser nil
          taken []]
-    (let [cell (get-in board [x y])]
+    (let [cell (board/get-cell-at board [x y])]
       (cond
         (is-cell-empty? cell) nil ;; No move: reached end and only 1 type of cell
         (and looser (not= looser cell)) {:winner cell   ;; Who wins the cells
@@ -87,7 +87,7 @@
   [board]
   {:pre [(board/board? board)]}
   (comp
-    (filter #(= (get-in board %) :empty))
+    (filter #(= (board/get-cell-at board %) :empty))
     (mapcat #(available-moves-at board %))
     ))
 
@@ -165,7 +165,7 @@
   {:pre [(coord? point)]}
   [board point]
   (let [neighbors (utils/coord-neighbors point)
-        walls (filter #(= :wall (get-in board % :wall)) neighbors)
+        walls (filter #(= :wall (board/get-cell-at board % :wall)) neighbors)
         count-wall (count walls)]
     (+ 1 (* count-wall count-wall 0.25))))
 
@@ -352,7 +352,7 @@
       {:view-box (str "0 0 " cst/board-width " " cst/board-height)
        :style {:max-height (str (vutils/max-board-height) "px")}}]
      (for [[x y] cst/all-positions
-           :let [cell (get-in @board [x y])]]
+           :let [cell (board/get-cell-at @board [x y])]]
        ^{:key [x y]}
        (if (= :empty cell)
          [empty-cell x y (if-not (show-help? x y) :empty :help)]

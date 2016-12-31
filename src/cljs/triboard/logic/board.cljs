@@ -54,7 +54,5 @@
     (fn [r [color point]] (assoc-in r point color))
     empty-board (init-positions)))
 
-(defn get-cell-at
-  [board coord]
-  {:pre [(board? board) (coord? coord)]}
-  (get-in board coord))
+(def get-cell-at get-in)
+
