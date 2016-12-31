@@ -1,10 +1,10 @@
 (ns triboard.core
   (:require
-    [clojure.string :as str]
     [cljs.core.async :as async :refer [put! chan <! >!]]
     [reagent.core :as reagent :refer [atom]]
     [triboard.utils :as utils]
     [triboard.logic.constants :as cst]
+    [triboard.view.panel :as panel]
     [triboard.view.utils :as vutils]
     )
   (:require-macros
@@ -50,10 +50,7 @@
     (player? (:winner m))
     (cell? (:looser m))))
 
-(defn scores? [s]
-  (and
-    (<= 0 (reduce + (vals s)) cst/max-score)
-    (every? s cst/players)))
+
 
 
 ;; -----------------------------------------
@@ -384,29 +381,15 @@
   (rect-cell x y player
     {:on-click #(send-player-event! [x y])}))
 
-(defn show-scores
-  [scores player]
-  {:pre [(scores? scores)]} 
-  (for [p cst/players]
-    ^{:key p}
-    [(if (= player p) :div.score--is-current :div.score)
-     {:class (str "score--" (name p))}
-     (str (str/capitalize (name p)) " - " (get scores p))]
-    ))
-
-(defn top-panel-button
-  [on-click txt]
-  [:button.help-button {:on-click on-click} txt])
-
 (defn show-top-panel
   [scores player]
   [:div.scores
-   [top-panel-button #(send-game-event! :new-game) (vutils/special-char "&#9733;")]
-   [top-panel-button #(swap! app-state update :help not) "?"]
-   (show-scores scores player)
-   [top-panel-button #(send-game-event! :restart) (vutils/special-char "&#x21bb;")]
-   ;;[top-panel-button #(send-game-event! :undo) (special-char "&#x21A9;")]
-   [top-panel-button #(send-game-event! :undo) (vutils/special-char "&larr;")]
+   [panel/top-panel-button #(send-game-event! :new-game) (vutils/special-char "&#9733;")]
+   [panel/top-panel-button #(swap! app-state update :help not) "?"]
+   (panel/show-scores scores player)
+   [panel/top-panel-button #(send-game-event! :restart) (vutils/special-char "&#x21bb;")]
+   ;;[panel/top-panel-button #(send-game-event! :undo) (special-char "&#x21A9;")]
+   [panel/top-panel-button #(send-game-event! :undo) (vutils/special-char "&larr;")]
    ])
 
 (defn run-game []
