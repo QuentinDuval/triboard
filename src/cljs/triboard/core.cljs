@@ -28,24 +28,9 @@
 ;; -----------------------------------------
 
 (defn with-available-moves
-  "Compute all available moves on the board.
-   And group these positions by player then by position
-   Example:
-   {:blue
-    {[0 5]
-     ({:move [0 5],
-       :winner :blue,
-       :looser :red,
-       :taken [[0 4]]})}}"
+  "Add the available moves on the board"
   [{:keys [board] :as game}]
-  {:pre [(board/board? board)]}
-  (assoc game :moves
-    (transduce
-      (mapcat #(move/available-moves-at board %))
-      #(update-in %1 [(:winner %2) (:move %2)] conj %2)
-      {}
-      (board/empty-cells board)
-      )))
+  (assoc game :moves (move/all-available-moves board)))
 
 (defn- next-player
   [player] 

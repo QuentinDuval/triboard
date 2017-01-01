@@ -44,15 +44,24 @@
          taken []]
     (let [cell (board/get-cell-at board [x y])]
       (cond
-        (is-not-convertible? cell) nil ;; No move: reached end and only 1 type of cell
-        (and looser (not= looser cell)) {:winner cell   ;; Who wins the cells
-                                         :looser looser ;; Who looses the cells
-                                         :move coord    ;; The move performed
-                                         :taken taken}  ;; The cells taken
+        (is-not-convertible? cell) nil                      ;; No move: reached end and only 1 type of cell
+        (and looser (not= looser cell)) {:winner cell       ;; Who wins the cells
+                                         :looser looser     ;; Who looses the cells
+                                         :move coord        ;; The move performed
+                                         :taken taken}      ;; The cells taken
         :else (recur
                 (+ x dx) (+ y dy)
                 cell (conj taken [x y])))
       )))
+
+(defn- available-moves-at
+  "Provides the list of moves that can be done from a cell"
+  [board point]
+  {:pre [(board/board? board) (board/coord? point)]
+   :post [(moves? %)]}
+  (eduction
+    (keep #(available-cells-by-dir board point %))
+    cst/directions))
 
 
 ;; -----------------------------------------
@@ -67,14 +76,23 @@
    :looser :empty
    :taken [point]})
 
-(defn available-moves-at
-  "Provides the list of moves that can be done from a cell"
-  [board point]
-  {:pre [(board/board? board) (board/coord? point)]
-   :post [(moves? %)]}
-  (eduction
-    (keep #(available-cells-by-dir board point %))
-    cst/directions))
+(defn all-available-moves
+  "Return all move available on the board, grouped by player and by move
+   Example:
+    {:blue
+      {[0 5]
+       ({:move [0 5],
+         :winner :blue,
+         :looser :red,
+         :taken [[0 4]]})}}"
+  [board]
+  {:pre [(board/board? board)]}
+  (transduce
+    (mapcat #(available-moves-at board %))
+    #(update-in %1 [(:winner %2) (:move %2)] conj %2)
+    {}
+    (board/empty-cells board)
+    ))
 
 (defn apply-move
   "Apply a move onto the board, yielding a new board"
