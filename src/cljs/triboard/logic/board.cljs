@@ -70,3 +70,9 @@
     [coord (get-cell-at board coord)]
     ))
 
+(defn empty-cells
+  "Access to the empty cells of the board as a list of coordinates"
+  [board]
+  (eduction
+    (filter #(= (get-cell-at board %) :empty))
+    cst/all-positions))

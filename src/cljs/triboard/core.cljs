@@ -85,15 +85,6 @@
    :looser :empty
    :taken [point]})
 
-(defn available-moves-xf
-  "Transducer to get available moves on the map"
-  [board]
-  {:pre [(board/board? board)]}
-  (comp
-    (filter #(= (board/get-cell-at board %) :empty))
-    (mapcat #(available-moves-at board %))
-    ))
-
 (defn with-available-moves
   "Compute all available moves on the board.
    And group these positions by player then by position
@@ -108,9 +99,11 @@
   {:pre [(board/board? board)]}
   (assoc game :moves
     (transduce
-      (available-moves-xf board)
+      (mapcat #(available-moves-at board %))
       #(update-in %1 [(:winner %2) (:move %2)] conj %2)
-      {} cst/all-positions)))
+      {}
+      (board/empty-cells board)
+      )))
 
 
 ;; -----------------------------------------
