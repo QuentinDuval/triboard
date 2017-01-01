@@ -20,7 +20,7 @@
 
 
 (defn render-board
-  [board show-help? on-click]
+  [board {:keys [show-help? on-player-click]}]
   (into
     [:svg.board
      {:view-box (str "0 0 " cst/board-width " " cst/board-height)
@@ -28,6 +28,6 @@
     (for [[[x y] cell] (model/to-iterable board)]
       ^{:key [x y]}
       (if (= :empty cell)
-        [empty-cell x y (if-not (show-help? x y) :empty :help) on-click]
+        [empty-cell x y (if-not (show-help? x y) :empty :help) on-player-click]
         [rect-cell x y cell])
       )))

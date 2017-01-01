@@ -327,14 +327,19 @@
     (not (is-ai? @current-player))
     (get-move-at @game @current-player [x y])))
 
+(def interactions
+  {:on-new-game #(send-game-event! :new-game)
+   :on-help toogle-help!
+   :on-restart #(send-game-event! :restart)
+   :on-undo #(send-game-event! :undo)
+   :show-help? show-help?
+   :on-player-click send-player-event!
+   })
+
 (defn run-game []
   [:div.game-panel
-   [panel/show-top-panel @scores @current-player
-    {:on-new-game #(send-game-event! :new-game)
-     :on-help toogle-help!
-     :on-restart #(send-game-event! :restart)
-     :on-undo #(send-game-event! :undo)}]
-   (vboard/render-board @board show-help? send-player-event!)
+   [panel/show-top-panel @scores @current-player interactions]
+   (vboard/render-board @board interactions)
    ])
 
 (reagent/render [run-game]
