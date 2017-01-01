@@ -306,11 +306,11 @@
 
 (defonce game-loop (start-game-loop))
 
-(def send-player-event!
-  #(put! (game-loop :player-events) %))
+(defn send-player-event! [e]
+  (put! (game-loop :player-events) e))
 
-(def send-game-event!
-  #(put! (game-loop :game-events) %))
+(defn send-game-event! [e]
+  (put! (game-loop :game-events) e))
 
 (defn toogle-help! []
   (swap! app-state update :help not))
