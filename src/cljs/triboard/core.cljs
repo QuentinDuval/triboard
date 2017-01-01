@@ -137,7 +137,7 @@
 
 (defn with-ai-data
   "Add the AI data needed to play the game"
-  [init-game]
+  [{:keys [board] :as init-game}]
   (merge init-game
     {:ai-players
      {:red (partial best-move (compute-cells-strength board))
@@ -159,11 +159,10 @@
          {:blue cst/init-block-count
           :red cst/init-block-count
           :green cst/init-block-count}}
-      with-available-moves
-      with-ai-data)))
+      with-available-moves)))
 
 (defonce app-state
-  (atom {:games (list (new-game))
+  (atom {:games (list (with-ai-data (new-game)))
          :help false}))
 
 (def game (reaction (first (get-in @app-state [:games]))))
