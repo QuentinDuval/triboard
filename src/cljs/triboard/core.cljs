@@ -6,6 +6,7 @@
     [triboard.logic.constants :as cst]
     [triboard.logic.board :as board]
     [triboard.logic.move :as move]
+    [triboard.logic.turn :as turn]
     [triboard.view.board :as vboard]
     [triboard.view.callbacks :as view]
     [triboard.view.panel :as panel]
@@ -21,68 +22,6 @@
 ;; TODO - Try to bring some domain vocabulary here: it gets too complicated to trace
 ;; TODO - http://www.w3schools.com/howto/howto_js_sidenav.asp
 ;; TODO - http://www.w3schools.com/svg/svg_grad_radial.asp
-
-
-;; -----------------------------------------
-;; ON PLAYER MOVE
-;; -----------------------------------------
-
-(defn with-available-moves
-  "Add the available moves on the board"
-  [{:keys [board] :as game}]
-  (assoc game :moves (move/all-available-moves board)))
-
-(defn- next-player
-  [player]
-  (case player
-    :blue :red
-    :red :green
-    :green :blue))
-
-(defn- with-next-player
-  "Find the next player to act - dismiss those that cannot play any move"
-  [{:keys [moves player] :as game}]
-  (let [nexts (take 3 (iterate next-player (next-player player)))]
-    (assoc game :player
-      (some #(if (get moves %) % false) nexts))
-    ))
-
-(defn- apply-move
-  [game {:keys [winner looser taken] :as move}]
-  {:pre [(move/move? move)]}
-  (-> game
-    (update-in [:board] move/apply-move move)
-    (update-in [:scores winner] + (count taken))
-    (update-in [:scores looser] - (count taken))
-    ))
-
-(defn- get-move-at
-  "Access the available moves for the provided player at the provided point"
-  [game player point]
-  (get-in game [:moves player point]))
-
-(defn play-move
-  "On player playing the move [x y] - update all the game state accordingly"
-  [{:keys [player board] :as game} point]
-  {:pre [(board/board? board)]}
-  (if-let [moves (get-move-at game player point)]
-    (->
-      (reduce apply-move game moves)
-      (apply-move (move/empty-cell-move player point))
-      (with-available-moves)
-      (with-next-player))
-    game))
-
-(defn new-init-turn []
-  (-> {:board (board/new-board)
-       :player (rand-nth cst/players)
-       :moves {}
-       :help false
-       :scores
-       {:blue cst/init-block-count
-        :red cst/init-block-count
-        :green cst/init-block-count}}
-    with-available-moves))
 
 
 ;; -----------------------------------------
@@ -139,7 +78,7 @@
     (first
       (utils/fast-max-key
         (fn [[m converted :as move]]
-          (let [new-game (play-move game m)
+          (let [new-game (turn/play-move game m)
                 diff-score (move-strength cells-strength identity move)
                 losses (map #(worst-immediate-loss cells-strength new-game % player) others)]
             (- diff-score (apply max losses))))
@@ -161,7 +100,7 @@
 ;; -----------------------------------------
 
 (defn new-game []
-  (list (with-ai-data (new-init-turn))))
+  (list (with-ai-data (turn/new-init-turn))))
 
 (defonce app-state
   (atom {:games (new-game)
@@ -190,7 +129,7 @@
 (defn- handle-ai! []
   (let [ai-algo (get @ai-players @current-player)
         move (ai-algo @game @current-player)]
-    (update-game! play-move move)))
+    (update-game! turn/play-move move)))
 
 (defn cancel-last-move ;; TODO - It needs the ai: how to move it in the game? undo then undo-while
   [old-turns]
@@ -221,7 +160,7 @@
       (while true
         (alt!
           game-events ([msg] (handle-game-event! msg))
-          player-events ([coord] (update-game! play-move coord))
+          player-events ([coord] (update-game! turn/play-move coord))
           ai-events ([msg] (when (= msg :ai-play) (handle-ai!)))
           (async/timeout ai-move-delay) ([_] (put! ai-events :ai-play))
           )))
@@ -250,7 +189,7 @@
   (and
     (:help @app-state)
     (not (is-ai? @current-player))
-    (get-move-at @game @current-player [x y])))
+    (turn/get-move-at @game @current-player [x y])))
 
 (def interactions
   (reify view/CallBacks
