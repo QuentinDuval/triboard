@@ -67,3 +67,13 @@
   (eduction
     (keep #(available-cells-by-dir board point %))
     cst/directions))
+
+(defn apply-move
+  "Aplpy a move onto the board, yielding a new board"
+  [board move]
+  {:pre [(board/board? board) (move? move)]
+   :post [(board/board? board)]}
+  (reduce
+    #(assoc-in %1 %2 (:winner move))
+    board
+    (:taken move)))

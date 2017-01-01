@@ -79,7 +79,7 @@
   [game {:keys [winner looser taken] :as move}]
   {:pre [(move/move? move)]}
   (-> game
-    (assoc :board (reduce #(assoc-in %1 %2 winner) (:board game) taken))
+    (update-in [:board] move/apply-move move)
     (update-in [:scores winner] + (count taken))
     (update-in [:scores looser] - (count taken))
     ))
