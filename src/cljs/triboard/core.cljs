@@ -73,6 +73,17 @@
       (with-next-player))
     game))
 
+(defn new-init-turn []
+  (-> {:board (board/new-board)
+       :player (rand-nth cst/players)
+       :moves {}
+       :help false
+       :scores
+       {:blue cst/init-block-count
+        :red cst/init-block-count
+        :green cst/init-block-count}}
+    with-available-moves))
+
 
 ;; -----------------------------------------
 ;; ARTIFICIAL INTELLIGENCE
@@ -150,18 +161,10 @@
 ;; -----------------------------------------
 
 (defn new-game []
-  (-> {:board (board/new-board)
-       :player (rand-nth cst/players)
-       :moves {}
-       :help false
-       :scores
-       {:blue cst/init-block-count
-        :red cst/init-block-count
-        :green cst/init-block-count}}
-    with-available-moves))
+  (list (with-ai-data (new-init-turn))))
 
 (defonce app-state
-  (atom {:games (list (with-ai-data (new-game)))
+  (atom {:games (new-game)
          :help false}))
 
 (def game (reaction (first (get-in @app-state [:games]))))
@@ -200,7 +203,7 @@
 (defn- handle-game-event!
   [msg]
   (case msg
-    :new-game (swap! app-state assoc-in [:games] (list (new-game)))
+    :new-game (swap! app-state assoc-in [:games] (new-game))
     :restart (swap! app-state update-in [:games] #(take-last 1 %))
     :undo (swap! app-state update-in [:games] cancel-last-move)))
 
