@@ -3,6 +3,7 @@
     [triboard.logic.constants :as cst]
     [triboard.logic.board :as board]
     [triboard.logic.move :as move]
+    [triboard.logic.scores :as scores]
     ))
 
 
@@ -66,8 +67,5 @@
        :player (rand-nth cst/players)
        :moves {}
        :help false
-       :scores
-       {:blue cst/init-block-count
-        :red cst/init-block-count
-        :green cst/init-block-count}}
+       :scores scores/initial-scores}
     with-available-moves))
