@@ -53,7 +53,8 @@
    :looser :red,
    :taken [[8 5] [9 5]]}"
   [board [xi yi :as coord] [dx dy]]
-  {:pre [(board/board? board) (board/coord? coord)]}
+  {:pre [(board/board? board) (board/coord? coord)]
+   :post [(or (nil? %) (move? %))]}
   (loop [x (+ xi dx)
          y (+ yi dy)
          looser nil
