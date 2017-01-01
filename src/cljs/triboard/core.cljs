@@ -189,7 +189,7 @@
         move (ai-algo @game @current-player)]
     (update-game! play-move move)))
 
-(defn cancel-last-move ;; TODO - It needs the ai: how to move it in the game?
+(defn cancel-last-move ;; TODO - It needs the ai: how to move it in the game? undo then undo-while
   [old-turns]
   (let [ai-turn? #(contains? (:ai-players %) (:player %))
         new-turns (drop-while ai-turn? (drop 1 old-turns))]
