@@ -33,7 +33,7 @@
   (assoc game :moves (move/all-available-moves board)))
 
 (defn- next-player
-  [player] 
+  [player]
   (case player
     :blue :red
     :red :green
@@ -135,6 +135,15 @@
         moves))
     ))
 
+(defn with-ai-data
+  "Add the AI data needed to play the game"
+  [init-game]
+  (merge init-game
+    {:ai-players
+     {:red (partial best-move (compute-cells-strength board))
+      :green (partial best-move (compute-cells-strength board))}}
+    ))
+
 
 ;; -----------------------------------------
 ;; GAME STATE
@@ -142,24 +151,22 @@
 
 (defn new-game []
   (let [board (board/new-board)]
-    (with-available-moves
-      {:board board
-       :player (rand-nth cst/players)
-       :moves {}
-       :help false
-       :ai-players
-       {:red (partial best-move (compute-cells-strength board))
-        :green (partial best-move (compute-cells-strength board))}
-       :scores
-       {:blue cst/init-block-count
-        :red cst/init-block-count
-        :green cst/init-block-count}})))
+    (-> {:board board
+         :player (rand-nth cst/players)
+         :moves {}
+         :help false
+         :scores
+         {:blue cst/init-block-count
+          :red cst/init-block-count
+          :green cst/init-block-count}}
+      with-available-moves
+      with-ai-data)))
 
 (defonce app-state
   (atom {:games (list (new-game))
          :help false}))
 
-(def game (reaction (first (get-in @app-state [:games])))) 
+(def game (reaction (first (get-in @app-state [:games]))))
 (def board (reaction (get-in @game [:board])))
 (def scores (reaction (get-in @game [:scores])))
 (def current-player (reaction (get-in @game [:player])))
@@ -208,7 +215,7 @@
         ai-events (chan 1 (comp (filter game-on-xf) (filter is-ai-xf)))
         player-events (chan 1 (comp (filter game-on-xf) (filter is-human-xf)))
         game-events (chan 1)]
-    
+
     (go
       (while true
         (alt!
@@ -217,7 +224,7 @@
           ai-events ([msg] (when (= msg :ai-play) (handle-ai!)))
           (async/timeout ai-move-delay) ([_] (put! ai-events :ai-play))
           )))
-    
+
     {:player-events player-events
      :game-events game-events}))
 
