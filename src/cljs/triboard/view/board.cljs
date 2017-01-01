@@ -2,8 +2,10 @@
   (:require
     [triboard.logic.board :as model]
     [triboard.logic.constants :as cst]
+    [triboard.view.callbacks :as cb]
     [triboard.view.utils :as vutils]
     ))
+
 
 (defn rect-cell
   [x y player options]
@@ -15,12 +17,13 @@
      options)])
 
 (defn empty-cell
-  [x y player on-click]
-  (rect-cell x y player {:on-click #(on-click [x y])}))
-
+  [x y cb player]
+  (rect-cell x y player
+    {:on-click #(cb/on-player-move cb x y)}
+    ))
 
 (defn render-board
-  [board {:keys [show-help? on-player-click]}]
+  [board cb]
   (into
     [:svg.board
      {:view-box (str "0 0 " cst/board-width " " cst/board-height)
@@ -28,6 +31,6 @@
     (for [[[x y] cell] (model/to-iterable board)]
       ^{:key [x y]}
       (if (= :empty cell)
-        [empty-cell x y (if-not (show-help? x y) :empty :help) on-player-click]
+        [empty-cell x y cb (if-not (cb/show-as-help? cb x y) :empty :help)]
         [rect-cell x y cell])
       )))

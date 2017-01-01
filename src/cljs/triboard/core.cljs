@@ -6,6 +6,7 @@
     [triboard.logic.constants :as cst]
     [triboard.logic.board :as board]
     [triboard.view.board :as vboard]
+    [triboard.view.callbacks :as view]
     [triboard.view.panel :as panel]
     [triboard.view.utils :as vutils]
     )
@@ -328,13 +329,14 @@
     (get-move-at @game @current-player [x y])))
 
 (def interactions
-  {:on-new-game #(send-game-event! :new-game)
-   :on-help toogle-help!
-   :on-restart #(send-game-event! :restart)
-   :on-undo #(send-game-event! :undo)
-   :show-help? show-help?
-   :on-player-click send-player-event!
-   })
+  (reify view/CallBacks
+    (on-new-game [_] (send-game-event! :new-game))
+    (on-toogle-help [_] (toogle-help!))
+    (on-restart [_] (send-game-event! :restart))
+    (on-undo [_] (send-game-event! :undo))
+    (on-player-move [_ x y] (send-player-event! [x y]))
+    (show-as-help? [_ x y] (show-help? x y))
+    ))
 
 (defn run-game []
   [:div.game-panel
