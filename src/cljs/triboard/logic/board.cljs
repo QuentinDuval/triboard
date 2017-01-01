@@ -32,7 +32,7 @@
 
 
 ;; -----------------------------------------
-;; Public API
+;; Public Types
 ;; -----------------------------------------
 
 (defn board?
@@ -48,7 +48,14 @@
     (integer? (second p))
     (= 2 (count p))))
 
-(defn new-board []
+
+;; -----------------------------------------
+;; Public API
+;; -----------------------------------------
+
+(defn new-board
+  "Creates a new board with initial positions of each players"
+  []
   {:post [(board? %)]}
   (reduce
     (fn [r [color point]] (assoc-in r point color))
@@ -57,6 +64,7 @@
 (def get-cell-at get-in)
 
 (defn to-iterable
+  "Access to the board as a list of coordinates with corresponding owner"
   [board]
   (for [[x y :as coord] cst/all-positions]
     [coord (get-cell-at board coord)]
