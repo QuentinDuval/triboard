@@ -32,12 +32,11 @@
     ))
 
 (defn- apply-move
-  [game {:keys [winner looser taken] :as move}]
+  [game move]
   {:pre [(move/move? move)]}
   (-> game
-    (update-in [:board] move/apply-move move)
-    (update-in [:scores winner] + (count taken))
-    (update-in [:scores looser] - (count taken))
+    (update :board move/apply-move move)
+    (update :scores scores/update-scores move)
     ))
 
 
