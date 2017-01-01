@@ -24,16 +24,8 @@
 
 
 ;; -----------------------------------------
-;; IDENTIFY CONVERTIBLE CELLS
+;; ON PLAYER MOVE
 ;; -----------------------------------------
-
-(defn take-empty-cell-move
-  "Create a move to take an empty cell" 
-  [player point]
-  {:move point
-   :winner player
-   :looser :empty
-   :taken [point]})
 
 (defn with-available-moves
   "Compute all available moves on the board.
@@ -54,11 +46,6 @@
       {}
       (board/empty-cells board)
       )))
-
-
-;; -----------------------------------------
-;; ON PLAYER MOVE
-;; -----------------------------------------
 
 (defn- next-player
   [player] 
@@ -96,7 +83,7 @@
   (if-let [moves (get-move-at game player point)]
     (->
       (reduce apply-move game moves)
-      (apply-move (take-empty-cell-move player point))
+      (apply-move (move/empty-cell-move player point))
       (with-available-moves)
       (with-next-player))
     game))

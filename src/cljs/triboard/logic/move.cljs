@@ -59,6 +59,14 @@
 ;; Public API
 ;; -----------------------------------------
 
+(defn empty-cell-move
+  "Create a move to take an empty cell"
+  [player point]
+  {:move point
+   :winner player
+   :looser :empty
+   :taken [point]})
+
 (defn available-moves-at
   "Provides the list of moves that can be done from a cell"
   [board point]
