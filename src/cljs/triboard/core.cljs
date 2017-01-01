@@ -5,10 +5,10 @@
     [triboard.utils :as utils]
     [triboard.logic.constants :as cst]
     [triboard.logic.board :as board]
+    [triboard.logic.move :as move]
     [triboard.view.board :as vboard]
     [triboard.view.callbacks :as view]
     [triboard.view.panel :as panel]
-    [triboard.view.utils :as vutils]
     )
   (:require-macros
     [cljs.core.async.macros :refer [go go-loop alt!]]
@@ -21,20 +21,6 @@
 ;; TODO - Try to bring some domain vocabulary here: it gets too complicated to trace
 ;; TODO - http://www.w3schools.com/howto/howto_js_sidenav.asp
 ;; TODO - http://www.w3schools.com/svg/svg_grad_radial.asp
-
-
-;; -----------------------------------------
-;; EXTRINSIC TYPES
-;; -----------------------------------------
-
-(defn move?
-  "A move is a map of coordinate, cell takens, a looser an a winner"
-  [m]
-  (and
-    (board/coord? (:move m))
-    (every? board/coord? (:taken m))
-    (cst/player? (:winner m))
-    (cst/cell? (:looser m))))
 
 
 ;; -----------------------------------------
@@ -54,7 +40,7 @@
    :taken [[8 5] [9 5]]}"
   [board [xi yi :as coord] [dx dy]]
   {:pre [(board/board? board) (board/coord? coord)]
-   :post [(or (nil? %) (move? %))]}
+   :post [(or (nil? %) (move/move? %))]}
   (loop [x (+ xi dx)
          y (+ yi dy)
          looser nil
@@ -127,7 +113,7 @@
 
 (defn- apply-move
   [game {:keys [winner looser taken] :as move}]
-  {:pre [(move? move)]}
+  {:pre [(move/move? move)]}
   (-> game
     (assoc :board (reduce #(assoc-in %1 %2 winner) (:board game) taken))
     (update-in [:scores winner] + (count taken))
@@ -175,7 +161,7 @@
 (defn- move-strength
   "Compute the strength of a move, based on the converted cells"
   [cells-strength converted-filter [point converted]]
-  {:pre [(fn? converted-filter) (every? move? converted)]}
+  {:pre [(fn? converted-filter) (every? move/move? converted)]}
   (transduce
     (comp
       (filter converted-filter) ;; TODO - Extract this part (specific to worst move)
