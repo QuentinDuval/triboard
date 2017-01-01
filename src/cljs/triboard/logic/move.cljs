@@ -69,7 +69,7 @@
     cst/directions))
 
 (defn apply-move
-  "Aplpy a move onto the board, yielding a new board"
+  "Apply a move onto the board, yielding a new board"
   [board move]
   {:pre [(board/board? board) (move? move)]
    :post [(board/board? board)]}
