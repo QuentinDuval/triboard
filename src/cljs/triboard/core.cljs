@@ -150,16 +150,15 @@
 ;; -----------------------------------------
 
 (defn new-game []
-  (let [board (board/new-board)]
-    (-> {:board board
-         :player (rand-nth cst/players)
-         :moves {}
-         :help false
-         :scores
-         {:blue cst/init-block-count
-          :red cst/init-block-count
-          :green cst/init-block-count}}
-      with-available-moves)))
+  (-> {:board (board/new-board)
+       :player (rand-nth cst/players)
+       :moves {}
+       :help false
+       :scores
+       {:blue cst/init-block-count
+        :red cst/init-block-count
+        :green cst/init-block-count}}
+    with-available-moves))
 
 (defonce app-state
   (atom {:games (list (with-ai-data (new-game)))
@@ -190,7 +189,7 @@
         move (ai-algo @game @current-player)]
     (update-game! play-move move)))
 
-(defn cancel-last-move
+(defn cancel-last-move ;; TODO - It needs the ai: how to move it in the game?
   [old-turns]
   (let [ai-turn? #(contains? (:ai-players %) (:player %))
         new-turns (drop-while ai-turn? (drop 1 old-turns))]
