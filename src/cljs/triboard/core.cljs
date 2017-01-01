@@ -27,42 +27,6 @@
 ;; IDENTIFY CONVERTIBLE CELLS
 ;; -----------------------------------------
 
-(defn ^boolean is-cell-empty?
-  "Indicates whether a cell is owned by any player"
-  [cell]
-  (or (nil? cell) (= cell :empty) (= cell :wall)))
-
-(defn available-cells-by-dir
-  "Indicates the convertible cells when clicking at [x y], and returns:
-	{:move [7 5]
-   :winner :blue,
-   :looser :red,
-   :taken [[8 5] [9 5]]}"
-  [board [xi yi :as coord] [dx dy]]
-  {:pre [(board/board? board) (board/coord? coord)]
-   :post [(or (nil? %) (move/move? %))]}
-  (loop [x (+ xi dx)
-         y (+ yi dy)
-         looser nil
-         taken []]
-    (let [cell (board/get-cell-at board [x y])]
-      (cond
-        (is-cell-empty? cell) nil ;; No move: reached end and only 1 type of cell
-        (and looser (not= looser cell)) {:winner cell   ;; Who wins the cells
-                                         :looser looser ;; Who looses the cells
-                                         :move coord    ;; The move performed
-                                         :taken taken}  ;; The cells taken
-        :else (recur
-                (+ x dx) (+ y dy)
-                cell (conj taken [x y])))
-      )))
-
-(defn available-moves-at
-  "Provides the list of moves that can be done from a cell"
-  {:pre [(board? board) (coord? point)]}
-  [board point]
-  (eduction (keep #(available-cells-by-dir board point %)) cst/directions))
-
 (defn take-empty-cell-move
   "Create a move to take an empty cell" 
   [player point]
@@ -85,7 +49,7 @@
   {:pre [(board/board? board)]}
   (assoc game :moves
     (transduce
-      (mapcat #(available-moves-at board %))
+      (mapcat #(move/available-moves-at board %))
       #(update-in %1 [(:winner %2) (:move %2)] conj %2)
       {}
       (board/empty-cells board)
