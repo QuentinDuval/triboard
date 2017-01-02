@@ -96,18 +96,14 @@
   []
   (let [game-on-xf (fn [_] (not @end-of-game))
         is-human-xf (fn [_] (not (is-ai? @current-player)))
-        is-ai-xf (fn [_] (is-ai? @current-player))
-        ai-events (chan 1 (comp (filter game-on-xf) (filter is-ai-xf)))
         player-events (chan 1 (comp (filter game-on-xf) (filter is-human-xf)))
         game-events (chan 1)]
-
     (go
       (while true
         (alt!
           game-events ([msg] (handle-game-event! msg))
           player-events ([coord] (update-game! turn/play-move coord))
-          ai-events ([msg] (when (= msg :ai-play) (handle-ai!)))
-          (async/timeout ai-move-delay) ([_] (put! ai-events :ai-play))
+          (async/timeout ai-move-delay) ([_] (if (is-ai? @current-player) (handle-ai!)))
           )))
 
     {:player-events player-events
