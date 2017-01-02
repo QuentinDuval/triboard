@@ -21,6 +21,7 @@
 ;; TODO - Move the assembling of the display in view
 ;; TODO - Rework the queue system to have something simpler
 ;; TODO - Extract the parts that are related to costmetic: Help
+;; TODO - Rework the game loop to be a state machine (beware of consuming messages)
 
 ;; TODO - http://www.w3schools.com/howto/howto_js_sidenav.asp
 ;; TODO - http://www.w3schools.com/svg/svg_grad_radial.asp
