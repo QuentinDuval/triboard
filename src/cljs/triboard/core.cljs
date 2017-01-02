@@ -5,9 +5,8 @@
     [triboard.ai.ai :as ai]
     [triboard.logic.game :as game]
     [triboard.logic.turn :as turn]
-    [triboard.view.board :as vboard]
     [triboard.view.callbacks :as view]
-    [triboard.view.panel :as panel]
+    [triboard.view.frame :as frame]
     )
   (:require-macros
     [cljs.core.async.macros :refer [go go-loop alt!]]
@@ -15,11 +14,8 @@
 
 
 (enable-console-print!)
-(set! *assert* true) ;; Set to true for the debug mode
+(set! *assert* true)                                        ;; Set to true for the debug mode
 
-;; TODO - Rework the connection with AI: the AI should not be in the game (could be function)
-;; TODO - Move the assembling of the display in view
-;; TODO - Rework the queue system to have something simpler
 ;; TODO - Extract the parts that are related to costmetic: Help
 ;; TODO - Rework the game loop to be a state machine (beware of consuming messages)
 
@@ -104,21 +100,16 @@
     (not (is-ai? @current-player))
     (turn/get-move-at @current-turn @current-player [x y])))
 
-(def interactions
-  (reify view/CallBacks
-    (on-new-game [_] (send-game-event! :new-game))
-    (on-toogle-help [_] (toogle-help!))
-    (on-restart [_] (send-game-event! :restart))
-    (on-undo [_] (send-game-event! :undo))
-    (on-player-move [_ x y] (send-player-event! [x y]))
-    (show-as-help? [_ x y] (show-help? x y))
-    ))
-
 (defn run-game []
-  [:div.game-panel
-   [panel/show-top-panel @scores @current-player interactions]
-   (vboard/render-board @board interactions)
-   ])
+  (frame/main-frame @current-turn
+    (reify view/CallBacks
+      (on-new-game [_] (send-game-event! :new-game))
+      (on-toogle-help [_] (toogle-help!))
+      (on-restart [_] (send-game-event! :restart))
+      (on-undo [_] (send-game-event! :undo))
+      (on-player-move [_ x y] (send-player-event! [x y]))
+      (show-as-help? [_ x y] (show-help? x y))
+      )))
 
 (reagent/render [run-game]
   (js/document.getElementById "app"))
