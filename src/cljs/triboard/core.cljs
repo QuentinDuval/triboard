@@ -27,25 +27,11 @@
 
 
 ;; -----------------------------------------
-;; ARTIFICIAL INTELLIGENCE
-;; -----------------------------------------
-
-(defn with-ai-data
-  "Add the AI data needed to play the game"
-  [{:keys [board] :as init-game}]
-  (merge init-game
-    {:ai-players
-     {:red (partial ai/best-move (ai/compute-cells-strength board))
-      :green (partial ai/best-move (ai/compute-cells-strength board))}}
-    ))
-
-
-;; -----------------------------------------
 ;; GAME STATE
 ;; -----------------------------------------
 
 (defn new-game []
-  (list (with-ai-data (turn/new-init-turn))))
+  (list (turn/new-init-turn)))
 
 (defn get-turn
   [game-turns]
@@ -56,7 +42,7 @@
   (conj game-turns
     (turn/play-move (get-turn game-turns) coord)))
 
-(defn cancel-last-move ;; TODO - It needs the ai: how to move it in the game? undo then undo-while
+(defn cancel-last-move
   [old-turns is-ai?]
   (let [new-turns (drop-while #(is-ai? (:player %)) (drop 1 old-turns))]
     (if (empty? new-turns)
@@ -76,23 +62,21 @@
 (def board (reaction (turn/get-board @game)))
 (def scores (reaction (turn/get-scores @game)))
 (def current-player (reaction (turn/current-player @game)))
-(def ai-players (reaction (get-in @game [:ai-players])))
-
-(defn is-ai? [player] (contains? @ai-players player))
 
 
 ;; -----------------------------------------
 ;; GAME LOOP
 ;; -----------------------------------------
 
+(def is-ai? #{:red :green})
 (def ai-move-delay 1000)
 
 (defn play-game-turn! [move]
   (swap! app-state update-in [:games] play-turn move))
 
 (defn- handle-ai! []
-  (let [ai-algo (get @ai-players @current-player)
-        move (ai-algo @game @current-player)]
+  ;; TODO - Find a way to cache the cells-strenght as it was done before
+  (let [move (ai/best-move (ai/compute-cells-strength @board) @game @current-player)]
     (play-game-turn! move)))
 
 (defn- handle-game-event!
@@ -100,7 +84,7 @@
   (case msg
     :new-game (swap! app-state assoc-in [:games] (new-game))
     :restart (swap! app-state update-in [:games] #(take-last 1 %))
-    :undo (swap! app-state update-in [:games] cancel-last-move #{:red :green})))
+    :undo (swap! app-state update-in [:games] cancel-last-move is-ai?)))
 
 (defn start-game-loop
   "Manage transitions between player moves, ai moves, and generic game events"
