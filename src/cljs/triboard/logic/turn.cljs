@@ -44,6 +44,21 @@
 ;; Public API
 ;; -----------------------------------------
 
+(defn new-init-turn []
+  (-> {:board (board/new-board)
+       :player (rand-nth cst/players)
+       :moves {}
+       :help false
+       :scores scores/initial-scores}
+    with-available-moves))
+
+(defn current-player [game] (:player game))
+(defn get-board [game] (:board game))
+(defn get-scores [game] (:scores game))
+
+(defn game-over? [game]
+  (nil? (current-player game)))
+
 (defn get-move-at
   "Access the available moves for the provided player at the provided point"
   [game player point]
@@ -60,11 +75,3 @@
       (with-available-moves)
       (with-next-player))
     game))
-
-(defn new-init-turn []
-  (-> {:board (board/new-board)
-       :player (rand-nth cst/players)
-       :moves {}
-       :help false
-       :scores scores/initial-scores}
-    with-available-moves))

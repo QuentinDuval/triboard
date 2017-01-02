@@ -52,14 +52,12 @@
          :help false}))
 
 (def game (reaction (first (get-in @app-state [:games]))))
-(def board (reaction (get-in @game [:board])))
-(def scores (reaction (get-in @game [:scores])))
-(def current-player (reaction (get-in @game [:player])))
+(def board (reaction (turn/get-board @game)))
+(def scores (reaction (turn/get-scores @game)))
+(def current-player (reaction (turn/current-player @game)))
 (def ai-players (reaction (get-in @game [:ai-players])))
-(def end-of-game (reaction (nil? @current-player)))
 
-(defn is-ai? [player]
-  (contains? @ai-players player))
+(defn is-ai? [player] (contains? @ai-players player))
 
 
 ;; -----------------------------------------
@@ -94,7 +92,7 @@
 (defn start-game-loop
   "Manage transitions between player moves, ai moves, and generic game events"
   []
-  (let [game-on-xf (fn [_] (not @end-of-game))
+  (let [game-on-xf (fn [_] (not (turn/game-over? @game)))
         is-human-xf (fn [_] (not (is-ai? @current-player)))
         player-events (chan 1 (comp (filter game-on-xf) (filter is-human-xf)))
         game-events (chan 1)]
