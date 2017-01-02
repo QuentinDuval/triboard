@@ -3,6 +3,7 @@
     [cljs.core.async :as async :refer [put! chan <! >!]]
     [reagent.core :as reagent :refer [atom]]
     [triboard.ai.ai :as ai]
+    [triboard.logic.game :as game]
     [triboard.logic.turn :as turn]
     [triboard.view.board :as vboard]
     [triboard.view.callbacks :as view]
@@ -16,7 +17,6 @@
 (enable-console-print!)
 (set! *assert* true) ;; Set to true for the debug mode
 
-;; TODO - Extract the game notion: the undo and stacking of different turns
 ;; TODO - Rework the connection with AI: the AI should not be in the game (could be function)
 ;; TODO - Move the assembling of the display in view
 ;; TODO - Rework the queue system to have something simpler
@@ -27,38 +27,14 @@
 
 
 ;; -----------------------------------------
-;; GAME STATE
-;; -----------------------------------------
-
-(defn new-game []
-  (list (turn/new-init-turn)))
-
-(defn get-turn
-  [game-turns]
-  (first game-turns))
-
-(defn play-turn
-  [game-turns coord]
-  (conj game-turns
-    (turn/play-move (get-turn game-turns) coord)))
-
-(defn cancel-last-move
-  [old-turns is-ai?]
-  (let [new-turns (drop-while #(is-ai? (:player %)) (drop 1 old-turns))]
-    (if (empty? new-turns)
-      (take-last 1 old-turns)
-      new-turns)))
-
-
-;; -----------------------------------------
 ;; APP STATE
 ;; -----------------------------------------
 
 (defonce app-state
-  (atom {:games (new-game)
+  (atom {:games (game/new-game)
          :help false}))
 
-(def game (reaction (get-turn (get-in @app-state [:games]))))
+(def game (reaction (game/current-turn (:games @app-state))))
 (def board (reaction (turn/get-board @game)))
 (def scores (reaction (turn/get-scores @game)))
 (def current-player (reaction (turn/current-player @game)))
@@ -72,7 +48,7 @@
 (def ai-move-delay 1000)
 
 (defn play-game-turn! [move]
-  (swap! app-state update-in [:games] play-turn move))
+  (swap! app-state update-in [:games] game/play-move move))
 
 (defn- handle-ai! []
   ;; TODO - Find a way to cache the cells-strenght as it was done before
@@ -82,9 +58,9 @@
 (defn- handle-game-event!
   [msg]
   (case msg
-    :new-game (swap! app-state assoc-in [:games] (new-game))
+    :new-game (swap! app-state assoc-in [:games] (game/new-game))
     :restart (swap! app-state update-in [:games] #(take-last 1 %))
-    :undo (swap! app-state update-in [:games] cancel-last-move is-ai?)))
+    :undo (swap! app-state update-in [:games] game/undo-player-move is-ai?)))
 
 (defn start-game-loop
   "Manage transitions between player moves, ai moves, and generic game events"
