@@ -47,6 +47,15 @@
 (defn new-game []
   (list (with-ai-data (turn/new-init-turn))))
 
+(defn get-turn
+  [game-turns]
+  (first game-turns))
+
+(defn play-turn
+  [game-turns coord]
+  (conj game-turns
+    (turn/play-move (get-turn game-turns) coord)))
+
 (defn cancel-last-move ;; TODO - It needs the ai: how to move it in the game? undo then undo-while
   [old-turns]
   (let [ai-turn? #(contains? (:ai-players %) (:player %))
@@ -64,7 +73,7 @@
   (atom {:games (new-game)
          :help false}))
 
-(def game (reaction (first (get-in @app-state [:games]))))
+(def game (reaction (get-turn (get-in @app-state [:games]))))
 (def board (reaction (turn/get-board @game)))
 (def scores (reaction (turn/get-scores @game)))
 (def current-player (reaction (turn/current-player @game)))
@@ -79,13 +88,13 @@
 
 (def ai-move-delay 1000)
 
-(defn update-game! [f & args]
-  (swap! app-state update-in [:games] conj (apply f @game args)))
+(defn play-game-turn! [move]
+  (swap! app-state update-in [:games] play-turn move))
 
 (defn- handle-ai! []
   (let [ai-algo (get @ai-players @current-player)
         move (ai-algo @game @current-player)]
-    (update-game! turn/play-move move)))
+    (play-game-turn! move)))
 
 (defn- handle-game-event!
   [msg]
@@ -105,7 +114,7 @@
       (while true
         (alt!
           game-events ([msg] (handle-game-event! msg))
-          player-events ([coord] (update-game! turn/play-move coord))
+          player-events ([coord] (play-game-turn! coord))
           (async/timeout ai-move-delay) ([_] (if (is-ai? @current-player) (handle-ai!)))
           )))
 
