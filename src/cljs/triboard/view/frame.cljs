@@ -10,5 +10,5 @@
   [turn interactions]
   [:div.game-panel
    [panel/show-top-panel (turn/get-scores turn) (turn/current-player turn) interactions]
-   (board/render-board (turn/get-board turn) interactions)
+   [board/render-board (turn/get-board turn) interactions]
    ])
