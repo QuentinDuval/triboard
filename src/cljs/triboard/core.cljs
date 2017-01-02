@@ -57,9 +57,8 @@
     (turn/play-move (get-turn game-turns) coord)))
 
 (defn cancel-last-move ;; TODO - It needs the ai: how to move it in the game? undo then undo-while
-  [old-turns]
-  (let [ai-turn? #(contains? (:ai-players %) (:player %))
-        new-turns (drop-while ai-turn? (drop 1 old-turns))]
+  [old-turns is-ai?]
+  (let [new-turns (drop-while #(is-ai? (:player %)) (drop 1 old-turns))]
     (if (empty? new-turns)
       (take-last 1 old-turns)
       new-turns)))
@@ -101,7 +100,7 @@
   (case msg
     :new-game (swap! app-state assoc-in [:games] (new-game))
     :restart (swap! app-state update-in [:games] #(take-last 1 %))
-    :undo (swap! app-state update-in [:games] cancel-last-move)))
+    :undo (swap! app-state update-in [:games] cancel-last-move #{:red :green})))
 
 (defn start-game-loop
   "Manage transitions between player moves, ai moves, and generic game events"
