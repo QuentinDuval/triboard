@@ -34,10 +34,10 @@
   (atom {:games (game/new-game)
          :help false}))
 
-(def game (reaction (game/current-turn (:games @app-state))))
-(def board (reaction (turn/get-board @game)))
-(def scores (reaction (turn/get-scores @game)))
-(def current-player (reaction (turn/current-player @game)))
+(def current-turn (reaction (game/current-turn (:games @app-state))))
+(def board (reaction (turn/get-board @current-turn)))
+(def scores (reaction (turn/get-scores @current-turn)))
+(def current-player (reaction (turn/current-player @current-turn)))
 
 
 ;; -----------------------------------------
@@ -52,7 +52,7 @@
 
 (defn- handle-ai! []
   ;; TODO - Find a way to cache the cells-strenght as it was done before
-  (let [move (ai/best-move (ai/compute-cells-strength @board) @game @current-player)]
+  (let [move (ai/best-move (ai/compute-cells-strength @board) @current-turn @current-player)]
     (play-game-turn! move)))
 
 (defn- handle-game-event!
@@ -65,7 +65,7 @@
 (defn start-game-loop
   "Manage transitions between player moves, ai moves, and generic game events"
   []
-  (let [game-on-xf (fn [_] (not (turn/game-over? @game)))
+  (let [game-on-xf (fn [_] (not (turn/game-over? @current-turn)))
         is-human-xf (fn [_] (not (is-ai? @current-player)))
         player-events (chan 1 (comp (filter game-on-xf) (filter is-human-xf)))
         game-events (chan 1)]
@@ -101,7 +101,7 @@
   (and
     (:help @app-state)
     (not (is-ai? @current-player))
-    (turn/get-move-at @game @current-player [x y])))
+    (turn/get-move-at @current-turn @current-player [x y])))
 
 (def interactions
   (reify view/CallBacks
