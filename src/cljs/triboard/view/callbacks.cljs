@@ -1,8 +1,6 @@
 (ns triboard.view.callbacks)
 
 
-;; TODO - show-as-help? should be reworked to be data flowing down
-
 (defprotocol CallBacks
   "A protocol for the interactions that can be triggered from the GUI"
   (on-new-game [this] "Send a new game command")
@@ -10,5 +8,4 @@
   (on-restart [this] "Send a restart command")
   (on-undo [this] "Send an undo command")
   (on-player-move [this x y] "Send a command to player at [x y]")
-  (show-as-help? [this x y] "Asks if the cell should be displayed as help")
   )

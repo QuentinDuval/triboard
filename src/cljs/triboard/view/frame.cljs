@@ -7,8 +7,8 @@
 
 
 (defn main-frame
-  [turn interactions]
+  [turn suggestions interactions]
   [:div.game-panel
    [panel/show-top-panel (turn/get-scores turn) (turn/get-player turn) interactions]
-   [board/render-board (turn/get-board turn) interactions]
+   [board/render-board (turn/get-board turn) suggestions interactions]
    ])

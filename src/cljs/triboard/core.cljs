@@ -93,22 +93,20 @@
 ;; DISPLAY
 ;; -----------------------------------------
 
-(defn ^boolean show-help?
-  [x y]
-  (and
-    (:help @app-state)
-    (not (is-ai? @current-player))
-    (turn/get-move-at @current-turn @current-player [x y])))
+(defn get-suggestions
+  []
+  (if (and (:help @app-state) (not (is-ai? @current-player)))
+    (turn/get-moves-of @current-turn @current-player)
+    {}))
 
 (defn run-game []
-  (frame/main-frame @current-turn
+  (frame/main-frame @current-turn (get-suggestions)
     (reify view/CallBacks
       (on-new-game [_] (send-game-event! :new-game))
       (on-toogle-help [_] (toogle-help!))
       (on-restart [_] (send-game-event! :restart))
       (on-undo [_] (send-game-event! :undo))
       (on-player-move [_ x y] (send-player-event! [x y]))
-      (show-as-help? [_ x y] (show-help? x y))
       )))
 
 (reagent/render [run-game]

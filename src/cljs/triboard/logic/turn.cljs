@@ -59,16 +59,16 @@
 (defn get-moves [turn] (:moves turn))
 (defn game-over? [turn] (nil? (get-player turn)))
 
-(defn get-move-at
-  "Access the available moves for the provided player at the provided point"
-  [turn player point]
-  (get-in (get-moves turn) [player point]))
+(defn get-moves-of
+  "Access the available moves for the provided player, by coordinates"
+  [turn player]
+  (get (get-moves turn) player))
 
 (defn play-move
   "On player playing the move [x y] - update all the game state accordingly"
   [{:keys [player board] :as turn} point]
   {:pre [(board/board? board)]}
-  (if-let [moves (get-move-at turn player point)]
+  (if-let [moves (get (get-moves-of turn player) point)]
     (-> turn
       (apply-moves (conj moves (move/empty-cell-move player point)))
       (with-available-moves)

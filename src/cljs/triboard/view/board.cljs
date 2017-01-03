@@ -23,7 +23,7 @@
     ))
 
 (defn render-board
-  [board cb]
+  [board suggestions cb]
   (into
     [:svg.board
      {:view-box (str "0 0 " cst/board-width " " cst/board-height)
@@ -31,6 +31,6 @@
     (for [[[x y] cell] (model/to-iterable board)]
       ^{:key [x y]}
       (if (= :empty cell)
-        [empty-cell x y cb (if-not (cb/show-as-help? cb x y) :empty :help)]
+        [empty-cell x y cb (if (contains? suggestions [x y]) :help :empty)]
         [rect-cell x y cell])
       )))
