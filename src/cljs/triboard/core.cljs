@@ -28,21 +28,26 @@
 ;; APP STATE
 ;; -----------------------------------------
 
+(def is-ai? #{:red :green})
+(def ai-move-delay 1000)
+
 (defonce app-state
   (atom {:game (game/new-game)
          :help false}))
 
 (def current-turn (reaction (game/current-turn (:game @app-state))))
 (def current-player (reaction (turn/get-player @current-turn)))
-(def help-toggled? (reaction (:help @app-state)))
+
+(def suggestions
+  (reaction
+    (if (and (:help @app-state) (not (is-ai? @current-player)))
+      (turn/get-moves-of @current-turn @current-player)
+      {})))
 
 
 ;; -----------------------------------------
 ;; GAME LOOP
 ;; -----------------------------------------
-
-(def is-ai? #{:red :green})
-(def ai-move-delay 1000)
 
 (defn play-game-turn! [move]
   (swap! app-state update-in [:game] game/play-move move))
@@ -90,14 +95,8 @@
 ;; PLUGGING THE BLOCKS
 ;; -----------------------------------------
 
-(defn get-suggestions
-  []
-  (if (and @help-toggled? (not (is-ai? @current-player)))
-    (turn/get-moves-of @current-turn @current-player)
-    {}))
-
 (defn run-game []
-  (frame/main-frame @current-turn (get-suggestions)
+  (frame/main-frame @current-turn @suggestions
     (reify view/CallBacks
       (on-new-game [_] (send-game-event! :new-game))
       (on-toogle-help [_] (toogle-help!))
