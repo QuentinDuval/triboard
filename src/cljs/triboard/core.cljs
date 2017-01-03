@@ -37,20 +37,17 @@
     (go
       (while true
         (alt!
-          game-events ([msg] (store/handle-game-event! msg))
-          player-events ([coord] (store/handle-game-event! [:player-move coord]))
-          (async/timeout ai-move-delay) ([_] (if @store/ai-player? (store/handle-game-event! [:ai-play])))
+          game-events ([msg] (store/send-event! msg))
+          player-events ([coord] (store/send-event! [:player-move coord]))
+          (async/timeout ai-move-delay) ([_] (if @store/ai-player? (store/send-event! [:ai-play])))
           )))
     {:player-events player-events
      :game-events game-events}))
 
 (defonce game-loop (start-game-loop))
 
-(defn send-player-event! [e]
-  (put! (game-loop :player-events) e))
-
-(defn send-game-event! [e]
-  (put! (game-loop :game-events) e))
+(defn send-player-event! [e] (put! (game-loop :player-events) e))
+(defn send-game-event! [e] (put! (game-loop :game-events) e))
 
 
 ;; -----------------------------------------

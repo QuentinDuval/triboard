@@ -42,7 +42,7 @@
 ;; Public API (updates)
 ;; -----------------------------------------
 
-(defn- handle-game-event!
+(defn- send-event!
   [msg]
   (case (first msg)
     :new-game (swap! app-state assoc :game (game/new-game))
