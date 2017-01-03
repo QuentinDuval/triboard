@@ -13,8 +13,8 @@
 
 (defn- with-available-moves
   "Add the available moves on the board"
-  [{:keys [board] :as game}]
-  (assoc game :moves (move/all-available-moves board)))
+  [{:keys [board] :as turn}]
+  (assoc turn :moves (move/all-available-moves board)))
 
 (defn- next-player
   [player]
@@ -32,9 +32,9 @@
     ))
 
 (defn- apply-move
-  [game move]
+  [turn move]
   {:pre [(move/move? move)]}
-  (-> game
+  (-> turn
     (update :board move/apply-move move)
     (update :scores scores/update-scores move)
     ))
@@ -51,26 +51,24 @@
        :scores scores/initial-scores}
     with-available-moves))
 
-(defn current-player [game] (:player game))
-(defn get-board [game] (:board game))
-(defn get-scores [game] (:scores game))
-
-(defn game-over? [game]
-  (nil? (current-player game)))
+(defn current-player [turn] (:player turn))
+(defn get-board [turn] (:board turn))
+(defn get-scores [turn] (:scores turn))
+(defn game-over? [turn] (nil? (current-player turn)))
 
 (defn get-move-at
   "Access the available moves for the provided player at the provided point"
-  [game player point]
-  (get-in game [:moves player point]))
+  [turn player point]
+  (get-in turn [:moves player point]))
 
 (defn play-move
   "On player playing the move [x y] - update all the game state accordingly"
-  [{:keys [player board] :as game} point]
+  [{:keys [player board] :as turn} point]
   {:pre [(board/board? board)]}
-  (if-let [moves (get-move-at game player point)]
+  (if-let [moves (get-move-at turn player point)]
     (->
-      (reduce apply-move game moves)
+      (reduce apply-move turn moves)
       (apply-move (move/empty-cell-move player point))
       (with-available-moves)
       (with-next-player))
-    game))
+    turn))
