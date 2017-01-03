@@ -49,11 +49,12 @@
 
 (defn- handle-game-event!
   [msg]
-  (case msg
+  (case (first msg)
     :new-game (swap! app-state assoc :game (game/new-game))
     :restart (swap! app-state update :game #(take-last 1 %))
     :undo (swap! app-state update :game game/undo-player-move is-ai?)
     :ai-play (play-game-turn! (ai/best-move @current-turn @current-player))
+    :player-move (play-game-turn! (second msg))
     ))
 
 
@@ -71,8 +72,8 @@
       (while true
         (alt!
           game-events ([msg] (handle-game-event! msg))
-          player-events ([coord] (play-game-turn! coord))
-          (async/timeout ai-move-delay) ([_] (if (is-ai? @current-player) (handle-game-event! :ai-play)))
+          player-events ([coord] (handle-game-event! [:player-move coord]))
+          (async/timeout ai-move-delay) ([_] (if (is-ai? @current-player) (handle-game-event! [:ai-play])))
           )))
     {:player-events player-events
      :game-events game-events}))
@@ -96,10 +97,10 @@
 (defn run-game []
   (frame/main-frame @current-turn @suggestions
     (reify view/CallBacks
-      (on-new-game [_] (send-game-event! :new-game))
+      (on-new-game [_] (send-game-event! [:new-game]))
       (on-toogle-help [_] (toogle-help!))
-      (on-restart [_] (send-game-event! :restart))
-      (on-undo [_] (send-game-event! :undo))
+      (on-restart [_] (send-game-event! [:restart]))
+      (on-undo [_] (send-game-event! [:undo]))
       (on-player-move [_ x y] (send-player-event! [x y]))
       )))
 
