@@ -28,10 +28,10 @@
 ;; -----------------------------------------
 
 (defonce app-state
-  (atom {:games (game/new-game)
+  (atom {:game (game/new-game)
          :help false}))
 
-(def current-turn (reaction (game/current-turn (:games @app-state))))
+(def current-turn (reaction (game/current-turn (:game @app-state))))
 (def current-board (reaction (turn/get-board @current-turn)))
 (def current-player (reaction (turn/get-player @current-turn)))
 
@@ -44,7 +44,7 @@
 (def ai-move-delay 1000)
 
 (defn play-game-turn! [move]
-  (swap! app-state update-in [:games] game/play-move move))
+  (swap! app-state update-in [:game] game/play-move move))
 
 (defn- handle-ai! []
   ;; TODO - Find a way to cache the cells-strenght as it was done before
@@ -54,9 +54,9 @@
 (defn- handle-game-event!
   [msg]
   (case msg
-    :new-game (swap! app-state assoc-in [:games] (game/new-game))
-    :restart (swap! app-state update-in [:games] #(take-last 1 %))
-    :undo (swap! app-state update-in [:games] game/undo-player-move is-ai?)))
+    :new-game (swap! app-state assoc-in [:game] (game/new-game))
+    :restart (swap! app-state update-in [:game] #(take-last 1 %))
+    :undo (swap! app-state update-in [:game] game/undo-player-move is-ai?)))
 
 (defn start-game-loop
   "Manage transitions between player moves, ai moves, and generic game events"
