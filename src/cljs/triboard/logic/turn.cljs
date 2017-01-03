@@ -26,18 +26,20 @@
 (defn- with-next-player
   "Find the next player to act - dismiss those that cannot play any move"
   [{:keys [moves player] :as game}]
-  (let [nexts (take 3 (iterate next-player (next-player player)))]
-    (assoc game :player
-                (some #(if (get moves %) % false) nexts))
+  (let [nexts (take 3 (iterate next-player (next-player player)))
+        next-valid (some #(if (get moves %) % false) nexts)]
+    (assoc game :player next-valid)
     ))
 
-(defn- apply-move
-  [turn move]
-  {:pre [(move/move? move)]}
-  (-> turn
-    (update :board move/apply-move move)
-    (update :scores scores/update-scores move)
-    ))
+(defn- apply-moves
+  [turn moves]
+  {:pre [(move/moves? moves)]}
+  (let [new-board (reduce move/apply-move (:board turn) moves)
+        new-scores (reduce scores/update-scores (:scores turn) moves)]
+    (-> turn
+      (assoc :board new-board)
+      (assoc :scores new-scores)
+      )))
 
 
 ;; -----------------------------------------
@@ -66,9 +68,8 @@
   [{:keys [player board] :as turn} point]
   {:pre [(board/board? board)]}
   (if-let [moves (get-move-at turn player point)]
-    (->
-      (reduce apply-move turn moves)
-      (apply-move (move/empty-cell-move player point))
+    (-> turn
+      (apply-moves (conj moves (move/empty-cell-move player point)))
       (with-available-moves)
       (with-next-player))
     turn))
