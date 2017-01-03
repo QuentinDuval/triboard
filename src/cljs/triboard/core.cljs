@@ -61,7 +61,7 @@
   (frame/main-frame @store/current-turn @store/suggestions
     (reify view/CallBacks
       (on-new-game [_] (send-game-event! [:new-game]))
-      (on-toogle-help [_] (store/toogle-help!))
+      (on-toogle-help [_] (send-game-event! [:toggle-help]))
       (on-restart [_] (send-game-event! [:restart]))
       (on-undo [_] (send-game-event! [:undo]))
       (on-player-move [_ x y] (send-player-event! [x y]))

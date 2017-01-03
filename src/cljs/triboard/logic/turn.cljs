@@ -61,7 +61,6 @@
 (defn get-board [turn] (:board turn))
 (defn get-scores [turn] (:scores turn))
 (defn get-moves [turn] (:moves turn))
-(defn game-over? [turn] (nil? (get-player turn)))
 
 (defn get-moves-of
   "Access the available moves for the provided player, by coordinates"
