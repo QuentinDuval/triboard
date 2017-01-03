@@ -44,24 +44,22 @@
       (turn/get-moves-of @current-turn @current-player)
       {})))
 
-
-;; -----------------------------------------
-;; GAME LOOP
-;; -----------------------------------------
-
 (defn play-game-turn! [move]
-  (swap! app-state update-in [:game] game/play-move move))
-
-(defn- handle-ai! []
-  (let [move (ai/best-move @current-turn @current-player)]
-    (play-game-turn! move)))
+  (swap! app-state update :game game/play-move move))
 
 (defn- handle-game-event!
   [msg]
   (case msg
-    :new-game (swap! app-state assoc-in [:game] (game/new-game))
-    :restart (swap! app-state update-in [:game] #(take-last 1 %))
-    :undo (swap! app-state update-in [:game] game/undo-player-move is-ai?)))
+    :new-game (swap! app-state assoc :game (game/new-game))
+    :restart (swap! app-state update :game #(take-last 1 %))
+    :undo (swap! app-state update :game game/undo-player-move is-ai?)
+    :ai-play (play-game-turn! (ai/best-move @current-turn @current-player))
+    ))
+
+
+;; -----------------------------------------
+;; GAME LOOP
+;; -----------------------------------------
 
 (defn start-game-loop
   "Manage transitions between player moves, ai moves, and generic game events"
@@ -74,7 +72,7 @@
         (alt!
           game-events ([msg] (handle-game-event! msg))
           player-events ([coord] (play-game-turn! coord))
-          (async/timeout ai-move-delay) ([_] (if (is-ai? @current-player) (handle-ai!)))
+          (async/timeout ai-move-delay) ([_] (if (is-ai? @current-player) (handle-game-event! :ai-play)))
           )))
     {:player-events player-events
      :game-events game-events}))
