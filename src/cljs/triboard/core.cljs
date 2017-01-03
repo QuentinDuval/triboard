@@ -18,6 +18,7 @@
 
 ;; TODO - Extract the parts that are related to costmetic: Help
 ;; TODO - Rework the game loop to be a state machine (beware of consuming messages)
+;; TODO - Rework the AI part, to be able to keep data linked to the init board
 
 ;; TODO - http://www.w3schools.com/howto/howto_js_sidenav.asp
 ;; TODO - http://www.w3schools.com/svg/svg_grad_radial.asp
@@ -32,7 +33,6 @@
          :help false}))
 
 (def current-turn (reaction (game/current-turn (:game @app-state))))
-(def current-board (reaction (turn/get-board @current-turn)))
 (def current-player (reaction (turn/get-player @current-turn)))
 (def help-toggled? (reaction (:help @app-state)))
 
@@ -48,8 +48,7 @@
   (swap! app-state update-in [:game] game/play-move move))
 
 (defn- handle-ai! []
-  ;; TODO - Find a way to cache the cells-strenght as it was done before
-  (let [move (ai/best-move (ai/compute-cells-strength @current-board) @current-turn @current-player)]
+  (let [move (ai/best-move @current-turn @current-player)]
     (play-game-turn! move)))
 
 (defn- handle-game-event!

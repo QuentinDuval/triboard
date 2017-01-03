@@ -21,6 +21,13 @@
         count-wall (count walls)]
     (+ 1 (* count-wall count-wall 0.25))))
 
+(defn- compute-cells-strength
+  "Adds to a given turn the strength of each of its cells"
+  [board]
+  (reduce
+    #(assoc %1 %2 (compute-cell-strength board %2))
+    {} cst/all-positions))
+
 (defn- move-strength
   "Compute the strength of a move, based on the converted cells"
   [cells-strength converted-filter [point converted]]
@@ -39,7 +46,7 @@
   {:pre [(player? player) (player? looser)]}
   [cells-strength turn player looser]
   (let [converted-filter #(= looser (:looser %))
-        all-moves (get-in turn [:moves player])]
+        all-moves (turn/get-moves-of turn player)]
     (transduce
       (map #(move-strength cells-strength converted-filter %))
       max all-moves)))
@@ -49,20 +56,14 @@
 ;; Public API
 ;; -----------------------------------------
 
-(defn compute-cells-strength
-  "Adds to a given turn the strength of each of its cells"
-  [board]
-  (reduce
-    #(assoc %1 %2 (compute-cell-strength board %2))
-    {} cst/all-positions))
-
 (defn best-move
   "[SIMPLISTIC] Return the best move for a player based on:
    * The immediate gain
    * The worse immediate lost afterwards"
   {:pre [(player? player)]}
-  [cells-strength turn player]
-  (let [moves (get-in turn [:moves player])
+  [turn player]
+  (let [cells-strength (compute-cells-strength (turn/get-board turn))
+        moves (turn/get-moves-of turn player)
         others (remove #{player} cst/players)]
     (first
       (utils/fast-max-key
