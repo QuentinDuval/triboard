@@ -48,7 +48,6 @@
   (-> {:board (board/new-board)
        :player (rand-nth cst/players)
        :moves {}
-       :help false
        :scores scores/initial-scores}
     with-available-moves))
 
