@@ -35,11 +35,11 @@
     converted))
 
 (defn- worst-immediate-loss ;; TODO - It should consider what the other player could win
-  "Return the next worse lost game move for 'looser' if 'player' plays"
+  "Return the next worse lost turn move for 'looser' if 'player' plays"
   {:pre [(player? player) (player? looser)]}
-  [cells-strength game player looser]
+  [cells-strength turn player looser]
   (let [converted-filter #(= looser (:looser %))
-        all-moves (get-in game [:moves player])]
+        all-moves (get-in turn [:moves player])]
     (transduce
       (map #(move-strength cells-strength converted-filter %))
       max all-moves)))
@@ -50,7 +50,7 @@
 ;; -----------------------------------------
 
 (defn compute-cells-strength
-  "Adds to a given game the strength of each of its cells"
+  "Adds to a given turn the strength of each of its cells"
   [board]
   (reduce
     #(assoc %1 %2 (compute-cell-strength board %2))
@@ -61,15 +61,15 @@
    * The immediate gain
    * The worse immediate lost afterwards"
   {:pre [(player? player)]}
-  [cells-strength game player]
-  (let [moves (get-in game [:moves player])
+  [cells-strength turn player]
+  (let [moves (get-in turn [:moves player])
         others (remove #{player} cst/players)]
     (first
       (utils/fast-max-key
         (fn [[m converted :as move]]
-          (let [new-game (turn/play-move game m)
+          (let [new-turn (turn/play-move turn m)
                 diff-score (move-strength cells-strength identity move)
-                losses (map #(worst-immediate-loss cells-strength new-game % player) others)]
+                losses (map #(worst-immediate-loss cells-strength new-turn % player) others)]
             (- diff-score (apply max losses))))
         moves))
     ))
