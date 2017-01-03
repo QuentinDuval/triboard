@@ -32,8 +32,7 @@
          :help false}))
 
 (def current-turn (reaction (game/current-turn (:games @app-state))))
-(def board (reaction (turn/get-board @current-turn)))
-(def scores (reaction (turn/get-scores @current-turn)))
+(def current-board (reaction (turn/get-board @current-turn)))
 (def current-player (reaction (turn/get-player @current-turn)))
 
 
@@ -49,7 +48,7 @@
 
 (defn- handle-ai! []
   ;; TODO - Find a way to cache the cells-strenght as it was done before
-  (let [move (ai/best-move (ai/compute-cells-strength @board) @current-turn @current-player)]
+  (let [move (ai/best-move (ai/compute-cells-strength @current-board) @current-turn @current-player)]
     (play-game-turn! move)))
 
 (defn- handle-game-event!
