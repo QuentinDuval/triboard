@@ -51,7 +51,8 @@
        :player (rand-nth cst/players)
        :moves {}
        :scores scores/initial-scores}
-    with-available-moves))
+    with-available-moves
+    with-next-player))
 
 (defn get-player [turn] (:player turn))
 (defn get-board [turn] (:board turn))
