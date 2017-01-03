@@ -53,15 +53,16 @@
        :scores scores/initial-scores}
     with-available-moves))
 
-(defn current-player [turn] (:player turn))
+(defn get-player [turn] (:player turn))
 (defn get-board [turn] (:board turn))
 (defn get-scores [turn] (:scores turn))
-(defn game-over? [turn] (nil? (current-player turn)))
+(defn get-moves [turn] (:moves turn))
+(defn game-over? [turn] (nil? (get-player turn)))
 
 (defn get-move-at
   "Access the available moves for the provided player at the provided point"
   [turn player point]
-  (get-in turn [:moves player point]))
+  (get-in (get-moves turn) [player point]))
 
 (defn play-move
   "On player playing the move [x y] - update all the game state accordingly"

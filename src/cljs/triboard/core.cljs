@@ -34,7 +34,7 @@
 (def current-turn (reaction (game/current-turn (:games @app-state))))
 (def board (reaction (turn/get-board @current-turn)))
 (def scores (reaction (turn/get-scores @current-turn)))
-(def current-player (reaction (turn/current-player @current-turn)))
+(def current-player (reaction (turn/get-player @current-turn)))
 
 
 ;; -----------------------------------------
