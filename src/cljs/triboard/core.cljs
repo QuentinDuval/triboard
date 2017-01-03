@@ -1,10 +1,8 @@
 (ns triboard.core
   (:require
     [cljs.core.async :as async :refer [put! chan <! >!]]
-    [reagent.core :as reagent :refer [atom]]
-    [triboard.ai.ai :as ai]
-    [triboard.logic.game :as game]
-    [triboard.logic.turn :as turn]
+    [reagent.core :as reagent]
+    [triboard.store :as store]
     [triboard.view.callbacks :as view]
     [triboard.view.frame :as frame]
     )
@@ -25,55 +23,23 @@
 
 
 ;; -----------------------------------------
-;; APP STATE
-;; -----------------------------------------
-
-(def is-ai? #{:red :green})
-(def ai-move-delay 1000)
-
-(defonce app-state
-  (atom {:game (game/new-game)
-         :help false}))
-
-(def current-turn (reaction (game/current-turn (:game @app-state))))
-(def current-player (reaction (turn/get-player @current-turn)))
-
-(def suggestions
-  (reaction
-    (if (and (:help @app-state) (not (is-ai? @current-player)))
-      (turn/get-moves-of @current-turn @current-player)
-      {})))
-
-(defn play-game-turn! [move]
-  (swap! app-state update :game game/play-move move))
-
-(defn- handle-game-event!
-  [msg]
-  (case (first msg)
-    :new-game (swap! app-state assoc :game (game/new-game))
-    :restart (swap! app-state update :game #(take-last 1 %))
-    :undo (swap! app-state update :game game/undo-player-move is-ai?)
-    :ai-play (play-game-turn! (ai/best-move @current-turn @current-player))
-    :player-move (play-game-turn! (second msg))
-    ))
-
-
-;; -----------------------------------------
 ;; GAME LOOP
 ;; -----------------------------------------
+
+(def ai-move-delay 1000)
 
 (defn start-game-loop
   "Manage transitions between player moves, ai moves, and generic game events"
   []
-  (let [is-human-xf (fn [_] (not (is-ai? @current-player)))
+  (let [is-human-xf (fn [_] (not @store/ai-player?))
         player-events (chan 1 (filter is-human-xf))
         game-events (chan 1)]
     (go
       (while true
         (alt!
-          game-events ([msg] (handle-game-event! msg))
-          player-events ([coord] (handle-game-event! [:player-move coord]))
-          (async/timeout ai-move-delay) ([_] (if (is-ai? @current-player) (handle-game-event! [:ai-play])))
+          game-events ([msg] (store/handle-game-event! msg))
+          player-events ([coord] (store/handle-game-event! [:player-move coord]))
+          (async/timeout ai-move-delay) ([_] (if @store/ai-player? (store/handle-game-event! [:ai-play])))
           )))
     {:player-events player-events
      :game-events game-events}))
@@ -86,19 +52,16 @@
 (defn send-game-event! [e]
   (put! (game-loop :game-events) e))
 
-(defn toogle-help! []
-  (swap! app-state update :help not))
-
 
 ;; -----------------------------------------
 ;; PLUGGING THE BLOCKS
 ;; -----------------------------------------
 
 (defn run-game []
-  (frame/main-frame @current-turn @suggestions
+  (frame/main-frame @store/current-turn @store/suggestions
     (reify view/CallBacks
       (on-new-game [_] (send-game-event! [:new-game]))
-      (on-toogle-help [_] (toogle-help!))
+      (on-toogle-help [_] (store/toogle-help!))
       (on-restart [_] (send-game-event! [:restart]))
       (on-undo [_] (send-game-event! [:undo]))
       (on-player-move [_ x y] (send-player-event! [x y]))
