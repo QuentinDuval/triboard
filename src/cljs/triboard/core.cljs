@@ -34,6 +34,7 @@
 (def current-turn (reaction (game/current-turn (:game @app-state))))
 (def current-board (reaction (turn/get-board @current-turn)))
 (def current-player (reaction (turn/get-player @current-turn)))
+(def help-toggled? (reaction (:help @app-state)))
 
 
 ;; -----------------------------------------
@@ -61,9 +62,8 @@
 (defn start-game-loop
   "Manage transitions between player moves, ai moves, and generic game events"
   []
-  (let [game-on-xf (fn [_] (not (turn/game-over? @current-turn)))
-        is-human-xf (fn [_] (not (is-ai? @current-player)))
-        player-events (chan 1 (comp (filter game-on-xf) (filter is-human-xf)))
+  (let [is-human-xf (fn [_] (not (is-ai? @current-player)))
+        player-events (chan 1 (filter is-human-xf))
         game-events (chan 1)]
     (go
       (while true
@@ -72,7 +72,6 @@
           player-events ([coord] (play-game-turn! coord))
           (async/timeout ai-move-delay) ([_] (if (is-ai? @current-player) (handle-ai!)))
           )))
-
     {:player-events player-events
      :game-events game-events}))
 
@@ -89,12 +88,12 @@
 
 
 ;; -----------------------------------------
-;; DISPLAY
+;; PLUGGING THE BLOCKS
 ;; -----------------------------------------
 
 (defn get-suggestions
   []
-  (if (and (:help @app-state) (not (is-ai? @current-player)))
+  (if (and @help-toggled? (not (is-ai? @current-player)))
     (turn/get-moves-of @current-turn @current-player)
     {}))
 
