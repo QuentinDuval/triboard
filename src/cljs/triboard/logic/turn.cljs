@@ -23,12 +23,15 @@
     :red :green
     :green :blue))
 
+(defn- next-3-players
+  [player]
+  (take 3 (iterate next-player (next-player player))))
+
 (defn- with-next-player
   "Find the next player to act - dismiss those that cannot play any move"
-  [{:keys [moves player] :as game}]
-  (let [nexts (take 3 (iterate next-player (next-player player)))
-        next-valid (some #(if (get moves %) % false) nexts)]
-    (assoc game :player next-valid)
+  [{:keys [moves player] :as turn}]
+  (let [who-can-play (filter #(get moves %) (next-3-players player))]
+    (assoc turn :player (first who-can-play))
     ))
 
 (defn- apply-moves
