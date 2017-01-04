@@ -51,7 +51,8 @@
   (let [all-moves (turn/get-moves-of turn player)]
     (transduce
       (map #(get (move-strength cells-strength player %) looser))
-      max all-moves)))
+      min
+      all-moves)))
 
 
 ;; -----------------------------------------
@@ -71,8 +72,8 @@
       (utils/fast-max-key
         (fn [[m converted :as move]]
           (let [new-turn (turn/play-move turn m)
-                diff-score (get (move-strength cells-strength player move) player)
-                losses (map #(worst-immediate-loss cells-strength new-turn % player) others)]
-            (- diff-score (apply max losses))))
+                new-diff (get (move-strength cells-strength player move) player)
+                next-diff (map #(worst-immediate-loss cells-strength new-turn % player) others)]
+            (+ new-diff (apply min next-diff))))
         moves))
     ))
