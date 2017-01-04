@@ -1,5 +1,6 @@
 (ns triboard.ai.ai
   (:require
+    [triboard.ai.scores :as scores]
     [triboard.logic.constants :as cst]
     [triboard.logic.board :as board]
     [triboard.logic.move :as move]
@@ -32,29 +33,24 @@
     (map (fn [point] [point (compute-cell-strength board point)]))
     cst/all-positions))
 
-;; TODO - Simplify the code to have a score function (compute the score, and look at your best choice)
-
 (defn- move-strength
   "Compute the strength of a move, based on the converted cells"
-  [cells-strength move-filter [point converted]]
-  {:pre [(fn? move-filter) (move/conversions? converted)]}
-  (transduce
-    (comp
-      (filter move-filter) ;; TODO - Extract this part (specific to worst move)
-      (mapcat :taken)
-      (map cells-strength))
-    +
-    (cells-strength point)
-    converted))
+  [get-cells-strength player [point converted]]
+  {:pre [(move/conversions? converted)]}
+  (reduce
+    #(scores/update-delta get-cells-strength %1 %2)
+    scores/null-delta
+    (conj converted
+      (move/empty-cell-conversion player point))
+    ))
 
 (defn- worst-immediate-loss ;; TODO - It should consider what the other player could win
   "Return the next worse lost turn move for 'looser' if 'player' plays"
   {:pre [(player? player) (player? looser)]}
   [cells-strength turn player looser]
-  (let [is-looser #(= looser (:looser %))
-        all-moves (turn/get-moves-of turn player)]
+  (let [all-moves (turn/get-moves-of turn player)]
     (transduce
-      (map #(move-strength cells-strength is-looser %))
+      (map #(get (move-strength cells-strength player %) looser))
       max all-moves)))
 
 
@@ -75,7 +71,7 @@
       (utils/fast-max-key
         (fn [[m converted :as move]]
           (let [new-turn (turn/play-move turn m)
-                diff-score (move-strength cells-strength identity move)
+                diff-score (get (move-strength cells-strength player move) player)
                 losses (map #(worst-immediate-loss cells-strength new-turn % player) others)]
             (- diff-score (apply max losses))))
         moves))
