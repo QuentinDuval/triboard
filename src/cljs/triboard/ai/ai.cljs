@@ -2,7 +2,6 @@
   (:require
     [triboard.ai.scores :as scores]
     [triboard.logic.constants :as cst]
-    [triboard.logic.board :as board]
     [triboard.logic.move :as move]
     [triboard.logic.turn :as turn]
     [triboard.utils :as utils]
@@ -12,26 +11,6 @@
 ;; -----------------------------------------
 ;; Private
 ;; -----------------------------------------
-
-(defn- neighbouring-walls
-  [board point]
-  (eduction
-    (filter #(= :wall (board/get-cell-at board % :wall)))
-    (utils/coord-neighbors point)))
-
-(defn- compute-cell-strength
-  "Compute a cell strength based on the number of walls it has"
-  {:pre [(coord? point)]}
-  [board point]
-  (let [wall-nb (count (neighbouring-walls board point))]
-    (+ 1 (* wall-nb wall-nb 0.25))))
-
-(defn- compute-cells-strength
-  "Adds to a given turn the strength of each of its cells"
-  [board]
-  (into {}
-    (map (fn [point] [point (compute-cell-strength board point)]))
-    cst/all-positions))
 
 (defn- move-strength
   "Compute the strength of a move, based on the converted cells"
@@ -65,7 +44,7 @@
    * The worse immediate lost afterwards"
   {:pre [(player? player)]}
   [turn player]
-  (let [cells-strength (compute-cells-strength (turn/get-board turn))
+  (let [cells-strength (scores/compute-cells-strength (turn/get-board turn))
         moves (turn/get-moves-of turn player)
         others (remove #{player} cst/players)]
     (first
