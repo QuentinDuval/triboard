@@ -17,7 +17,7 @@
 (defn update-scores
   "Update the scoring based on the provided move"
   [scores move]
-  {:pre [(move/move? move)]}
+  {:pre [(move/conversion? move)]}
   (let [delta (count (:taken move))]
     (-> scores
       (update (:winner move) + delta)

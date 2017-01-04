@@ -37,7 +37,7 @@
 (defn- move-strength
   "Compute the strength of a move, based on the converted cells"
   [cells-strength move-filter [point converted]]
-  {:pre [(fn? move-filter) (move/moves? converted)]}
+  {:pre [(fn? move-filter) (move/conversions? converted)]}
   (transduce
     (comp
       (filter move-filter) ;; TODO - Extract this part (specific to worst move)

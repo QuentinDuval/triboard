@@ -9,16 +9,18 @@
 ;; Public Types
 ;; -----------------------------------------
 
-(defn move?                                                 ;; TODO - renaming => conversion
+(defn conversion?
   "A move is the result of player a cell at a given coordinate"
   [m]
   (and
-    (board/coord? (:move m))                                ;; TODO - rename => point
+    (board/coord? (:point m))                                ;; TODO - rename => point
     (every? board/coord? (:taken m))
     (cst/player? (:winner m))
     (cst/cell? (:looser m))))
 
-(defn moves? [moves] (every? move? moves))
+(defn conversions?
+  [moves]
+  (every? conversion? moves))
 
 
 ;; -----------------------------------------
@@ -31,7 +33,7 @@
 
 (defn- available-cells-by-dir
   "Indicates the convertible cells when clicking at [x y], and returns:
-	{:move [7 5]
+	{:point [7 5]
    :winner :blue,
    :looser :red,
    :taken [[8 5] [9 5]]}"
@@ -45,7 +47,7 @@
         (is-not-convertible? cell) nil                      ;; No move: reached end and only 1 type of cell
         (and looser (not= looser cell)) {:winner cell       ;; Who wins the cells
                                          :looser looser     ;; Who looses the cells
-                                         :move coord        ;; The move performed
+                                         :point coord       ;; The move performed
                                          :taken taken}      ;; The cells taken
         :else (recur
                 (+ x dx) (+ y dy)
@@ -56,7 +58,7 @@
   "Provides the list of moves that can be done from a cell"
   [board point]
   {:pre [(board/board? board) (board/coord? point)]
-   :post [(moves? %)]}
+   :post [(conversions? %)]}
   (eduction
     (keep #(available-cells-by-dir board point %))
     cst/directions))
@@ -69,7 +71,7 @@
 (defn empty-cell-conversion
   "Create a move to take an empty cell"
   [player point]
-  {:move point
+  {:point point
    :winner player
    :looser :empty
    :taken [point]})
@@ -79,7 +81,7 @@
    Example:
     {:blue
       {[0 5]
-       ({:move [0 5],
+       ({:point [0 5],
          :winner :blue,
          :looser :red,
          :taken [[0 4]]})}}"
@@ -87,7 +89,7 @@
   {:pre [(board/board? board)]}
   (transduce
     (mapcat #(available-conversions-at board %))
-    #(update-in %1 [(:winner %2) (:move %2)] conj %2)
+    #(update-in %1 [(:winner %2) (:point %2)] conj %2)
     {}
     (board/empty-cells board)
     ))
@@ -95,7 +97,7 @@
 (defn apply-conversion
   "Apply a move onto the board, yielding a new board"
   [board move]
-  {:pre [(board/board? board) (move? move)]
+  {:pre [(board/board? board) (conversion? move)]
    :post [(board/board? board)]}
   (reduce
     #(assoc-in %1 %2 (:winner move))

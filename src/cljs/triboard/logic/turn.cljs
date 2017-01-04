@@ -36,7 +36,7 @@
 
 (defn- apply-moves
   [turn moves]
-  {:pre [(move/moves? moves)]}
+  {:pre [(move/conversions? moves)]}
   (let [new-board (reduce move/apply-conversion (:board turn) moves)
         new-scores (reduce scores/update-scores (:scores turn) moves)]
     (-> turn
