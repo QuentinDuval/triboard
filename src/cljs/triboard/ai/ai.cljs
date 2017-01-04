@@ -34,11 +34,11 @@
 
 (defn- move-strength
   "Compute the strength of a move, based on the converted cells"
-  [cells-strength converted-filter [point converted]]
-  {:pre [(fn? converted-filter) (every? move/move? converted)]}
+  [cells-strength move-filter [point converted]]
+  {:pre [(fn? move-filter) (move/moves? converted)]}
   (transduce
     (comp
-      (filter converted-filter) ;; TODO - Extract this part (specific to worst move)
+      (filter move-filter) ;; TODO - Extract this part (specific to worst move)
       (mapcat :taken)
       (map cells-strength))
     +
@@ -49,10 +49,10 @@
   "Return the next worse lost turn move for 'looser' if 'player' plays"
   {:pre [(player? player) (player? looser)]}
   [cells-strength turn player looser]
-  (let [converted-filter #(= looser (:looser %))
+  (let [is-looser #(= looser (:looser %))
         all-moves (turn/get-moves-of turn player)]
     (transduce
-      (map #(move-strength cells-strength converted-filter %))
+      (map #(move-strength cells-strength is-looser %))
       max all-moves)))
 
 
