@@ -37,9 +37,14 @@
   {:pre [(move/conversion? conversion)]}
   (let [diff (transduce (map get-cell-strength) + (:taken conversion))]
     (-> delta
-      (update (:looser delta) - diff)
-      (update (:winner delta) + diff)
+      (update (:looser conversion) - diff)
+      (update (:winner conversion) + diff)
       )))
+
+(defn min-delta-for
+  "Compute the minimal diff for a player among a list of delta"
+  [player deltas]
+  (transduce (map #(get % player)) min deltas))
 
 (defn compute-cells-strength
   "Adds to a given turn the strength of each of its cells"

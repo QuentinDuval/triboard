@@ -14,12 +14,12 @@
 
 (defn- move-strength
   "Compute the strength of a move, based on the converted cells"
-  [get-cells-strength player [point converted]]
-  {:pre [(move/conversions? converted)]}
+  [get-cells-strength player [point conversions]]
+  {:pre [(move/conversions? conversions)]}
   (reduce
     #(scores/update-delta get-cells-strength %1 %2)
     scores/null-delta
-    (conj converted
+    (conj conversions
       (move/empty-cell-conversion player point))
     ))
 
@@ -28,10 +28,9 @@
   {:pre [(player? player) (player? looser)]}
   [cells-strength turn player looser]
   (let [all-moves (turn/get-moves-of turn player)]
-    (transduce
-      (map #(get (move-strength cells-strength player %) looser))
-      min
-      all-moves)))
+    (scores/min-delta-for looser
+      (map #(move-strength cells-strength player %) all-moves)
+      )))
 
 
 ;; -----------------------------------------
@@ -45,7 +44,6 @@
   {:pre [(player? player)]}
   [turn player]
   (let [cells-strength (scores/compute-cells-strength (turn/get-board turn))
-        moves (turn/get-moves-of turn player)
         others (remove #{player} cst/players)]
     (first
       (utils/fast-max-key
@@ -54,5 +52,8 @@
                 new-diff (get (move-strength cells-strength player move) player)
                 next-diff (map #(worst-immediate-loss cells-strength new-turn % player) others)]
             (+ new-diff (apply min next-diff))))
-        moves))
+        (turn/get-moves-of turn player)
+        ))
     ))
+
+
