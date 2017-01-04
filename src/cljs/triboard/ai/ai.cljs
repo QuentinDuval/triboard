@@ -12,14 +12,18 @@
 ;; Private
 ;; -----------------------------------------
 
+(defn- neighbouring-walls
+  [board point]
+  (eduction
+    (filter #(= :wall (board/get-cell-at board % :wall)))
+    (utils/coord-neighbors point)))
+
 (defn- compute-cell-strength
   "Compute a cell strength based on the number of walls it has"
   {:pre [(coord? point)]}
   [board point]
-  (let [neighbors (utils/coord-neighbors point)
-        walls (filter #(= :wall (board/get-cell-at board % :wall)) neighbors)
-        count-wall (count walls)]
-    (+ 1 (* count-wall count-wall 0.25))))
+  (let [wall-nb (count (neighbouring-walls board point))]
+    (+ 1 (* wall-nb wall-nb 0.25))))
 
 (defn- compute-cells-strength
   "Adds to a given turn the strength of each of its cells"
