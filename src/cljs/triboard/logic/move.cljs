@@ -9,11 +9,11 @@
 ;; Public Types
 ;; -----------------------------------------
 
-(defn move?
+(defn move?                                                 ;; TODO - renaming => conversion
   "A move is the result of player a cell at a given coordinate"
   [m]
   (and
-    (board/coord? (:move m))                                ;; TODO - rename
+    (board/coord? (:move m))                                ;; TODO - rename => point
     (every? board/coord? (:taken m))
     (cst/player? (:winner m))
     (cst/cell? (:looser m))))
@@ -52,7 +52,7 @@
                 cell (conj taken [x y])))
       )))
 
-(defn- available-moves-at
+(defn- available-conversions-at
   "Provides the list of moves that can be done from a cell"
   [board point]
   {:pre [(board/board? board) (board/coord? point)]
@@ -66,7 +66,7 @@
 ;; Public API
 ;; -----------------------------------------
 
-(defn empty-cell-move
+(defn empty-cell-conversion
   "Create a move to take an empty cell"
   [player point]
   {:move point
@@ -86,13 +86,13 @@
   [board]
   {:pre [(board/board? board)]}
   (transduce
-    (mapcat #(available-moves-at board %))
+    (mapcat #(available-conversions-at board %))
     #(update-in %1 [(:winner %2) (:move %2)] conj %2)
     {}
     (board/empty-cells board)
     ))
 
-(defn apply-move
+(defn apply-conversion
   "Apply a move onto the board, yielding a new board"
   [board move]
   {:pre [(board/board? board) (move? move)]

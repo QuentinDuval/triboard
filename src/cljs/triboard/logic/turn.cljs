@@ -37,7 +37,7 @@
 (defn- apply-moves
   [turn moves]
   {:pre [(move/moves? moves)]}
-  (let [new-board (reduce move/apply-move (:board turn) moves)
+  (let [new-board (reduce move/apply-conversion (:board turn) moves)
         new-scores (reduce scores/update-scores (:scores turn) moves)]
     (-> turn
       (assoc :board new-board)
@@ -73,7 +73,7 @@
   {:pre [(board/board? board)]}
   (if-let [moves (get (get-moves-of turn player) point)]
     (-> turn
-      (apply-moves (conj moves (move/empty-cell-move player point)))
+      (apply-moves (conj moves (move/empty-cell-conversion player point)))
       (with-available-moves)
       (with-next-player))
     turn))
