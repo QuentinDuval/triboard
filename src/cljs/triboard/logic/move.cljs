@@ -11,16 +11,14 @@
 
 (defn conversion?
   "A move is the result of player a cell at a given coordinate"
-  [m]
+  [c]
   (and
-    (board/coord? (:point m))                                ;; TODO - rename => point
-    (every? board/coord? (:taken m))
-    (cst/player? (:winner m))
-    (cst/cell? (:looser m))))
+    (board/coord? (:point c))
+    (every? board/coord? (:taken c))
+    (cst/player? (:winner c))
+    (cst/cell? (:looser c))))
 
-(defn conversions?
-  [moves]
-  (every? conversion? moves))
+(defn conversions? [coll] (every? conversion? coll))
 
 
 ;; -----------------------------------------
