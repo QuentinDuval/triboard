@@ -28,9 +28,9 @@
 (defn- compute-cells-strength
   "Adds to a given turn the strength of each of its cells"
   [board]
-  (reduce
-    #(assoc %1 %2 (compute-cell-strength board %2))
-    {} cst/all-positions))
+  (into {}
+    (map (fn [point] [point (compute-cell-strength board point)]))
+    cst/all-positions))
 
 (defn- move-strength
   "Compute the strength of a move, based on the converted cells"
