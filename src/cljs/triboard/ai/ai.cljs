@@ -32,6 +32,8 @@
     (map (fn [point] [point (compute-cell-strength board point)]))
     cst/all-positions))
 
+;; TODO - Simplify the code to have a score function (compute the score, and look at your best choice)
+
 (defn- move-strength
   "Compute the strength of a move, based on the converted cells"
   [cells-strength move-filter [point converted]]
