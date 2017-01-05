@@ -23,14 +23,11 @@
       (move/empty-cell-conversion player point))
     ))
 
-(defn- worst-immediate-loss ;; TODO - It should consider what the other player could win
-  "Return the next worse lost turn move for 'looser' if 'player' plays"
-  {:pre [(player? player) (player? looser)]}
-  [weights-by-cell turn player looser]
-  (let [all-moves (turn/get-moves-of turn player)]
-    (scores/min-delta-for looser
-      (map #(score-move weights-by-cell player %) all-moves)
-      )))
+(defn- get-worst-possible-score-for
+  [weights-by-cell turn player other-players]
+  (let [all-adverse-moves (mapcat #(turn/get-moves-of turn %) other-players)
+        all-possible-scores (map #(score-move weights-by-cell player %) all-adverse-moves)]
+    (scores/min-delta-for player all-possible-scores)))
 
 
 ;; -----------------------------------------
@@ -49,9 +46,9 @@
       (utils/fast-max-key
         (fn [[m converted :as move]]
           (let [new-turn (turn/play-move turn m)
-                new-diff (get (score-move weights-by-cell player move) player)
-                next-diff (map #(worst-immediate-loss weights-by-cell new-turn % player) others)]
-            (+ new-diff (apply min next-diff))))
+                move-diff (get (score-move weights-by-cell player move) player)
+                next-diff (get-worst-possible-score-for weights-by-cell new-turn player others)]
+            (+ move-diff next-diff)))
         (turn/get-moves-of turn player)
         ))
     ))
