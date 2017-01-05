@@ -10,6 +10,7 @@
     [clojure.test.check.properties :as prop :include-macros true]
     [triboard.logic.constants :as cst]
     [triboard.logic.game :as game]
+    [triboard.logic.turn :as turn]
     ))
 
 
@@ -20,6 +21,14 @@
 (defn play-moves
   [init-game moves]
   (reduce game/play-move init-game moves))
+
+(defn current-score
+  [game]
+  (turn/get-scores (game/current-turn game)))
+
+(defn sum-player-scores
+  [score]
+  (transduce (map second) + score))
 
 
 ;; ----------------------------------------------------------------------------
@@ -34,7 +43,7 @@
 ;; Generators
 ;; ----------------------------------------------------------------------------
 
-(def move-gen
+(def coord-gen
   (gen/elements cst/all-positions))
 
 (def initial-empty-cell-count
@@ -43,7 +52,7 @@
 (def game-gen
   (gen/fmap
     #(play-moves (game/new-game) %)
-    (gen/vector move-gen 0 initial-empty-cell-count)
+    (gen/vector coord-gen 0 initial-empty-cell-count)
     ))
 
 
@@ -51,14 +60,34 @@
 ;; Property based tests
 ;; ----------------------------------------------------------------------------
 
+(defn valid-game-transition?
+  [old-game new-game move]
+  (let [old-scores (current-score old-game)
+        new-scores (current-score new-game)]
+    (and
+      (= (sum-player-scores old-scores) (- (sum-player-scores new-scores) 1))
+      )))
+
+(defn game-move-properties
+  [old-game]
+  (prop/for-all [coord coord-gen]
+    (let [new-game (game/play-move old-game coord)]
+      (or
+        (= old-game new-game)
+        (valid-game-transition? old-game new-game coord)
+        ))))
+
 (defn game-undo-properties
   [old-game]
-  (prop/for-all [move move-gen]
-    (let [new-game (game/play-move old-game move)]
+  (prop/for-all [coord coord-gen]
+    (let [new-game (game/play-move old-game coord)]
       (or
         (= old-game new-game)
         (= old-game (game/undo-player-move new-game (fn [_] false)))
         ))))
+
+(defspec try-move-from-valid-game 100
+  (prop/for-all [g game-gen] (game-move-properties g)))
 
 (defspec try-undo-from-valid-game 100
   (prop/for-all [g game-gen] (game-undo-properties g)))
