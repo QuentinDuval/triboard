@@ -75,5 +75,4 @@
     (-> turn
       (apply-moves (conj moves (move/empty-cell-conversion player point)))
       (with-available-moves)
-      (with-next-player))
-    turn))
+      (with-next-player))))
