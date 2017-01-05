@@ -32,12 +32,13 @@
 
 (defn- worst-possible-score-from
   [{:keys [player other-players] :as ai} turn]
-  (scores/min-delta-for player
-    (eduction
-      (comp
-        (mapcat #(turn/get-moves-of turn %))
-        (map #(score-move ai %)))
-      other-players)))
+  (transduce
+    (comp
+      (mapcat #(turn/get-moves-of turn %))
+      (map #(score-move ai %))
+      (map #(get % player)))
+    min
+    other-players))
 
 (defn- move-best-outcome
   [ai turn [coord converted :as move]]

@@ -50,8 +50,3 @@
       (update (:looser conversion) - diff)
       (update (:winner conversion) + diff)
       )))
-
-(defn min-delta-for
-  "Compute the minimal diff for a player among a list of delta"
-  [player deltas]
-  (transduce (map #(get % player)) min deltas))
