@@ -73,7 +73,7 @@
   (prop/for-all [coord coord-gen]
     (let [new-game (game/play-move old-game coord)]
       (or
-        (= old-game new-game)
+        (= old-game new-game)                               ;; TODO - test contained in empty cells
         (valid-game-transition? old-game new-game coord)
         ))))
 
