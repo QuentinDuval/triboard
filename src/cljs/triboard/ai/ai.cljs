@@ -31,18 +31,20 @@
       (move/empty-cell-conversion player point))
     ))
 
-(defn- get-worst-possible-score-for
+(defn- next-worst-possible-score
   [{:keys [player other-players] :as ai-input} turn]
-  (let [all-adverse-moves (mapcat #(turn/get-moves-of turn %) other-players)
-        all-possible-scores (map #(score-move ai-input %) all-adverse-moves)]
-    (scores/min-delta-for player all-possible-scores)
-    ))
+  (scores/min-delta-for player
+    (eduction
+      (comp
+        (mapcat #(turn/get-moves-of turn %))
+        (map #(score-move ai-input %)))
+      other-players)))
 
 (defn- move-best-outcome
   [ai-input turn [coord converted :as move]]
   (let [new-turn (turn/play-move turn coord)
         move-diff (get (score-move ai-input move) (:player ai-input))
-        next-diff (get-worst-possible-score-for ai-input new-turn)]
+        next-diff (next-worst-possible-score ai-input new-turn)]
     (+ move-diff next-diff)))
 
 
