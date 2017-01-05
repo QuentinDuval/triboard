@@ -30,7 +30,7 @@
     (conj conversions (move/empty-cell-conversion player point))
     ))
 
-(defn- next-worst-possible-score
+(defn- worst-possible-score-from
   [{:keys [player other-players] :as ai} turn]
   (scores/min-delta-for player
     (eduction
@@ -43,7 +43,7 @@
   [ai turn [coord converted :as move]]
   (let [new-turn (turn/play-move turn coord)
         move-diff (get (score-move ai move) (:player ai))
-        next-diff (next-worst-possible-score ai new-turn)]
+        next-diff (worst-possible-score-from ai new-turn)]
     (+ move-diff next-diff)))
 
 
