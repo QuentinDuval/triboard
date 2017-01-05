@@ -14,10 +14,10 @@
 
 (defn- score-move
   "Compute the strength of a move, based on the converted cells"
-  [get-cells-strength player [point conversions]]
+  [weights-by-cell player [point conversions]]
   {:pre [(move/conversions? conversions)]}
   (reduce
-    #(scores/update-score-diff get-cells-strength %1 %2)
+    #(scores/update-score-diff weights-by-cell %1 %2)
     scores/null-score-diff
     (conj conversions
       (move/empty-cell-conversion player point))
@@ -26,10 +26,10 @@
 (defn- worst-immediate-loss ;; TODO - It should consider what the other player could win
   "Return the next worse lost turn move for 'looser' if 'player' plays"
   {:pre [(player? player) (player? looser)]}
-  [cells-strength turn player looser]
+  [weights-by-cell turn player looser]
   (let [all-moves (turn/get-moves-of turn player)]
     (scores/min-delta-for looser
-      (map #(score-move cells-strength player %) all-moves)
+      (map #(score-move weights-by-cell player %) all-moves)
       )))
 
 
@@ -43,14 +43,14 @@
    * The worse immediate lost afterwards"
   {:pre [(player? player)]}
   [turn player]
-  (let [cells-strength (scores/get-cells-weight (turn/get-board turn))
+  (let [weights-by-cell (scores/get-weights-by-cell (turn/get-board turn))
         others (remove #{player} cst/players)]
     (first
       (utils/fast-max-key
         (fn [[m converted :as move]]
           (let [new-turn (turn/play-move turn m)
-                new-diff (get (score-move cells-strength player move) player)
-                next-diff (map #(worst-immediate-loss cells-strength new-turn % player) others)]
+                new-diff (get (score-move weights-by-cell player move) player)
+                next-diff (map #(worst-immediate-loss weights-by-cell new-turn % player) others)]
             (+ new-diff (apply min next-diff))))
         (turn/get-moves-of turn player)
         ))

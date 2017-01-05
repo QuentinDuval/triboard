@@ -23,6 +23,10 @@
   (let [wall-nb (count (neighbouring-walls board point))]
     (+ 1 (* wall-nb wall-nb 0.25))))
 
+(defn- sum-cell-weight
+  [weights-by-cell cells]
+  (transduce (map weights-by-cell) + cells))
+
 
 ;; -----------------------------------------
 ;; Public API
@@ -32,9 +36,9 @@
   {:blue 0 :red 0 :green 0})
 
 (defn update-score-diff
-  [get-cell-strength delta conversion]
+  [weights-by-cell delta conversion]
   {:pre [(move/conversion? conversion)]}
-  (let [diff (transduce (map get-cell-strength) + (:taken conversion))]
+  (let [diff (sum-cell-weight weights-by-cell (:taken conversion))]
     (-> delta
       (update (:looser conversion) - diff)
       (update (:winner conversion) + diff)
@@ -45,7 +49,7 @@
   [player deltas]
   (transduce (map #(get % player)) min deltas))
 
-(defn get-cells-weight
+(defn get-weights-by-cell
   "For each cell of the board, compute a weighting factor to determine its importance"
   [board]
   (into {}
