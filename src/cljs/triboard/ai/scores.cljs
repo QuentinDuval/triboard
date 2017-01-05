@@ -32,6 +32,13 @@
 ;; Public API
 ;; -----------------------------------------
 
+(defn get-weights-by-cell
+  "For each cell of the board, compute a weighting factor to determine its importance"
+  [board]
+  (into {}
+    (map (fn [point] [point (get-cell-weight board point)]))
+    cst/all-positions))
+
 (def null-score-diff
   {:blue 0 :red 0 :green 0})
 
@@ -48,10 +55,3 @@
   "Compute the minimal diff for a player among a list of delta"
   [player deltas]
   (transduce (map #(get % player)) min deltas))
-
-(defn get-weights-by-cell
-  "For each cell of the board, compute a weighting factor to determine its importance"
-  [board]
-  (into {}
-    (map (fn [point] [point (get-cell-weight board point)]))
-    cst/all-positions))
