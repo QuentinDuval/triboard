@@ -3,7 +3,7 @@
     [triboard.logic.constants :as cst]
     ))
 
-(defn fast-max-key
+(defn max-by
   "Fast max key that avoids recomputing things several times"
   {:pre [(fn? key-fn) (seq? coll)]}
   [key-fn coll]

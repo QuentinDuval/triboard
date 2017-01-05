@@ -13,7 +13,7 @@
 ;; Private
 ;; -----------------------------------------
 
-(defn- to-ai-input
+(defn- make-ai
   [turn player]
   {:player player
    :other-players (remove #{player} cst/players)
@@ -27,37 +27,37 @@
   (reduce
     #(scores/update-score-diff cell-weights %1 %2)
     scores/null-score-diff
-    (conj conversions
-      (move/empty-cell-conversion player point))
+    (conj conversions (move/empty-cell-conversion player point))
     ))
 
 (defn- next-worst-possible-score
-  [{:keys [player other-players] :as ai-input} turn]
+  [{:keys [player other-players] :as ai} turn]
   (scores/min-delta-for player
     (eduction
       (comp
         (mapcat #(turn/get-moves-of turn %))
-        (map #(score-move ai-input %)))
+        (map #(score-move ai %)))
       other-players)))
 
 (defn- move-best-outcome
-  [ai-input turn [coord converted :as move]]
+  [ai turn [coord converted :as move]]
   (let [new-turn (turn/play-move turn coord)
-        move-diff (get (score-move ai-input move) (:player ai-input))
-        next-diff (next-worst-possible-score ai-input new-turn)]
+        move-diff (get (score-move ai move) (:player ai))
+        next-diff (next-worst-possible-score ai new-turn)]
     (+ move-diff next-diff)))
 
 
 ;; -----------------------------------------
 ;; Public API
 ;; -----------------------------------------
+
 (defn best-move
   "[SIMPLISTIC] Return the best move for a player based on:
    * The immediate gain
    * The worse immediate lost afterwards"
   {:pre [(player? player)] :post [(board/coord? %)]}
   [turn player]
-  (let [ai-input (to-ai-input turn player)]
+  (let [ai (make-ai turn player)]
     (first
-      (utils/fast-max-key #(move-best-outcome ai-input turn %) (turn/get-moves-of turn player))
+      (utils/max-by #(move-best-outcome ai turn %) (turn/get-moves-of turn player))
       )))
