@@ -51,7 +51,7 @@
 
 (s/fdef empty-cells
   :args (s/cat :board ::board)
-  :ret (partial every? #(s/valid? ::coord %))) ;; TODO - Fails with coll-of ::coord. WHY?
+  :ret (partial every? #(s/valid? ::coord %))) ;; TODO - Fails with coll-of ::coord or s/every. WHY?
 
 (defn board?
   "A board is a vector of vector of cells"
