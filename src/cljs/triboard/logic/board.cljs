@@ -2,6 +2,7 @@
   (:require
     [cljs.spec :as s :include-macros true]
     [cljs.spec.test :as stest :include-macros true]
+    [cljs.spec.impl.gen :as gen]
     [triboard.logic.constants :as cst]
     ))
 
@@ -37,12 +38,18 @@
 ;; Public Types
 ;; -----------------------------------------
 
-(s/def ::board (s/coll-of cst/cell?))
+(s/def ::board (s/coll-of (s/coll-of cst/cell? :count 11) :count 16))
 (s/def ::coord (s/tuple integer? integer?))
 
 (s/fdef new-board :ret ::board)
-(s/fdef to-iterable :args ::board :ret (s/coll-of (s/tuple ::coord cst/cell?)))
-(s/fdef empty-cells :args ::board :ret (s/coll-of cst/cell?))
+
+(s/fdef to-iterable
+  :args (s/cat :board ::board)
+  :ret (s/coll-of (s/tuple ::coord cst/cell?)))
+
+(s/fdef empty-cells
+  :args (s/cat :board ::board)
+  :ret (s/coll-of ::coord))
 
 (defn board?
   "A board is a vector of vector of cells"
@@ -65,7 +72,6 @@
 (defn new-board
   "Creates a new board with initial positions of each players"
   []
-  {:post [(board? %)]}
   (reduce
     (fn [r [color point]] (assoc-in r point color))
     empty-board (init-positions)))
@@ -85,3 +91,8 @@
   (eduction
     (filter #(= (get-cell-at board %) :empty))
     cst/all-positions))
+
+;; (s/check-asserts true)
+
+;; You can test this function by using
+;; (empty-cells (first (gen/sample (s/gen ::board) 1)))
