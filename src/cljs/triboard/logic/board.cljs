@@ -38,18 +38,20 @@
 ;; Public Types
 ;; -----------------------------------------
 
-(s/def ::board (s/coll-of (s/coll-of cst/cell? :count 11) :count 16))
+(s/def ::board (s/every (s/every cst/cell? :count 11) :count 16))
 (s/def ::coord (s/tuple integer? integer?))
 
-(s/fdef new-board :ret ::board)
+(s/fdef new-board
+  ;; :args
+  :ret ::board)
 
 (s/fdef to-iterable
   :args (s/cat :board ::board)
-  :ret (s/coll-of (s/tuple ::coord cst/cell?)))
+  :ret (s/every (s/tuple ::coord cst/cell?))) ;; Success with (s/explain `to-iterable to-iterable)
 
 (s/fdef empty-cells
   :args (s/cat :board ::board)
-  :ret (s/coll-of ::coord)) ;; TODO - Fails with empty collection, also fails with a s/or!
+  :ret (partial every? #(s/valid? ::coord %))) ;; TODO - Fails with coll-of ::coord. WHY?
 
 (defn board?
   "A board is a vector of vector of cells"
