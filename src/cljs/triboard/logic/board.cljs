@@ -49,7 +49,7 @@
 
 (s/fdef empty-cells
   :args (s/cat :board ::board)
-  :ret (s/coll-of ::coord))
+  :ret (s/coll-of ::coord)) ;; TODO - Fails with empty collection, also fails with a s/or!
 
 (defn board?
   "A board is a vector of vector of cells"
@@ -96,3 +96,6 @@
 
 ;; You can test this function by using
 ;; (empty-cells (first (gen/sample (s/gen ::board) 1)))
+;; (stest/check `empty-cells)
+;; (s/explain `empty-cells empty-cells)
+;; (stest/instrument `empty-cells)
