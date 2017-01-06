@@ -1,5 +1,7 @@
 (ns triboard.logic.board
   (:require
+    [cljs.spec :as s :include-macros true]
+    [cljs.spec.test :as stest :include-macros true]
     [triboard.logic.constants :as cst]
     ))
 
@@ -34,6 +36,13 @@
 ;; -----------------------------------------
 ;; Public Types
 ;; -----------------------------------------
+
+(s/def ::board (s/coll-of cst/cell?))
+(s/def ::coord (s/tuple integer? integer?))
+
+(s/fdef new-board :ret ::board)
+(s/fdef to-iterable :args ::board :ret (s/coll-of (s/tuple ::coord cst/cell?)))
+(s/fdef empty-cells :args ::board :ret (s/coll-of cst/cell?))
 
 (defn board?
   "A board is a vector of vector of cells"
