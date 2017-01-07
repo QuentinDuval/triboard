@@ -31,6 +31,6 @@
     (for [[[x y] cell] (model/to-iterable board)]
       ^{:key [x y]}
       (if (= :empty cell)
-        [empty-cell x y cb (if (contains? suggestions [x y]) :help :empty)]
+        [empty-cell x y cb (if (suggestions [x y]) :help :empty)]
         [rect-cell x y cell])
       )))
