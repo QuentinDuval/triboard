@@ -1,23 +1,18 @@
 (ns triboard.view.panel
   (:require
     [clojure.string :as str]
+    [cljs.spec :as s]
     [triboard.logic.constants :as cst]
     [triboard.view.callbacks :as cb]
     [triboard.view.utils :as vutils]
     ))
 
 
-(defn scores?
-  "Specification of the input for `show-scores`"
-  [s]
-  (and
-    (<= 0 (reduce + (vals s)) cst/max-score)
-    (every? s cst/players)))
+(s/fdef show-scores
+  :args (s/tuple #(every? % cst/players)))
 
-
-(defn show-scores
+(defn- show-scores
   [scores player]
-  {:pre [(scores? scores)]}
   (for [p cst/players]
     ^{:key p}
     [(if (= player p) :div.score--is-current :div.score)
@@ -25,11 +20,9 @@
      (str (str/capitalize (name p)) " - " (get scores p))]
     ))
 
-
-(defn top-panel-button
+(defn- top-panel-button
   [on-click txt]
   [:button.help-button {:on-click on-click} txt])
-
 
 (defn show-top-panel
   [scores player cb]

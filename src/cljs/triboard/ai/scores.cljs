@@ -22,7 +22,6 @@
     (neighbors-coordinates point)))
 
 (defn- get-cell-weight
-  {:pre [(coord? point)]}
   [board point]
   (let [wall-nb (count (neighbouring-walls board point))]
     (+ 1 (* wall-nb wall-nb 0.25))))
