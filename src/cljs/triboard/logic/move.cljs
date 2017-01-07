@@ -76,7 +76,7 @@
 
 (s/fdef all-available-moves
   :args (s/tuple ::board/board)
-  :ret map?)
+  :ret map?)                                                ;; TODO - Improve
 
 (s/fdef apply-conversion
   :args (s/tuple ::board/board ::conversion)

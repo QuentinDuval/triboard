@@ -1,5 +1,7 @@
 (ns triboard.logic.turn
   (:require
+    [cljs.spec :as s :include-macros true]
+    [cljs.spec.impl.gen :as gen]
     [triboard.logic.constants :as cst]
     [triboard.logic.board :as board]
     [triboard.logic.move :as move]
