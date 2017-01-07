@@ -65,9 +65,9 @@
 (def null-score-diff {:blue 0 :red 0 :green 0})
 
 (defn update-score-diff
-  [weights-by-cell diff conversion]
+  [weights-by-cell delta conversion]
   (let [diff (sum-cell-weight weights-by-cell (:taken conversion))]
-    (-> diff
+    (-> delta
       (update (:looser conversion) - diff)
       (update (:winner conversion) + diff)
       )))
