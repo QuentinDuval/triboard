@@ -79,12 +79,13 @@
 (defn all-available-moves
   "Return all move available on the board, grouped by player and by move"
   [board]
-  (transduce
-    (mapcat #(available-conversions-at board %))
-    #(update-in %1 [(:winner %2) (:point %2)] conj %2)
-    {}
-    (board/empty-cells board)
-    ))
+  (dissoc
+    (transduce
+      (mapcat #(available-conversions-at board %))
+      #(update-in %1 [(:winner %2) (:point %2)] conj %2)
+      {}
+      (board/empty-cells board))
+    nil))                                                   ;; TODO - find why we have nil
 
 (s/fdef apply-conversion
   :args (s/tuple ::board/board ::conversion)
