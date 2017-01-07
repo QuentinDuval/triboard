@@ -112,4 +112,7 @@
 ;; Running the tests
 ;; ----------------------------------------------------------------------------
 
+;; (require '[cljs.spec.test])
+;; (cljs.spec.test/instrument)
+;; (cljs.spec.test/unstrument)
 (test/run-tests)
