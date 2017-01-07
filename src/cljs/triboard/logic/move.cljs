@@ -55,8 +55,6 @@
 (defn- available-conversions-at
   "Provides the list of moves that can be done from a cell"
   [board point]
-  {:pre [(board/board? board) (board/coord? point)]
-   :post [(conversions? %)]}
   (eduction
     (keep #(available-cells-by-dir board point %))
     cst/directions))

@@ -1,4 +1,7 @@
-(ns triboard.logic.constants)
+(ns triboard.logic.constants
+  (:require
+    [cljs.spec :as s :include-macros true]
+    ))
 
 
 (def board-width 16)
@@ -16,3 +19,6 @@
 
 (def player? (set players))
 (def cell? (conj player? :wall :empty))
+
+(s/def ::player player?)
+(s/def ::cell cell?)

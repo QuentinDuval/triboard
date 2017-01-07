@@ -51,6 +51,9 @@
 ;; Public API
 ;; -----------------------------------------
 
+(s/def ::available-moves map?)                              ;; TODO - Do better
+(s/def ::turn (s/keys :req-un [::board/board ::cst/player ::available-moves ::scores/scores]))
+
 (defn new-init-turn []
   (-> {:board (board/new-board)
        :player (rand-nth cst/players)
@@ -72,7 +75,6 @@
 (defn play-move
   "On player playing the move [x y] - update all the game state accordingly"
   [{:keys [player board] :as turn} point]
-  {:pre [(board/board? board)]}
   (if-let [moves (get (get-moves-of turn player) point)]
     (-> turn
       (apply-moves (conj moves (move/empty-cell-conversion player point)))

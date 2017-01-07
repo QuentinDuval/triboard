@@ -56,7 +56,7 @@
   "[SIMPLISTIC] Return the best move for a player based on:
    * The immediate gain
    * The worse immediate lost afterwards"
-  {:pre [(player? player)] :post [(board/coord? %)]}
+  ;; {:pre [(player? player)] :post [(board/coord? %)]} ;;TODO
   [turn player]
   (let [ai (make-ai turn player)]
     (first

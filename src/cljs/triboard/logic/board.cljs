@@ -38,8 +38,7 @@
 ;; Public Types
 ;; -----------------------------------------
 
-(s/def ::cell cst/cell?)
-(s/def ::board (s/every (s/every cst/cell? :count 11) :count 16))
+(s/def ::board (s/every (s/every ::cst/cell :count 11) :count 16))
 (s/def ::x-coord (into #{} (range cst/board-width)))
 (s/def ::y-coord (into #{} (range cst/board-height)))
 (s/def ::coord (s/tuple ::x-coord ::y-coord))
@@ -49,15 +48,11 @@
 
 (s/fdef to-iterable
   :args (s/cat :board ::board)
-  :ret (s/every (s/tuple ::coord cst/cell?)))
+  :ret (s/every (s/tuple ::coord ::cst/cell)))
 
 (s/fdef empty-cells
   :args (s/cat :board ::board)
   :ret (partial every? #(s/valid? ::coord %))) ;; TODO - Fails with coll-of ::coord or s/every. WHY?
-
-;; TODO - Remove these predicates
-(defn board? [b] (s/valid? ::board b))
-(defn coord? [c] (s/valid? ::coord c))
 
 
 ;; -----------------------------------------
