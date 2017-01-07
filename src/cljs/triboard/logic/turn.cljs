@@ -75,7 +75,7 @@
 
 #_(s/fdef play-move
   :args (s/tuple ::turn ::cst/player)
-  :ret (s/nilable ::turn))
+  :ret ::turn)
 
 (defn play-move
   "On player playing the move [x y] - update all the game state accordingly"
