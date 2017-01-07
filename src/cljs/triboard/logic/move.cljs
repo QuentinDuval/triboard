@@ -16,6 +16,10 @@
 (s/def ::winner cst/player?)
 (s/def ::looser (conj cst/player? :empty))
 (s/def ::conversion  (s/keys :req-un [::point ::taken ::winner ::looser]))
+(s/def ::available-moves
+  (s/every-kv ::cst/player
+    (s/every-kv ::board/coord
+      (s/every ::conversion))))
 
 (defn conversion? [c] (s/valid? ::conversion c))
 (defn conversions? [coll] (every? conversion? coll))
@@ -30,11 +34,7 @@
   (or (nil? cell) (= cell :empty) (= cell :wall)))
 
 (defn- available-cells-by-dir
-  "Indicates the convertible cells when clicking at [x y], and returns:
-	{:point [7 5]
-   :winner :blue,
-   :looser :red,
-   :taken [[8 5] [9 5]]}"
+  "Indicates the convertible cells when clicking at [x y]"
   [board [xi yi :as coord] [dx dy]]
   (loop [x (+ xi dx)
          y (+ yi dy)
@@ -74,21 +74,10 @@
 
 (s/fdef all-available-moves
   :args (s/tuple ::board/board)
-  :ret map?)                                                ;; TODO - Improve
-
-(s/fdef apply-conversion
-  :args (s/tuple ::board/board ::conversion)
-  :ret ::board/board)
+  :ret ::available-moves)
 
 (defn all-available-moves
-  "Return all move available on the board, grouped by player and by move
-   Example:
-    {:blue
-      {[0 5]
-       ({:point [0 5],
-         :winner :blue,
-         :looser :red,
-         :taken [[0 4]]})}}"
+  "Return all move available on the board, grouped by player and by move"
   [board]
   (transduce
     (mapcat #(available-conversions-at board %))
@@ -96,6 +85,10 @@
     {}
     (board/empty-cells board)
     ))
+
+(s/fdef apply-conversion
+  :args (s/tuple ::board/board ::conversion)
+  :ret ::board/board)
 
 (defn apply-conversion
   "Apply a move onto the board, yielding a new board"

@@ -51,8 +51,8 @@
 ;; Public API
 ;; -----------------------------------------
 
-(s/def ::available-moves map?)                              ;; TODO - Do better
-(s/def ::turn (s/keys :req-un [::board/board ::cst/player ::available-moves ::scores/scores]))
+(s/def ::turn
+  (s/keys :req-un [::board/board ::cst/player ::move/available-moves ::scores/scores]))
 
 (defn new-init-turn []
   (-> {:board (board/new-board)
