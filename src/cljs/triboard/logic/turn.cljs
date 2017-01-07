@@ -52,7 +52,8 @@
 ;; -----------------------------------------
 
 (s/def ::turn
-  (s/keys :req-un [::board/board ::cst/player ::move/available-moves ::scores/scores]))
+  (s/keys :req-un
+    [::board/board ::cst/player ::move/available-moves ::scores/scores]))
 
 (defn new-init-turn []
   (-> {:board (board/new-board)
@@ -71,6 +72,10 @@
   "Access the available moves for the provided player, by coordinates"
   [turn player]
   (get (get-moves turn) player))
+
+#_(s/fdef play-move
+  :args (s/tuple ::turn ::cst/player)
+  :ret (s/nilable ::turn))
 
 (defn play-move
   "On player playing the move [x y] - update all the game state accordingly"
