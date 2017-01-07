@@ -11,15 +11,16 @@
 ;; Private
 ;; -----------------------------------------
 
-(defn neighbors-coordinates
+(defn- neighbors-coordinates
   [[x y]]
   (map (fn [[dx dy]] [(+ x dx) (+ y dy)]) cst/directions))
 
 (defn- neighbouring-walls
   [board point]
-  (eduction
-    (filter #(= :wall (board/get-cell-at board % :wall)))
-    (neighbors-coordinates point)))
+  (let [is-wall? #(= :wall (board/get-cell-at board %))]
+    (eduction
+      (filter is-wall?)
+      (neighbors-coordinates point))))
 
 (defn- get-cell-weight
   [board point]
