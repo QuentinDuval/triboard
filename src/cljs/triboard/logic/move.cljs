@@ -16,8 +16,8 @@
 (s/def ::looser (conj cst/player? :empty))
 (s/def ::conversion  (s/keys :req-un [::point ::taken ::winner ::looser]))
 (s/def ::available-moves
-  (s/every-kv ::cst/player
-    (s/every-kv ::board/coord
+  (s/map-of ::cst/player
+    (s/map-of ::board/coord
       (s/every ::conversion))))
 
 (defn conversion? [c] (s/valid? ::conversion c))
