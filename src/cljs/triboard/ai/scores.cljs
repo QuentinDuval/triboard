@@ -70,4 +70,5 @@
     (-> delta
       (update (:looser conversion) - diff)
       (update (:winner conversion) + diff)
+      (dissoc :empty)
       )))
