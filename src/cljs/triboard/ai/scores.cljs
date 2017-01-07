@@ -3,7 +3,6 @@
     [triboard.logic.constants :as cst]
     [triboard.logic.board :as board]
     [triboard.logic.move :as move]
-    [triboard.utils :as utils]
     ))
 
 
@@ -11,11 +10,16 @@
 ;; Private
 ;; -----------------------------------------
 
+(defn neighbors-coordinates
+  "All neighbors of a given coordinate"
+  [[x y]]
+  (map (fn [[dx dy]] [(+ x dx) (+ y dy)]) cst/directions))
+
 (defn- neighbouring-walls
   [board point]
   (eduction
     (filter #(= :wall (board/get-cell-at board % :wall)))
-    (utils/coord-neighbors point)))
+    (neighbors-coordinates point)))
 
 (defn- get-cell-weight
   {:pre [(coord? point)]}

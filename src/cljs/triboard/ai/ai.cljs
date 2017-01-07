@@ -6,7 +6,6 @@
     [triboard.logic.constants :as cst]
     [triboard.logic.move :as move]
     [triboard.logic.turn :as turn]
-    [triboard.utils :as utils]
     ))
 
 
@@ -47,6 +46,12 @@
         next-diff (worst-possible-score-from ai new-turn)]
     (+ move-diff next-diff)))
 
+(defn- max-by
+  "Fast max key that avoids recomputing things several times"
+  {:pre [(fn? key-fn) (seq? coll)]}
+  [key-fn coll]
+  (apply max-key (memoize key-fn) coll))
+
 
 ;; -----------------------------------------
 ;; Public API
@@ -63,5 +68,5 @@
   [turn player]
   (let [ai (make-ai turn player)]
     (first
-      (utils/max-by #(move-best-outcome ai turn %) (turn/get-moves-of turn player))
+      (max-by #(move-best-outcome ai turn %) (turn/get-moves-of turn player))
       )))
