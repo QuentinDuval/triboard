@@ -1,12 +1,23 @@
 (ns triboard.logic.turn
   (:require
     [cljs.spec :as s :include-macros true]
-    [cljs.spec.impl.gen :as gen]
     [triboard.logic.constants :as cst]
     [triboard.logic.board :as board]
     [triboard.logic.move :as move]
     [triboard.logic.scores :as scores]
     ))
+
+
+;; -----------------------------------------
+;; Public types
+;; -----------------------------------------
+
+(s/def ::turn
+  (s/keys :req-un
+    [::board/board
+     ::cst/player
+     ::move/available-moves
+     ::scores/scores]))
 
 
 ;; -----------------------------------------
@@ -36,9 +47,12 @@
     (assoc turn :player (first who-can-play))
     ))
 
+#_(s/fdef apply-moves
+  :args (s/tuple ::turn (s/coll-of ::move/conversion))
+  :ret ::turn)
+
 (defn- apply-moves
   [turn moves]
-  {:pre [(move/conversions? moves)]}
   (let [new-board (reduce move/apply-conversion (:board turn) moves)
         new-scores (reduce scores/update-scores (:scores turn) moves)]
     (-> turn
@@ -50,10 +64,6 @@
 ;; -----------------------------------------
 ;; Public API
 ;; -----------------------------------------
-
-(s/def ::turn
-  (s/keys :req-un
-    [::board/board ::cst/player ::move/available-moves ::scores/scores]))
 
 (defn new-init-turn []
   (-> {:board (board/new-board)
