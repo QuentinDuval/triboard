@@ -1,5 +1,7 @@
 (ns triboard.ai.scores
   (:require
+    [cljs.spec :as s :include-macros true]
+    [cljs.spec.impl.gen :as gen]
     [triboard.logic.constants :as cst]
     [triboard.logic.board :as board]
     [triboard.logic.move :as move]
@@ -11,7 +13,6 @@
 ;; -----------------------------------------
 
 (defn neighbors-coordinates
-  "All neighbors of a given coordinate"
   [[x y]]
   (map (fn [[dx dy]] [(+ x dx) (+ y dy)]) cst/directions))
 
@@ -33,6 +34,24 @@
 
 
 ;; -----------------------------------------
+;; Public Types
+;; -----------------------------------------
+
+;; TODO - How to generate maps with specific keys like coordinates? Meta programming?
+
+(s/def ::score-diff (s/map-of ::cst/player number?))        ;; TODO - Imcomplete player set
+(s/def ::weights-by-cell (s/map-of ::board/coord number?))  ;; TODO - Imcomplete map
+
+(s/fdef get-weights-by-cell
+  :args (s/tuple ::board/board)
+  :ret ::weights-by-cell)
+
+(s/fdef update-score-diff
+  :args (s/tuple ::weights-by-cell ::score-diff ::move/conversion)
+  :ret ::score-diff)
+
+
+;; -----------------------------------------
 ;; Public API
 ;; -----------------------------------------
 
@@ -43,14 +62,12 @@
     (map (fn [point] [point (get-cell-weight board point)]))
     cst/all-positions))
 
-(def null-score-diff
-  {:blue 0 :red 0 :green 0})
+(def null-score-diff {:blue 0 :red 0 :green 0})
 
 (defn update-score-diff
-  [weights-by-cell delta conversion]
-  {:pre [(move/conversion? conversion)]}
+  [weights-by-cell diff conversion]
   (let [diff (sum-cell-weight weights-by-cell (:taken conversion))]
-    (-> delta
+    (-> diff
       (update (:looser conversion) - diff)
       (update (:winner conversion) + diff)
       )))

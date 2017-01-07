@@ -9,6 +9,7 @@
     [cljs.spec.impl.gen :as gen]
     [cljs.test :as test]
     [clojure.test.check :as tc]
+    ;; [clojure.test.check.generators :as tgen]
     [clojure.test.check.properties :as prop :include-macros true]
     [triboard.logic.constants :as cst]
     [triboard.logic.board :as board]
