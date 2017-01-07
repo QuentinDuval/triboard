@@ -38,33 +38,24 @@
 ;; Public Types
 ;; -----------------------------------------
 
+(s/def ::cell cst/cell?)
 (s/def ::board (s/every (s/every cst/cell? :count 11) :count 16))
 (s/def ::coord (s/tuple integer? integer?))
 
 (s/fdef new-board
-  ;; :args
   :ret ::board)
 
 (s/fdef to-iterable
   :args (s/cat :board ::board)
-  :ret (s/every (s/tuple ::coord cst/cell?))) ;; Success with (s/explain `to-iterable to-iterable)
+  :ret (s/every (s/tuple ::coord cst/cell?)))
 
 (s/fdef empty-cells
   :args (s/cat :board ::board)
   :ret (partial every? #(s/valid? ::coord %))) ;; TODO - Fails with coll-of ::coord or s/every. WHY?
 
-(defn board?
-  "A board is a vector of vector of cells"
-  [b]
-  (every? #(every? cst/cell? %) b))
-
-(defn coord?
-  "A cell is a pair of integer"
-  [p]
-  (and
-    (integer? (first p))
-    (integer? (second p))
-    (= 2 (count p))))
+;; TODO - Remove these predicates
+(defn board? [b] (s/valid? ::board b))
+(defn coord? [c] (s/valid? ::coord c))
 
 
 ;; -----------------------------------------
@@ -99,5 +90,6 @@
 ;; You can test this function by using
 ;; (empty-cells (first (gen/sample (s/gen ::board) 1)))
 ;; (stest/check `empty-cells)
+;; (s/explain `to-iterable to-iterable)
 ;; (s/explain `empty-cells empty-cells)
 ;; (stest/instrument `empty-cells)
