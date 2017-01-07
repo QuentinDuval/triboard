@@ -47,8 +47,6 @@
     (+ move-diff next-diff)))
 
 (defn- max-by
-  "Fast max key that avoids recomputing things several times"
-  {:pre [(fn? key-fn) (seq? coll)]}
   [key-fn coll]
   (apply max-key (memoize key-fn) coll))
 
