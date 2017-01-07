@@ -15,7 +15,7 @@
 
 (s/fdef update-scores
   :args (s/tuple ::scores ::move/conversion)
-  :ret (s/map-of ::cst/player integer?))                    ;; Hard to ensure more
+  :ret (s/map-of ::cst/player integer?))                    ;; Hard to ensure positive number
 
 (def initial-scores
   {:blue cst/init-block-count

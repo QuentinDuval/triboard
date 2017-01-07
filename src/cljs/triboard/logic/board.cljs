@@ -69,8 +69,7 @@
   "Access to the board as a list of coordinates with corresponding owner"
   [board]
   (for [[x y :as coord] cst/all-positions]
-    [coord (get-cell-at board coord)]
-    ))
+    [coord (get-cell-at board coord)]))
 
 (defn empty-cells
   "Access to the empty cells of the board as a list of coordinates"

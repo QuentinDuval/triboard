@@ -5,7 +5,7 @@
     )
   (:require
     [cljs.spec :as s]
-    ;; [cljs.spec.test :as stest :include-macros true]
+    [cljs.spec.test :as stest :include-macros true]
     [cljs.spec.impl.gen :as gen]
     [cljs.test :as test]
     [clojure.test.check :as tc]
@@ -14,6 +14,7 @@
     [triboard.logic.constants :as cst]
     [triboard.logic.board :as board]
     [triboard.logic.game :as game]
+    [triboard.logic.scores :as scores]
     [triboard.logic.turn :as turn]
     ))
 
@@ -61,6 +62,14 @@
 ;; ----------------------------------------------------------------------------
 ;; Property based tests
 ;; ----------------------------------------------------------------------------
+
+(deftest board-test
+  (is (empty? (stest/check `board/empty-cells)))
+  (is (empty? (stest/check `board/to-iterable))))
+
+(deftest scores-test
+  (let [res (stest/summarize-results (stest/check `scores/update-scores))]
+    (is (= (:total res) (:check-passed res)))))
 
 (defn valid-game-transition?
   [old-game new-game move]
