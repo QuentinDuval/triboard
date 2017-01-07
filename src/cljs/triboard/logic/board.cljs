@@ -39,8 +39,8 @@
 ;; -----------------------------------------
 
 (s/def ::board (s/every (s/every ::cst/cell :count 11) :count 16))
-(s/def ::x-coord (into #{} (range cst/board-width)))
-(s/def ::y-coord (into #{} (range cst/board-height)))
+(s/def ::x-coord (set (range cst/board-width)))
+(s/def ::y-coord (set (range cst/board-height)))
 (s/def ::coord (s/tuple ::x-coord ::y-coord))
 
 (s/fdef new-board
@@ -81,12 +81,3 @@
   (eduction
     (filter #(= (get-cell-at board %) :empty))
     cst/all-positions))
-
-;; (s/check-asserts true)
-
-;; You can test this function by using
-;; (empty-cells (first (gen/sample (s/gen ::board) 1)))
-;; (stest/check `empty-cells)
-;; (s/explain `to-iterable to-iterable)
-;; (s/explain `empty-cells empty-cells)
-;; (stest/instrument `empty-cells)
