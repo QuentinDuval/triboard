@@ -40,7 +40,9 @@
 
 (s/def ::cell cst/cell?)
 (s/def ::board (s/every (s/every cst/cell? :count 11) :count 16))
-(s/def ::coord (s/tuple integer? integer?))
+(s/def ::x-coord (into #{} (range cst/board-width)))
+(s/def ::y-coord (into #{} (range cst/board-height)))
+(s/def ::coord (s/tuple ::x-coord ::y-coord))
 
 (s/fdef new-board
   :ret ::board)

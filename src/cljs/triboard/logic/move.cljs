@@ -1,5 +1,7 @@
 (ns triboard.logic.move
   (:require
+    [cljs.spec :as s :include-macros true]
+    [cljs.spec.impl.gen :as gen]
     [triboard.logic.board :as board]
     [triboard.logic.constants :as cst]
     ))
@@ -9,15 +11,13 @@
 ;; Public Types
 ;; -----------------------------------------
 
-(defn conversion?
-  "A move is the result of player a cell at a given coordinate"
-  [c]
-  (and
-    (board/coord? (:point c))
-    (every? board/coord? (:taken c))
-    (cst/player? (:winner c))
-    (cst/cell? (:looser c))))
+(s/def ::point ::board/coord)
+(s/def ::taken (s/coll-of ::board/coord))
+(s/def ::winner cst/player?)
+(s/def ::looser (conj cst/player? :empty))
+(s/def ::conversion  (s/keys :req-un [::point ::taken ::winner ::looser]))
 
+(defn conversion? [c] (s/valid? ::conversion c))
 (defn conversions? [coll] (every? conversion? coll))
 
 
@@ -74,6 +74,14 @@
    :looser :empty
    :taken [point]})
 
+(s/fdef all-available-moves
+  :args (s/tuple ::board/board)
+  :ret map?)
+
+(s/fdef apply-conversion
+  :args (s/tuple ::board/board ::conversion)
+  :ret ::board/board)
+
 (defn all-available-moves
   "Return all move available on the board, grouped by player and by move
    Example:
@@ -84,7 +92,6 @@
          :looser :red,
          :taken [[0 4]]})}}"
   [board]
-  {:pre [(board/board? board)]}
   (transduce
     (mapcat #(available-conversions-at board %))
     #(update-in %1 [(:winner %2) (:point %2)] conj %2)
@@ -95,8 +102,6 @@
 (defn apply-conversion
   "Apply a move onto the board, yielding a new board"
   [board move]
-  {:pre [(board/board? board) (conversion? move)]
-   :post [(board/board? board)]}
   (reduce
     #(assoc-in %1 %2 (:winner move))
     board
