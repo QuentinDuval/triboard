@@ -55,7 +55,7 @@
 ;; Public API
 ;; -----------------------------------------
 
-#_(s/fdef best-move
+(s/fdef best-move
   :args (s/tuple ::turn/turn ::cst/player)
   :ret ::board/coord)
 

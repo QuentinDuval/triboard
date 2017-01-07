@@ -20,9 +20,6 @@
     (s/map-of ::board/coord
       (s/every ::conversion))))
 
-(defn conversion? [c] (s/valid? ::conversion c))
-(defn conversions? [coll] (every? conversion? coll))
-
 
 ;; -----------------------------------------
 ;; Private

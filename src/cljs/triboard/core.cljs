@@ -1,6 +1,7 @@
 (ns triboard.core
   (:require
     [cljs.core.async :as async :refer [put! chan <! >!]]
+    [cljs.spec.test :as stest]
     [reagent.core :as reagent]
     [triboard.store :as store]
     [triboard.view.callbacks :as view]
@@ -11,16 +12,13 @@
     [reagent.ratom :refer [reaction]]))
 
 
-(enable-console-print!)
-(set! *assert* true)                                        ;; Set to true for the debug mode
+;; (stest/instrument)
+;; (enable-console-print!)
+;; (set! *assert* false)
 
 ;; TODO - Extract the parts that are related to costmetic: Help
 ;; TODO - Rework the game loop to be a state machine (beware of consuming messages)
 ;; TODO - Rework the AI part, to be able to keep data linked to the init board
-
-;; TODO - http://www.w3schools.com/howto/howto_js_sidenav.asp
-;; TODO - http://www.w3schools.com/svg/svg_grad_radial.asp
-
 
 ;; -----------------------------------------
 ;; GAME LOOP

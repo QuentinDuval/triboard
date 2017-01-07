@@ -14,6 +14,7 @@
     [triboard.logic.constants :as cst]
     [triboard.logic.board :as board]
     [triboard.logic.game :as game]
+    [triboard.logic.move :as move]
     [triboard.logic.scores :as scores]
     [triboard.logic.turn :as turn]
     ))
@@ -68,12 +69,18 @@
 ;; Property based tests
 ;; ----------------------------------------------------------------------------
 
-#_(deftest board-test
-  (is (check-spec-test (stest/check `board/empty-cells)))
-  (is (check-spec-test (stest/check `board/to-iterable))))
+#_(
+    (deftest board-test
+      (is (check-spec-test (stest/check `board/empty-cells)))
+      (is (check-spec-test (stest/check `board/to-iterable))))
 
-#_(deftest scores-test
-  (is (check-spec-test (stest/check `scores/update-scores))))
+    (deftest scores-test
+      (is (check-spec-test (stest/check `scores/update-scores))))
+
+    (deftest move-test
+      (is (check-spec-test (stest/check `move/all-available-moves)))
+      (is (check-spec-test (stest/check `move/apply-conversion))))
+    )
 
 (defn valid-game-transition?
   [old-game new-game move]

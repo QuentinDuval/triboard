@@ -9,18 +9,6 @@
 
 
 ;; -----------------------------------------
-;; Public types
-;; -----------------------------------------
-
-(s/def ::turn
-  (s/keys :req-un
-    [::board/board
-     ::cst/player
-     ::move/available-moves
-     ::scores/scores]))
-
-
-;; -----------------------------------------
 ;; Private
 ;; -----------------------------------------
 
@@ -47,10 +35,6 @@
     (assoc turn :player (first who-can-play))
     ))
 
-#_(s/fdef apply-moves
-  :args (s/tuple ::turn (s/coll-of ::move/conversion))
-  :ret ::turn)
-
 (defn- apply-moves
   [turn moves]
   (let [new-board (reduce move/apply-conversion (:board turn) moves)
@@ -64,6 +48,13 @@
 ;; -----------------------------------------
 ;; Public API
 ;; -----------------------------------------
+
+(s/def ::turn
+  (s/keys :req-un
+    [::board/board
+     ::cst/player
+     ::move/available-moves
+     ::scores/scores]))
 
 (defn new-init-turn []
   (-> {:board (board/new-board)
@@ -83,8 +74,8 @@
   [turn player]
   (get (get-moves turn) player))
 
-#_(s/fdef play-move
-  :args (s/tuple ::turn ::cst/player)
+(s/fdef play-move
+  :args (s/cat :turn ::turn :point ::board/coord)
   :ret ::turn)
 
 (defn play-move
@@ -94,4 +85,5 @@
     (-> turn
       (apply-moves (conj moves (move/empty-cell-conversion player point)))
       (with-available-moves)
-      (with-next-player))))
+      (with-next-player))
+    turn))

@@ -17,8 +17,9 @@
 (defn play-move
   "Play a move, adding a new turn into the game"
   [game-turns coord]
-  (let [current-turn (current-turn game-turns)]
-    (if-let [next-turn (turn/play-move current-turn coord)]
+  (let [current-turn (current-turn game-turns)
+        next-turn (turn/play-move current-turn coord)]
+    (if (not= next-turn current-turn)
       (conj game-turns next-turn)
       game-turns)))
 
