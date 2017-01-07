@@ -6,10 +6,10 @@
   (:require
     [cljs.spec :as s]
     [cljs.spec.test :as stest :include-macros true]
-    [cljs.spec.impl.gen :as gen]
+    ;;[cljs.spec.impl.gen :as sgen]
     [cljs.test :as test]
     [clojure.test.check :as tc]
-    ;; [clojure.test.check.generators :as tgen]
+    [clojure.test.check.generators :as gen]
     [clojure.test.check.properties :as prop :include-macros true]
     [triboard.logic.constants :as cst]
     [triboard.logic.board :as board]
@@ -34,6 +34,11 @@
 (defn sum-player-scores
   [score]
   (transduce (map second) + score))
+
+(defn check-spec-test
+  [spec-res]
+  (let [res (stest/summarize-results spec-res)]
+    (= (:total res) (:check-passed res))))
 
 
 ;; ----------------------------------------------------------------------------
@@ -63,13 +68,12 @@
 ;; Property based tests
 ;; ----------------------------------------------------------------------------
 
-(deftest board-test
-  (is (empty? (stest/check `board/empty-cells)))
-  (is (empty? (stest/check `board/to-iterable))))
+#_(deftest board-test
+  (is (check-spec-test (stest/check `board/empty-cells)))
+  (is (check-spec-test (stest/check `board/to-iterable))))
 
-(deftest scores-test
-  (let [res (stest/summarize-results (stest/check `scores/update-scores))]
-    (is (= (:total res) (:check-passed res)))))
+#_(deftest scores-test
+  (is (check-spec-test (stest/check `scores/update-scores))))
 
 (defn valid-game-transition?
   [old-game new-game move]

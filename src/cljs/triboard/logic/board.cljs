@@ -1,7 +1,6 @@
 (ns triboard.logic.board
   (:require
     [cljs.spec :as s :include-macros true]
-    [cljs.spec.impl.gen :as gen]
     [triboard.logic.constants :as cst]
     ))
 
