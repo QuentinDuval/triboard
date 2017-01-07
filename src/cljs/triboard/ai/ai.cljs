@@ -1,5 +1,6 @@
 (ns triboard.ai.ai
   (:require
+    [cljs.spec :as s :include-macros true]
     [triboard.ai.scores :as scores]
     [triboard.logic.board :as board]
     [triboard.logic.constants :as cst]
@@ -23,7 +24,6 @@
 (defn- score-move
   "Compute the strength of a move, based on the converted cells"
   [{:keys [player cell-weights]} [point conversions]]
-  {:pre [(move/conversions? conversions)]}
   (reduce
     #(scores/update-score-diff cell-weights %1 %2)
     scores/null-score-diff
@@ -52,11 +52,14 @@
 ;; Public API
 ;; -----------------------------------------
 
+(s/fdef best-move
+  :args (s/tuple ::turn/turn ::cst/player)
+  :ret ::board/coord)
+
 (defn best-move
   "[SIMPLISTIC] Return the best move for a player based on:
    * The immediate gain
    * The worse immediate lost afterwards"
-  ;; {:pre [(player? player)] :post [(board/coord? %)]} ;;TODO
   [turn player]
   (let [ai (make-ai turn player)]
     (first
