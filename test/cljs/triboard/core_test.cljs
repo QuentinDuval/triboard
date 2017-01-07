@@ -4,11 +4,15 @@
     [clojure.test.check.clojure-test :refer [defspec]]
     )
   (:require
+    [cljs.spec :as s]
+    ;; [cljs.spec.test :as stest :include-macros true]
+    ;; [cljs.spec.impl.gen :as sgen]
     [cljs.test :as test]
     [clojure.test.check :as tc]
     [clojure.test.check.generators :as gen]
     [clojure.test.check.properties :as prop :include-macros true]
     [triboard.logic.constants :as cst]
+    [triboard.logic.board :as board]
     [triboard.logic.game :as game]
     [triboard.logic.turn :as turn]
     ))
@@ -43,17 +47,15 @@
 ;; Generators
 ;; ----------------------------------------------------------------------------
 
-(def coord-gen
-  (gen/elements cst/all-positions))
+(def coord-gen (s/gen ::board/coord))
 
 (def initial-empty-cell-count
   (- (* cst/board-width cst/board-height) (* 4 cst/init-block-count)))
 
 (def game-gen
   (gen/fmap
-    #(play-moves (game/new-game) %)
-    (gen/vector coord-gen 0 initial-empty-cell-count)
-    ))
+    (fn [coord] (play-moves (game/new-game) coord))
+    (gen/vector coord-gen 0 initial-empty-cell-count)))
 
 
 ;; ----------------------------------------------------------------------------

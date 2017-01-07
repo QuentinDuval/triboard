@@ -1,8 +1,6 @@
 (ns triboard.logic.board
   (:require
     [cljs.spec :as s :include-macros true]
-    [cljs.spec.test :as stest :include-macros true]
-    [cljs.spec.impl.gen :as gen]
     [triboard.logic.constants :as cst]
     ))
 
@@ -38,10 +36,8 @@
 ;; Public Types
 ;; -----------------------------------------
 
+(s/def ::coord (set cst/all-positions))
 (s/def ::board (s/every (s/every ::cst/cell :count 11) :count 16))
-(s/def ::x-coord (set (range cst/board-width)))
-(s/def ::y-coord (set (range cst/board-height)))
-(s/def ::coord (s/tuple ::x-coord ::y-coord))
 
 (s/fdef new-board
   :ret ::board)
