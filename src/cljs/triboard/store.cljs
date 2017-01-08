@@ -1,7 +1,9 @@
 (ns triboard.store
   (:require
+    [cljs.spec :as s]
     [reagent.core :as reagent]
     [triboard.ai.ai :as ai]
+    [triboard.logic.board :as board]
     [triboard.logic.game :as game]
     [triboard.logic.turn :as turn])
   (:require-macros
@@ -12,14 +14,14 @@
 ;; Private
 ;; -----------------------------------------
 
-(def is-ai? #{:red :green})
+(def ^:private is-ai? #{:red :green})
 
 (defonce app-state
   (reagent/atom
     {:game (game/new-game)
      :help false}))
 
-(defn play-game-turn! [move]
+(defn- play-game-turn! [move]
   (swap! app-state update :game game/play-move move))
 
 
@@ -42,6 +44,13 @@
 ;; Public API (updates)
 ;; -----------------------------------------
 
+(s/def ::game-event
+  (s/or
+    :no-params (s/tuple #{:new-game :toggle-help :restart :undo :ai-play})
+    :player-move (s/tuple #{:player-move} ::board/coord)))
+
+(s/fdef send-event! :args (s/tuple ::game-event))
+
 (defn- send-event!
   [msg]
   (case (first msg)
@@ -52,4 +61,3 @@
     :ai-play (play-game-turn! (ai/best-move @current-turn @current-player))
     :player-move (play-game-turn! (second msg))
     ))
-
