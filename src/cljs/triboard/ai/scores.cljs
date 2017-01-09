@@ -18,9 +18,7 @@
 (defn- neighbouring-walls
   [board point]
   (let [is-wall? #(= :wall (board/get-cell-at board %))]
-    (eduction
-      (filter is-wall?)
-      (neighbors-coordinates point))))
+    (eduction (filter is-wall?) (neighbors-coordinates point))))
 
 (defn- get-cell-weight
   [board point]
@@ -37,7 +35,6 @@
 ;; -----------------------------------------
 
 ;; TODO - How to generate maps with specific keys like coordinates? Meta programming?
-
 (s/def ::score-diff (s/map-of ::cst/player number?))        ;; TODO - Imcomplete player set
 (s/def ::weights-by-cell (s/map-of ::board/coord number?))  ;; TODO - Imcomplete map
 
