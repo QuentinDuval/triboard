@@ -27,9 +27,9 @@
 (defn show-top-panel
   [scores player cb]
   [:div.scores
-   [top-panel-button #(cb/on-new-game cb) (vutils/special-char "&#9733;")]
+   [top-panel-button #(cb/on-new-game cb) vutils/star]
    [top-panel-button #(cb/on-toogle-help cb) "?"]
    (show-scores scores player)
-   [top-panel-button #(cb/on-restart cb) (vutils/special-char "&#x21bb;")]
-   [top-panel-button #(cb/on-undo cb) (vutils/special-char "&larr;")] ;;"&#x21A9;"
+   [top-panel-button #(cb/on-restart cb) vutils/circle-arrow]
+   [top-panel-button #(cb/on-undo cb) vutils/back-arrow]
    ])
