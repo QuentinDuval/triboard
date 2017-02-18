@@ -1,8 +1,7 @@
 (ns triboard.logic.board
   (:require
     [cljs.spec :as s :include-macros true]
-    [triboard.logic.constants :as cst]
-    ))
+    [triboard.logic.constants :as cst]))
 
 
 ;; -----------------------------------------
@@ -59,15 +58,16 @@
   "Creates a new board with initial positions of each players"
   []
   (reduce
-    (fn [r [color point]] (assoc-in r point color))
-    empty-board (init-positions)))
+    (fn [board [color point]] (assoc-in board point color))
+    empty-board
+    (init-positions)))
 
 (def get-cell-at get-in)
 
 (defn to-iterable
   "Access to the board as a list of coordinates with corresponding owner"
   [board]
-  (for [[x y :as coord] cst/all-positions]
+  (for [coord cst/all-positions]
     [coord (get-cell-at board coord)]))
 
 (defn empty-cells
