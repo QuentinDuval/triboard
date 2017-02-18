@@ -8,12 +8,15 @@
     ))
 
 
-(s/fdef show-scores
-  :args (s/tuple #(every? % cst/players)))
+;; ----------------------------------------------------------------------------
+;; Private
+;; ----------------------------------------------------------------------------
 
 (defn- player->css-style
-  [player]
-  {:class (str "score--" (name player))})
+  [player highlight?]
+  (let [player-class (str "score--" (name player))
+        score-class (if (highlight? player) "score--is-current" "score")]
+    (str player-class " " score-class)))
 
 (defn- player->score-text
   [player score]
@@ -21,16 +24,24 @@
 
 (defn- show-scores
   [scores highlight?]
-  (for [p cst/players]
-    ^{:key p}
-    [(if (highlight? p) :div.score--is-current :div.score)
-     (player->css-style p)
-     (player->score-text p (get scores p))]
+  (for [player cst/players :let [score (get scores player)]]
+    ^{:key player}
+    [:div
+     {:class (player->css-style player highlight?)}
+     (player->score-text player score)]
     ))
 
 (defn- top-panel-button
   [on-click txt]
   [:button.help-button {:on-click on-click} txt])
+
+
+;; ----------------------------------------------------------------------------
+;; Public
+;; ----------------------------------------------------------------------------
+
+(s/fdef show-scores
+  :args (s/tuple #(every? % cst/players)))
 
 (defn show-top-panel
   "Show the top panel of the game that contains
