@@ -1,11 +1,12 @@
 (ns triboard.ai.ai
   (:require
     [cljs.spec :as s :include-macros true]
-    [triboard.ai.scores :as scores]
+    [triboard.ai.scoring :as scoring]
     [triboard.logic.board :as board]
     [triboard.logic.game :as game]
     [triboard.logic.move :as move]
     [triboard.logic.player :as player]
+    [triboard.logic.scores :as scores]
     ))
 
 
@@ -17,15 +18,15 @@
   [board player]
   {:player player
    :other-players (remove #{player} player/all)
-   :cell-weights (scores/get-weights-by-cell board)
+   :cell-weights (scoring/get-weighting board)
    })
 
 (defn- score-move
   "Compute the strength of a move, based on the converted cells"
   [{:keys [player cell-weights]} [point conversions]]
   (reduce
-    #(scores/update-score-diff cell-weights %1 %2)
-    scores/null-score-diff
+    #(scores/update-scores-with %1 %2 cell-weights)
+    scores/null-scores
     (conj conversions (move/empty-cell-conversion player point))
     ))
 

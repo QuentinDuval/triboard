@@ -1,6 +1,7 @@
 (ns triboard.logic.scores
   (:require
     [cljs.spec :as s :include-macros true]
+    [triboard.logic.board :as board]
     [triboard.logic.constants :as cst]
     [triboard.logic.move :as move]
     [triboard.logic.player :as player]
@@ -24,12 +25,13 @@
 ;; ----------------------------------------------------------------------------
 
 (s/def ::scores (s/map-of ::player/player number?))         ;; TODO - parameterized specs?
+(s/fdef weighting :args (s/tuple ::board/coord) :ret number?)
 
 (s/fdef update-scores
   :args (s/tuple ::scores ::move/conversion) :ret ::scores)
 
 (s/fdef update-scores-with
-  :args (s/tuple ::scores ::move/conversion fn?) :ret ::scores)
+  :args (s/tuple ::scores ::move/conversion ::weighting) :ret ::scores)
 
 (def null-scores
   {:blue 0 :red 0 :green 0})
