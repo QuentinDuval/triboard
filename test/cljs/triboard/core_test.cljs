@@ -15,6 +15,7 @@
     [triboard.logic.board :as board]
     [triboard.logic.game :as game]
     [triboard.logic.move :as move]
+    [triboard.logic.player :as player]
     [triboard.logic.scores :as scores]
     [triboard.logic.turn :as turn]
     ))
@@ -70,8 +71,27 @@
 
 
 ;; ----------------------------------------------------------------------------
-;; SCORE TESTS
+;; BOARD
 ;; ----------------------------------------------------------------------------
+
+(deftest test-draw-slices
+  (let [elements (range 1 100)
+        slices player/all]
+    (testing "Ranges of slices"
+      (is
+        (=
+          [[:blue 1] [:blue 2] [:red 3] [:red 4] [:green 5] [:green 6]]
+          (vec (board/draw-slices 2 slices elements))))
+      )))
+
+
+;; ----------------------------------------------------------------------------
+;; SCORE
+;; ----------------------------------------------------------------------------
+
+(deftest score-todo-test
+  (testing "trivial assumption"
+    (is (= 1 1))))
 
 (defn prop-update-score
   [score conversion]

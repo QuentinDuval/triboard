@@ -15,7 +15,7 @@
     (vec (repeat cst/board-width column))))
 
 
-(defn- draw-slices
+(defn draw-slices
   "Draw n * m slices from the collection"
   [n slices positions]
   (mapcat
@@ -27,10 +27,10 @@
 
 (defn- init-positions
   "Create random initial positions for the players"
-  []
+  [positions]
   (draw-slices cst/init-block-count
     (conj player/all :wall)
-    (shuffle cst/all-positions)))
+    positions))
 
 
 ;; -----------------------------------------
@@ -62,7 +62,7 @@
   (reduce
     (fn [board [color point]] (assoc-in board point color))
     empty-board
-    (init-positions)))
+    (init-positions (shuffle cst/all-positions))))
 
 (def get-cell-at get-in)
 

@@ -2,7 +2,6 @@
   (:require
     [cljs.spec :as s :include-macros true]
     [triboard.ai.scoring :as scoring]
-    [triboard.logic.board :as board]
     [triboard.logic.game :as game]
     [triboard.logic.move :as move]
     [triboard.logic.player :as player]
@@ -58,8 +57,8 @@
 ;; -----------------------------------------
 
 (s/fdef play-best-move
-  :args (s/tuple ::game ::player/player)
-  :ret :game)
+  :args (s/tuple ::game/game ::player/player)
+  :ret ::game/game)
 
 (defn- best-move                                            ;; TODO - Compute games directly...
   [game player]
