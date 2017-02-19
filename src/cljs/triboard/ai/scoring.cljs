@@ -1,6 +1,5 @@
 (ns triboard.ai.scoring
   (:require
-    [cljs.spec :as s :include-macros true]
     [triboard.logic.constants :as cst]
     [triboard.logic.board :as board]
     ))
@@ -12,7 +11,7 @@
 
 (defn- neighbors-coordinates
   [[x y]]
-  (map (fn [[dx dy]] [(+ x dx) (+ y dy)]) cst/directions))
+  (for [[dx dy] cst/directions] [(+ x dx) (+ y dy)]))
 
 (defn- neighbouring-walls
   [board point]
@@ -27,8 +26,9 @@
 (defn- all-weights
   [board]
   (into {}
-    (map (fn [point] [point (cell-weight board point)]))
-    cst/all-positions))
+    (for [point cst/all-positions]
+      [point (cell-weight board point)]
+      )))
 
 
 ;; ----------------------------------------------------------------------------
