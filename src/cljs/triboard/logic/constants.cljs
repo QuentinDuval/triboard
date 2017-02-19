@@ -8,7 +8,4 @@
 (def max-score (- (* board-width board-height) init-block-count))
 
 (def all-positions
-  (vec
-    (for [x (range board-width)
-          y (range board-height)]
-      [x y])))
+  (vec (for [x (range board-width) y (range board-height)] [x y])))
