@@ -53,7 +53,7 @@
 ;; -----------------------------------------
 
 (defn run-game []
-  (frame/main-frame @store/current-turn @store/suggestions
+  (frame/main-frame @store/current-state @store/suggestions
     (reify view/CallBacks
       (on-new-game [_] (send-game-event! [:new-game]))
       (on-toogle-help [_] (send-game-event! [:toggle-help]))

@@ -2,27 +2,42 @@
   (:require
     [cljs.spec :as s :include-macros true]
     [triboard.logic.board :as board]
+    [triboard.logic.constants :as cst]
+    [triboard.logic.move :as move]
+    [triboard.logic.scores :as scores]
     [triboard.logic.turn :as turn]
     ))
 
 
-(s/def ::game #(every? (partial s/valid? ::turn/turn) %))
-(s/fdef current-turn :args (s/tuple ::game) :ret ::turn/turn)
+(s/def ::game
+  #(every? (partial s/valid? ::turn/turn) %))
+
+(s/def ::game-state
+  (s/keys :req-un
+    [::board/board
+     ::cst/player
+     ::move/available-moves
+     ::scores/scores]))
+
+(s/fdef current-state :args (s/tuple ::game) :ret ::game-state)
 (s/fdef play-move :args (s/tuple ::game ::board/coord) :ret ::game)
 (s/fdef undo-player-move :args (s/tuple ::game fn?) :ret ::game)
 
 (defn new-game []
   (list (turn/new-init-turn)))
 
-(defn current-turn
-  "Get the current turn available for a move"
+(defn current-state
+  "Return the current state of the game:
+   * Board (cells and owners)
+   * Player score
+   * Next player to play"
   [game]
   (first game))
 
 (defn play-move
   "Play a move, adding a new turn into the game"
   [game coord]
-  (let [curr-turn (current-turn game)
+  (let [curr-turn (current-state game)
         next-turn (turn/play-move curr-turn coord)]
     (if (not= next-turn curr-turn)
       (conj game next-turn)

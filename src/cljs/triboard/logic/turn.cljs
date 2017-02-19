@@ -64,14 +64,10 @@
     with-available-moves
     with-next-player))
 
-(defn get-player [turn] (:player turn))
-(defn get-board [turn] (:board turn))
-(defn get-scores [turn] (:scores turn))
-
 (defn get-moves-of
   "Access the available moves for the provided player, by coordinates"
   [turn player]
-  (get (get-moves turn) player))
+  (get (:moves turn) player))
 
 (s/fdef play-move
   :args (s/cat :turn ::turn :point ::board/coord)

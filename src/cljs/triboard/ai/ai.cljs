@@ -4,6 +4,7 @@
     [triboard.ai.scores :as scores]
     [triboard.logic.board :as board]
     [triboard.logic.constants :as cst]
+    [triboard.logic.game :as game]
     [triboard.logic.move :as move]
     [triboard.logic.turn :as turn]
     ))
@@ -14,10 +15,10 @@
 ;; -----------------------------------------
 
 (defn- make-ai
-  [turn player]
+  [game-state player]
   {:player player
    :other-players (remove #{player} cst/players)
-   :cell-weights (scores/get-weights-by-cell (turn/get-board turn))
+   :cell-weights (scores/get-weights-by-cell (:board game-state))
    })
 
 (defn- score-move
@@ -56,7 +57,7 @@
 ;; -----------------------------------------
 
 (s/fdef best-move
-  :args (s/tuple ::turn/turn ::cst/player)
+  :args (s/tuple ::game/game-state ::cst/player)            ;; TODO - take a full game
   :ret ::board/coord)
 
 (defn best-move
@@ -66,5 +67,5 @@
   [turn player]
   (let [ai (make-ai turn player)]
     (first
-      (max-by #(move-best-outcome ai turn %) (turn/get-moves-of turn player))
+      (max-by #(move-best-outcome ai turn %) (turn/get-moves-of turn player)) ;; TODO - Game
       )))
