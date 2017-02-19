@@ -57,14 +57,11 @@
 ;; Public API
 ;; -----------------------------------------
 
-(s/fdef best-move
+(s/fdef play-best-move
   :args (s/tuple ::game ::player/player)
-  :ret ::board/coord)
+  :ret :game)
 
-(defn best-move
-  "[SIMPLISTIC] Return the best move for a player based on:
-   * The immediate gain
-   * The worse immediate lost afterwards"
+(defn- best-move                                            ;; TODO - Compute games directly...
   [game player]
   (let [game-state (game/current-state game)
         ai (make-ai (:board game-state) player)]
@@ -74,5 +71,8 @@
       )))
 
 (defn play-best-move
+  "[SIMPLISTIC] Play the best move for a player based on:
+   * The immediate gain
+   * The worse immediate lost afterwards"
   [game player]
   (game/play-move game (best-move game player)))
