@@ -20,9 +20,6 @@
     {:game (game/new-game)
      :help false}))
 
-(defn- play-game-turn! [move]
-  (swap! app-state update :game game/play-move move))
-
 
 ;; -----------------------------------------
 ;; Public API (reactive consumption)
@@ -58,6 +55,6 @@
     :toggle-help (swap! app-state update :help not)
     :restart (swap! app-state update :game #(take-last 1 %))
     :undo (swap! app-state update :game game/undo-player-move is-ai?)
-    :ai-play (play-game-turn! (ai/best-move @game @current-player))
-    :player-move (play-game-turn! (second msg))
+    :ai-play (swap! app-state update :game ai/play-best-move @current-player)
+    :player-move (swap! app-state update :game game/play-move (second msg))
     ))

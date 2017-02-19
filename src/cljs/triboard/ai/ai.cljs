@@ -72,3 +72,7 @@
       (max-by #(move-best-outcome ai game %)
         (get-in game-state [:moves player]))
       )))
+
+(defn play-best-move
+  [game player]
+  (game/play-move game (best-move game player)))
