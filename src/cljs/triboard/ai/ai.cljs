@@ -31,10 +31,10 @@
     ))
 
 (defn- worst-possible-score-from
-  [{:keys [player other-players] :as ai} turn]
+  [{:keys [player other-players] :as ai} game-state]
   (transduce
     (comp
-      (mapcat #(turn/get-moves-of turn %))
+      (mapcat #(get (:moves game-state) %))
       (map #(score-move ai %))
       (map #(get % player)))
     min
@@ -42,7 +42,7 @@
 
 (defn- move-best-outcome
   [ai turn [coord converted :as move]]
-  (let [new-turn (turn/play-move turn coord)
+  (let [new-turn (turn/play-move turn coord)                ;; TODO - replace by game
         move-diff (get (score-move ai move) (:player ai))
         next-diff (worst-possible-score-from ai new-turn)]
     (+ move-diff next-diff)))
@@ -64,8 +64,9 @@
   "[SIMPLISTIC] Return the best move for a player based on:
    * The immediate gain
    * The worse immediate lost afterwards"
-  [turn player]
-  (let [ai (make-ai turn player)]
+  [game-state player]
+  (let [ai (make-ai game-state player)]
     (first
-      (max-by #(move-best-outcome ai turn %) (turn/get-moves-of turn player)) ;; TODO - Game
+      (max-by #(move-best-outcome ai game-state %)
+        (get (:moves game-state) player))                   ;; TODO - Game
       )))

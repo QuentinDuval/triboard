@@ -4,8 +4,7 @@
     [reagent.core :as reagent]
     [triboard.ai.ai :as ai]
     [triboard.logic.board :as board]
-    [triboard.logic.game :as game]
-    [triboard.logic.turn :as turn])
+    [triboard.logic.game :as game])
   (:require-macros
     [reagent.ratom :refer [reaction]]))
 
@@ -36,7 +35,7 @@
 (def suggestions
   (reaction
     (if (and (:help @app-state) (not (is-ai? @current-player)))
-      (turn/get-moves-of @current-state @current-player)
+      (get (:moves @current-state) @current-player)
       {})))
 
 

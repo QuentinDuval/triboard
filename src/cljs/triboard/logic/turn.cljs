@@ -64,11 +64,6 @@
     with-available-moves
     with-next-player))
 
-(defn get-moves-of
-  "Access the available moves for the provided player, by coordinates"
-  [turn player]
-  (get (:moves turn) player))
-
 (s/fdef play-move
   :args (s/cat :turn ::turn :point ::board/coord)
   :ret ::turn)
@@ -76,7 +71,7 @@
 (defn play-move
   "On player playing the move [x y] - update all the game state accordingly"
   [{:keys [player board] :as turn} point]
-  (if-let [moves (get (get-moves-of turn player) point)]
+  (if-let [moves (get-in turn [:moves player point])]
     (-> turn
       (apply-moves (conj moves (move/empty-cell-conversion player point)))
       (with-available-moves)
