@@ -91,7 +91,5 @@
 (defn apply-conversion
   "Apply a move onto the board, yielding a new board"
   [board move]
-  (reduce
-    #(assoc-in %1 %2 (:winner move))
-    board
-    (:taken move)))
+  (let [updates (map vector (:taken move) (repeat (:winner move)))]
+    (board/update-cells board updates)))
