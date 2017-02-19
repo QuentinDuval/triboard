@@ -65,7 +65,7 @@
     with-next-player))
 
 (s/fdef play-move
-  :args (s/cat :turn ::turn :point ::board/coord)
+  :args (s/cat :turn ::board/coord)
   :ret ::turn)
 
 (defn play-move
