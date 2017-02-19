@@ -47,12 +47,18 @@
 ;; Public API
 ;; -----------------------------------------
 
+(defn update-cells
+  "Updates the cells at the provided positions"
+  [initial-board updates]
+  (reduce
+    (fn [board [coord color]] (assoc-in board coord color))
+    initial-board
+    updates))
+
 (defn new-board
   "Creates a new board with initial positions of each players"
   []
-  (reduce
-    (fn [board [point color]] (assoc-in board point color))
-    empty-board
+  (update-cells empty-board
     (pick-n-cells-for-each-player cst/init-block-count (shuffle cst/all-positions))))
 
 (def get-cell-at get-in)
