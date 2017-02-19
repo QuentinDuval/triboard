@@ -17,11 +17,8 @@
 (defn pick-n-cells-for-each-player
   "Pick N initial positions for each player and the walls"
   [n positions]
-  (let [elements (conj player/all :wall)]
-    (map vector
-      positions
-      (mapcat #(repeat n %) elements))
-    ))
+  (let [tiles (conj player/all :wall)]
+    (map vector positions (mapcat #(repeat n %) tiles))))
 
 
 ;; -----------------------------------------
@@ -58,16 +55,17 @@
 (defn new-board
   "Creates a new board with initial positions of each players"
   []
-  (update-cells empty-board
-    (pick-n-cells-for-each-player cst/init-block-count (shuffle cst/all-positions))))
+  (->>
+    (shuffle cst/all-positions)
+    (pick-n-cells-for-each-player cst/init-block-count)
+    (update-cells empty-board)))
 
 (def get-cell-at get-in)
 
 (defn to-iterable
   "Access to the board as a list of coordinates with corresponding owner"
   [board]
-  (for [coord cst/all-positions]
-    [coord (get-cell-at board coord)]))
+  (for [coord cst/all-positions] [coord (get-cell-at board coord)]))
 
 (defn empty-cells
   "Access to the empty cells of the board as a list of coordinates"
