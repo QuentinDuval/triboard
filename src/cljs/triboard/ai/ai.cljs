@@ -30,10 +30,10 @@
     ))
 
 (defn- worst-possible-score-from
-  [{:keys [player other-players] :as ai} game-state]
+  [{:keys [player other-players] :as ai} moves]
   (transduce
     (comp
-      (mapcat #(get (:moves game-state) %))
+      (mapcat #(get moves %))
       (map #(score-move ai %))
       (map #(get % player)))
     min
@@ -43,7 +43,8 @@
   [ai game [coord converted :as move]]
   (let [new-game (game/play-move game coord)
         move-diff (get (score-move ai move) (:player ai))
-        next-diff (worst-possible-score-from ai (game/current-state new-game))]
+        new-moves (:moves (game/current-state new-game))
+        next-diff (worst-possible-score-from ai new-moves)]
     (+ move-diff next-diff)))
 
 (defn- max-by
