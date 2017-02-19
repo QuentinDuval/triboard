@@ -57,15 +57,16 @@
 ;; -----------------------------------------
 
 (s/fdef best-move
-  :args (s/tuple ::game/game-state ::cst/player)            ;; TODO - take a full game
+  :args (s/tuple ::game ::cst/player)
   :ret ::board/coord)
 
 (defn best-move
   "[SIMPLISTIC] Return the best move for a player based on:
    * The immediate gain
    * The worse immediate lost afterwards"
-  [game-state player]
-  (let [ai (make-ai game-state player)]
+  [game player]
+  (let [game-state (game/current-state game)
+        ai (make-ai game-state player)]
     (first
       (max-by #(move-best-outcome ai game-state %)
         (get (:moves game-state) player))                   ;; TODO - Game

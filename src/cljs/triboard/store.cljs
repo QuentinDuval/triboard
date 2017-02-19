@@ -28,7 +28,8 @@
 ;; Public API (reactive consumption)
 ;; -----------------------------------------
 
-(def current-state (reaction (game/current-state (:game @app-state))))
+(def game (reaction (:game @app-state)))
+(def current-state (reaction (game/current-state @game)))
 (def current-player (reaction (:player @current-state)))
 (def ai-player? (reaction (is-ai? @current-player)))
 
@@ -57,6 +58,6 @@
     :toggle-help (swap! app-state update :help not)
     :restart (swap! app-state update :game #(take-last 1 %))
     :undo (swap! app-state update :game game/undo-player-move is-ai?)
-    :ai-play (play-game-turn! (ai/best-move @current-state @current-player))
+    :ai-play (play-game-turn! (ai/best-move @game @current-player))
     :player-move (play-game-turn! (second msg))
     ))
