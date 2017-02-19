@@ -31,7 +31,7 @@
   (or (nil? cell) (= cell :empty) (= cell :wall)))
 
 (defn- available-cells-by-dir
-  "Indicates the convertible cells when clicking at [x y]"
+  "Indicates the convertible cells when clicking at [x y]"  ;; TODO - Refactor & Test
   [board [xi yi :as coord] [dx dy]]
   (loop [x (+ xi dx)
          y (+ yi dy)
