@@ -14,23 +14,13 @@
   (let [column (vec (repeat cst/board-height :empty))]
     (vec (repeat cst/board-width column))))
 
-
-(defn draw-slices
-  "Draw n * m slices from the collection"
-  [n slices positions]
-  (mapcat
-    (fn [k] (map vector
-              (repeat (nth slices k))
-              (subvec positions (* k n) (* (inc k) n))
-              ))
-    (range (count slices))))
-
-(defn- init-positions
-  "Create random initial positions for the players"
-  [positions]
-  (draw-slices cst/init-block-count
-    (conj player/all :wall)
-    positions))
+(defn pick-n-cells-for-each-player
+  "Pick N initial positions for each player and the walls"
+  [n positions]
+  (let [elements (conj player/all :wall)]
+    (map vector
+      (mapcat #(repeat n %) elements)
+      positions)))
 
 
 ;; -----------------------------------------
@@ -62,7 +52,7 @@
   (reduce
     (fn [board [color point]] (assoc-in board point color))
     empty-board
-    (init-positions (shuffle cst/all-positions))))
+    (pick-n-cells-for-each-player cst/init-block-count (shuffle cst/all-positions))))
 
 (def get-cell-at get-in)
 

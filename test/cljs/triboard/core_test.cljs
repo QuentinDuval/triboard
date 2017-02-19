@@ -74,14 +74,13 @@
 ;; BOARD
 ;; ----------------------------------------------------------------------------
 
-(deftest test-draw-slices
-  (let [elements (range 1 100)
-        slices player/all]
-    (testing "Ranges of slices"
-      (is
-        (=
-          [[:blue 1] [:blue 2] [:red 3] [:red 4] [:green 5] [:green 6]]
-          (vec (board/draw-slices 2 slices elements))))
+(deftest test-pick-n-cells-for-each-player
+  (let [elements (range 1 100)]
+    (testing "Pick 2 elements for each player"
+      (is (=
+            [[:blue 1] [:blue 2] [:red 3] [:red 4]
+             [:green 5] [:green 6] [:wall 7] [:wall 8]]
+            (vec (board/pick-n-cells-for-each-player 2 elements))))
       )))
 
 
