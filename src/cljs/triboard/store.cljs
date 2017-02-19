@@ -4,7 +4,8 @@
     [reagent.core :as reagent]
     [triboard.ai.ai :as ai]
     [triboard.logic.board :as board]
-    [triboard.logic.game :as game])
+    [triboard.logic.game :as game]
+    [triboard.logic.player :as player])
   (:require-macros
     [reagent.ratom :refer [reaction]]))
 
@@ -12,8 +13,6 @@
 ;; -----------------------------------------
 ;; Private
 ;; -----------------------------------------
-
-(def ^:private is-ai? #{:red :green})
 
 (defonce app-state
   (reagent/atom
@@ -28,11 +27,11 @@
 (def game (reaction (:game @app-state)))
 (def current-state (reaction (game/current-state @game)))
 (def current-player (reaction (:player @current-state)))
-(def ai-player? (reaction (is-ai? @current-player)))
+(def ai-player? (reaction (player/is-ai? @current-player)))
 
 (def suggestions
   (reaction
-    (if (and (:help @app-state) (not (is-ai? @current-player)))
+    (if (and (:help @app-state) (not @ai-player?))
       (get (:moves @current-state) @current-player)
       {})))
 
@@ -54,7 +53,7 @@
     :new-game (swap! app-state assoc :game (game/new-game))
     :toggle-help (swap! app-state update :help not)
     :restart (swap! app-state update :game #(take-last 1 %))
-    :undo (swap! app-state update :game game/undo-player-move is-ai?)
+    :undo (swap! app-state update :game game/undo-player-move player/is-ai?)
     :ai-play (swap! app-state update :game ai/play-best-move @current-player)
     :player-move (swap! app-state update :game game/play-move (second msg))
     ))

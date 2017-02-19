@@ -8,6 +8,7 @@
 
 (def player? (set all))
 (def cell? (conj player? :wall :empty))
+(def is-ai? #{:red :green})
 
 (s/def ::player player?)
 (s/def ::cell cell?)
