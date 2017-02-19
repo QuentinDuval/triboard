@@ -2,7 +2,7 @@
   (:require
     [clojure.string :as str]
     [cljs.spec :as s]
-    [triboard.logic.constants :as cst]
+    [triboard.logic.player :as player]
     [triboard.view.callbacks :as cb]
     [triboard.view.utils :as vutils]
     ))
@@ -24,7 +24,7 @@
 
 (defn- show-scores
   [scores highlight?]
-  (for [player cst/players :let [score (get scores player)]]
+  (for [player player/players :let [score (get scores player)]]
     ^{:key player}
     [:div
      {:class (player->css-style player highlight?)}
@@ -41,7 +41,7 @@
 ;; ----------------------------------------------------------------------------
 
 (s/fdef show-scores
-  :args (s/tuple #(every? % cst/players)))
+  :args (s/tuple #(every? % player/players)))
 
 (defn show-top-panel
   "Show the top panel of the game that contains

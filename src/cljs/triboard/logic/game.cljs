@@ -2,8 +2,8 @@
   (:require
     [cljs.spec :as s :include-macros true]
     [triboard.logic.board :as board]
-    [triboard.logic.constants :as cst]
     [triboard.logic.move :as move]
+    [triboard.logic.player :as player]
     [triboard.logic.scores :as scores]
     [triboard.logic.turn :as turn]
     ))
@@ -15,7 +15,7 @@
 (s/def ::game-state
   (s/keys :req-un
     [::board/board
-     ::cst/player
+     ::player/player
      ::move/available-moves
      ::scores/scores]))
 

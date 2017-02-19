@@ -3,9 +3,9 @@
     [cljs.spec :as s :include-macros true]
     [triboard.ai.scores :as scores]
     [triboard.logic.board :as board]
-    [triboard.logic.constants :as cst]
     [triboard.logic.game :as game]
     [triboard.logic.move :as move]
+    [triboard.logic.player :as player]
     ))
 
 
@@ -16,7 +16,7 @@
 (defn- make-ai
   [board player]
   {:player player
-   :other-players (remove #{player} cst/players)
+   :other-players (remove #{player} player/players)
    :cell-weights (scores/get-weights-by-cell board)
    })
 
@@ -57,7 +57,7 @@
 ;; -----------------------------------------
 
 (s/fdef best-move
-  :args (s/tuple ::game ::cst/player)
+  :args (s/tuple ::game ::player/player)
   :ret ::board/coord)
 
 (defn best-move

@@ -1,7 +1,9 @@
 (ns triboard.logic.board
   (:require
     [cljs.spec :as s :include-macros true]
-    [triboard.logic.constants :as cst]))
+    [triboard.logic.constants :as cst]
+    [triboard.logic.player :as player]
+    ))
 
 
 ;; -----------------------------------------
@@ -27,7 +29,7 @@
   "Create random initial positions for the players"
   []
   (draw-slices cst/init-block-count
-    (conj cst/players :wall)
+    (conj player/players :wall)
     (shuffle cst/all-positions)))
 
 
@@ -36,14 +38,14 @@
 ;; -----------------------------------------
 
 (s/def ::coord (set cst/all-positions))
-(s/def ::board (s/every (s/every ::cst/cell :count 11) :count 16))
+(s/def ::board (s/every (s/every ::player/cell :count 11) :count 16))
 
 (s/fdef new-board
   :ret ::board)
 
 (s/fdef to-iterable
   :args (s/cat :board ::board)
-  :ret (s/every (s/tuple ::coord ::cst/cell)))
+  :ret (s/every (s/tuple ::coord ::player/cell)))
 
 (s/fdef empty-cells
   :args (s/cat :board ::board)

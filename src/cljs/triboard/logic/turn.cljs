@@ -1,9 +1,9 @@
 (ns triboard.logic.turn
   (:require
     [cljs.spec :as s :include-macros true]
-    [triboard.logic.constants :as cst]
     [triboard.logic.board :as board]
     [triboard.logic.move :as move]
+    [triboard.logic.player :as player]
     [triboard.logic.scores :as scores]
     ))
 
@@ -52,13 +52,13 @@
 (s/def ::turn
   (s/keys :req-un
     [::board/board
-     ::cst/player
+     ::player/player
      ::move/available-moves
      ::scores/scores]))
 
 (defn new-init-turn []
   (-> {:board (board/new-board)
-       :player (rand-nth cst/players)
+       :player (rand-nth player/players)
        :moves {}
        :scores scores/initial-scores}
     with-available-moves

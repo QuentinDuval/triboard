@@ -3,6 +3,7 @@
     [cljs.spec :as s :include-macros true]
     [triboard.logic.board :as board]
     [triboard.logic.constants :as cst]
+    [triboard.logic.player :as player]
     ))
 
 
@@ -12,11 +13,11 @@
 
 (s/def ::point ::board/coord)
 (s/def ::taken (s/coll-of ::board/coord))
-(s/def ::winner cst/player?)
-(s/def ::looser (conj cst/player? :empty))
+(s/def ::winner player/player?)
+(s/def ::looser (conj player/player? :empty))
 (s/def ::conversion  (s/keys :req-un [::point ::taken ::winner ::looser]))
 (s/def ::available-moves
-  (s/map-of ::cst/player
+  (s/map-of ::player/player
     (s/map-of ::board/coord
       (s/every ::conversion))))
 
