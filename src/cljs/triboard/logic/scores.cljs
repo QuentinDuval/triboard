@@ -24,8 +24,9 @@
 ;; Public API
 ;; ----------------------------------------------------------------------------
 
-(s/def ::scores (s/map-of ::player/player number?))         ;; TODO - parameterized specs?
-(s/fdef weighting :args (s/tuple ::board/coord) :ret number?)
+(s/def ::weight (s/double-in :NaN? false))
+(s/def ::scores (s/map-of ::player/player ::weight))         ;; TODO - parameterized specs?
+(s/fdef weighting :args (s/tuple ::board/coord) :ret ::weight)
 
 (s/fdef update-scores
   :args (s/tuple ::scores ::move/conversion) :ret ::scores)

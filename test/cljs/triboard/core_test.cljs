@@ -47,7 +47,10 @@
 ;; ----------------------------------------------------------------------------
 
 (deftest example-passing-test
-  (is (= 1 1)))
+  (testing "trivial assumption"
+    (is (= 1 1))))
+
+
 
 
 ;; ----------------------------------------------------------------------------
@@ -63,6 +66,24 @@
   (gen/fmap
     (fn [coord] (play-moves (game/new-game) coord))
     (gen/vector coord-gen 0 initial-empty-cell-count)))
+
+
+
+;; ----------------------------------------------------------------------------
+;; SCORE TESTS
+;; ----------------------------------------------------------------------------
+
+(defn prop-update-score
+  [score conversion]
+  (=
+    (scores/update-scores score conversion)
+    (scores/update-scores-with score conversion (constantly 1))
+    ))
+
+(defspec test-prop-update-score 100
+  (prop/for-all [score (s/gen ::scores/scores)
+                 conversion (s/gen ::move/conversion)]
+    (prop-update-score score conversion)))
 
 
 ;; ----------------------------------------------------------------------------
