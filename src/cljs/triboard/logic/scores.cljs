@@ -23,12 +23,16 @@
 ;; Public API
 ;; ----------------------------------------------------------------------------
 
-(s/def ::pos-int (s/and integer? #(<= 0 %)))
-(s/def ::scores (s/map-of ::player/player ::pos-int))
+(s/def ::scores (s/map-of ::player/player number?))         ;; TODO - parameterized specs?
 
 (s/fdef update-scores
-  :args (s/tuple ::scores ::move/conversion)
-  :ret (s/map-of ::player/player integer?))                    ;; TODO - Hard to ensure positive number
+  :args (s/tuple ::scores ::move/conversion) :ret ::scores)
+
+(s/fdef update-scores-with
+  :args (s/tuple ::scores ::move/conversion fn?) :ret ::scores)
+
+(def null-scores
+  {:blue 0 :red 0 :green 0})
 
 (def initial-scores
   {:blue cst/init-block-count
