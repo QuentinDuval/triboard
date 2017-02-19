@@ -16,7 +16,7 @@
 (defn- make-ai
   [board player]
   {:player player
-   :other-players (remove #{player} player/players)
+   :other-players (remove #{player} player/all)
    :cell-weights (scores/get-weights-by-cell board)
    })
 

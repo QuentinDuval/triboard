@@ -13,8 +13,8 @@
 
 (s/def ::point ::board/coord)
 (s/def ::taken (s/coll-of ::board/coord))
-(s/def ::winner player/player?)
-(s/def ::looser (conj player/player? :empty))
+(s/def ::winner ::player/player)
+(s/def ::looser ::player/playable-cell)
 (s/def ::conversion  (s/keys :req-un [::point ::taken ::winner ::looser]))
 (s/def ::available-moves
   (s/map-of ::player/player

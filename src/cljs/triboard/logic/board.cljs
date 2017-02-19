@@ -29,7 +29,7 @@
   "Create random initial positions for the players"
   []
   (draw-slices cst/init-block-count
-    (conj player/players :wall)
+    (conj player/all :wall)
     (shuffle cst/all-positions)))
 
 

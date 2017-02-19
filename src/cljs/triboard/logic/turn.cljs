@@ -17,21 +17,10 @@
   [{:keys [board] :as turn}]
   (assoc turn :moves (move/all-available-moves board)))
 
-(defn- next-player
-  [player]
-  (case player
-    :blue :red
-    :red :green
-    :green :blue))
-
-(defn- next-3-players
-  [player]
-  (take 3 (rest (iterate next-player player))))
-
 (defn- with-next-player
   "Find the next player to act - dismiss those that cannot play any move"
   [{:keys [moves player] :as turn}]
-  (let [who-can-play (filter #(get moves %) (next-3-players player))]
+  (let [who-can-play (filter #(get moves %) (player/next-three player))]
     (assoc turn :player (first who-can-play))
     ))
 
@@ -58,7 +47,7 @@
 
 (defn new-init-turn []
   (-> {:board (board/new-board)
-       :player (rand-nth player/players)
+       :player (rand-nth player/all)
        :moves {}
        :scores scores/initial-scores}
     with-available-moves
