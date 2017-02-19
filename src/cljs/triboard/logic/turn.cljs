@@ -26,7 +26,7 @@
 
 (defn- next-3-players
   [player]
-  (take 3 (iterate next-player (next-player player))))
+  (take 3 (rest (iterate next-player player))))
 
 (defn- with-next-player
   "Find the next player to act - dismiss those that cannot play any move"
