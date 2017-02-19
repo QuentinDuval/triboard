@@ -7,9 +7,21 @@
     ))
 
 
-;; -----------------------------------------
+;; ----------------------------------------------------------------------------
+;; Private API
+;; ----------------------------------------------------------------------------
+
+(defn- transfer-delta
+  [scores conversion delta]
+  (-> scores
+    (update (:winner conversion) + delta)
+    (update (:looser conversion) - delta)
+    (dissoc :empty)))
+
+
+;; ----------------------------------------------------------------------------
 ;; Public API
-;; -----------------------------------------
+;; ----------------------------------------------------------------------------
 
 (s/def ::pos-int (s/and integer? #(<= 0 %)))
 (s/def ::scores (s/map-of ::player/player ::pos-int))
@@ -23,11 +35,14 @@
    :red cst/init-block-count
    :green cst/init-block-count})
 
+(defn update-scores-with
+  "Update the scoring based on the provided move, and a weighting policy"
+  [scores conversion weight-of]
+  (let [delta (transduce (map weight-of) + (:taken conversion))]
+    (transfer-delta scores conversion delta)))
+
 (defn update-scores
   "Update the scoring based on the provided move"
-  [scores move]
-  (let [delta (count (:taken move))]
-    (-> scores
-      (update (:winner move) + delta)
-      (update (:looser move) - delta)
-      (dissoc :empty))))
+  [scores conversion]
+  (let [delta (count (:taken conversion))]
+    (transfer-delta scores conversion delta)))
