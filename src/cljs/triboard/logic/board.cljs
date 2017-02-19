@@ -19,8 +19,9 @@
   [n positions]
   (let [elements (conj player/all :wall)]
     (map vector
-      (mapcat #(repeat n %) elements)
-      positions)))
+      positions
+      (mapcat #(repeat n %) elements))
+    ))
 
 
 ;; -----------------------------------------
@@ -50,7 +51,7 @@
   "Creates a new board with initial positions of each players"
   []
   (reduce
-    (fn [board [color point]] (assoc-in board point color))
+    (fn [board [point color]] (assoc-in board point color))
     empty-board
     (pick-n-cells-for-each-player cst/init-block-count (shuffle cst/all-positions))))
 

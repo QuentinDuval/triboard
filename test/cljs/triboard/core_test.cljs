@@ -78,8 +78,8 @@
   (let [elements (range 1 100)]
     (testing "Pick 2 elements for each player"
       (is (=
-            [[:blue 1] [:blue 2] [:red 3] [:red 4]
-             [:green 5] [:green 6] [:wall 7] [:wall 8]]
+            [[1 :blue] [2 :blue] [3 :red] [4 :red]
+             [5 :green] [6 :green] [7 :wall] [8 :wall]]
             (vec (board/pick-n-cells-for-each-player 2 elements))))
       )))
 
