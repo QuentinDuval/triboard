@@ -6,7 +6,6 @@
     [triboard.logic.constants :as cst]
     [triboard.logic.game :as game]
     [triboard.logic.move :as move]
-    [triboard.logic.turn :as turn]
     ))
 
 
@@ -15,10 +14,10 @@
 ;; -----------------------------------------
 
 (defn- make-ai
-  [game-state player]
+  [board player]
   {:player player
    :other-players (remove #{player} cst/players)
-   :cell-weights (scores/get-weights-by-cell (:board game-state))
+   :cell-weights (scores/get-weights-by-cell board)
    })
 
 (defn- score-move
@@ -41,10 +40,10 @@
     other-players))
 
 (defn- move-best-outcome
-  [ai turn [coord converted :as move]]
-  (let [new-turn (turn/play-move turn coord)                ;; TODO - replace by game
+  [ai game [coord converted :as move]]
+  (let [new-game (game/play-move game coord)
         move-diff (get (score-move ai move) (:player ai))
-        next-diff (worst-possible-score-from ai new-turn)]
+        next-diff (worst-possible-score-from ai (game/current-state new-game))]
     (+ move-diff next-diff)))
 
 (defn- max-by
@@ -66,8 +65,8 @@
    * The worse immediate lost afterwards"
   [game player]
   (let [game-state (game/current-state game)
-        ai (make-ai game-state player)]
+        ai (make-ai (:board game-state) player)]
     (first
-      (max-by #(move-best-outcome ai game-state %)
-        (get (:moves game-state) player))                   ;; TODO - Game
+      (max-by #(move-best-outcome ai game %)
+        (get-in game-state [:moves player]))
       )))
