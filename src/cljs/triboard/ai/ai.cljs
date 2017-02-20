@@ -43,7 +43,6 @@
         move-diff (get (score-move ai transition) (:player ai))
         new-moves (:moves (game/current-state new-game))
         next-diff (worst-possible-score-from ai new-moves)]
-    (println next-diff)
     (+ move-diff next-diff)))
 
 (defn- max-by
