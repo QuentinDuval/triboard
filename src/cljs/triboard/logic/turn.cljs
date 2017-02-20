@@ -42,7 +42,7 @@
   (s/keys :req-un
     [::board/board
      ::player/player
-     ::move/available-moves
+     ::move/available-moves                                 ;;TODO - wrong!!!! :moves
      ::scores/scores]))
 
 (defn new-init-turn []

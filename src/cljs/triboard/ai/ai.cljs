@@ -32,17 +32,18 @@
   (transduce
     (comp
       (mapcat #(get moves %))
-      (map #(score-move ai %))
+      (map #(score-move ai (second %)))
       (map #(get % player)))
     min
     other-players))
 
 (defn- move-best-outcome
-  [ai [_ transition]]
-  (let [new-game (-> transition :board deref)
+  [ai game [coord transition]]
+  (let [new-game (game/play-move game coord) ;; TODO - Should be the next game (not NEW BOARD)
         move-diff (get (score-move ai transition) (:player ai))
         new-moves (:moves (game/current-state new-game))
         next-diff (worst-possible-score-from ai new-moves)]
+    (println next-diff)
     (+ move-diff next-diff)))
 
 (defn- max-by
@@ -63,7 +64,7 @@
   (let [game-state (game/current-state game)
         ai (make-ai (:board game-state) player)]
     (first
-      (max-by #(move-best-outcome ai %)
+      (max-by #(move-best-outcome ai game %)
         (get-in game-state [:moves player]))        ;; TODO - To compute game directly, need of a transition between games
       )))
 
