@@ -22,11 +22,11 @@
 
 (defn- score-move
   "Compute the strength of a move, based on the converted cells"
-  [{:keys [player cell-weights]} [point conversions]]
+  [{:keys [player cell-weights]} transition]
   (reduce                                                   ;; TODO - Factor in move
     #(scores/update-scores-with %1 %2 cell-weights)
     scores/null-scores
-    (:transition conversions)))
+    (:transition transition)))
 
 (defn- worst-possible-score-from
   [{:keys [player other-players] :as ai} moves]
@@ -39,9 +39,9 @@
     other-players))
 
 (defn- move-best-outcome
-  [ai game [coord converted :as move]]
-  (let [new-game (game/play-move game coord)
-        move-diff (get (score-move ai move) (:player ai))
+  [ai game [_ transition]]
+  (let [new-game (-> transition :board deref)
+        move-diff (get (score-move ai transition) (:player ai))
         new-moves (:moves (game/current-state new-game))
         next-diff (worst-possible-score-from ai new-moves)]
     (+ move-diff next-diff)))

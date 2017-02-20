@@ -21,7 +21,7 @@
 (defn- cell-weight
   [board point]
   (let [wall-nb (count (neighbouring-walls board point))]
-    (+ 1 (* wall-nb wall-nb 0.25))))
+    (+ 1 (* wall-nb wall-nb 0.25))))                        ;; TODO - Cell weight does not work...
 
 (defn- all-weights
   [board]
