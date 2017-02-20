@@ -30,23 +30,26 @@
   [cell]
   (or (nil? cell) (= cell :empty) (= cell :wall)))
 
+(defn- walk-dir
+  [[x y] [dx dy]]
+  [(+ x dx) (+ y dy)])
+
 (defn- available-cells-by-dir
   "Indicates the convertible cells when clicking at [x y]"  ;; TODO - Refactor & Test
-  [board [xi yi :as coord] [dx dy]]
-  (loop [x (+ xi dx)
-         y (+ yi dy)
+  [board initial-coord direction]
+  (loop [coord (walk-dir initial-coord direction)
          looser nil
          taken []]
-    (let [cell (board/get-cell-at board [x y])]
+    (let [cell (board/get-cell-at board coord)]
       (cond
-        (is-not-convertible? cell) nil                      ;; No move: reached end and only 1 type of cell
-        (and looser (not= looser cell)) {:winner cell       ;; Who wins the cells
-                                         :looser looser     ;; Who looses the cells
-                                         :point coord       ;; The move performed
-                                         :taken taken}      ;; The cells taken
+        (is-not-convertible? cell) nil                        ;; No move: reached end and only 1 type of cell
+        (and looser (not= looser cell)) {:winner cell         ;; Who wins the cells
+                                         :looser looser       ;; Who looses the cells
+                                         :point initial-coord ;; The move performed
+                                         :taken taken}        ;; The cells taken
         :else (recur
-                (+ x dx) (+ y dy)
-                cell (conj taken [x y])))
+                (walk-dir coord direction)
+                cell (conj taken coord)))
       )))
 
 (defn- available-conversions-at
