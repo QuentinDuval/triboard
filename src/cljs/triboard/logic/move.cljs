@@ -15,7 +15,7 @@
 (s/def ::taken (s/coll-of ::board/coord))
 (s/def ::winner ::player/player)
 (s/def ::looser ::player/playable-cell)
-(s/def ::conversion  (s/keys :req-un [::point ::taken ::winner ::looser]))
+(s/def ::conversion (s/keys :req-un [::point ::taken ::winner ::looser]))
 (s/def ::available-moves
   (s/map-of ::player/player
     (s/map-of ::board/coord
@@ -42,11 +42,11 @@
          taken []]
     (let [cell (board/get-cell-at board coord)]
       (cond
-        (is-not-convertible? cell) nil                        ;; No move: reached end and only 1 type of cell
-        (and looser (not= looser cell)) {:winner cell         ;; Who wins the cells
-                                         :looser looser       ;; Who looses the cells
-                                         :point init-coord    ;; The move performed
-                                         :taken taken}        ;; The cells taken
+        (is-not-convertible? cell) nil                      ;; No move: reached end and only 1 type of cell
+        (and looser (not= looser cell)) {:winner cell       ;; Who wins the cells
+                                         :looser looser     ;; Who looses the cells
+                                         :point init-coord  ;; The move performed
+                                         :taken taken}      ;; The cells taken
         :else (recur
                 (next-coord coord)
                 cell
@@ -86,12 +86,12 @@
 
 
 #_(s/fdef all-available-moves
-  :args (s/tuple ::board/board)
-  :ret ::available-moves)
+    :args (s/tuple ::board/board)
+    :ret ::available-moves)
 
 #_(s/fdef apply-conversion
-  :args (s/tuple ::board/board ::conversion)
-  :ret ::board/board)
+    :args (s/tuple ::board/board ::conversion)
+    :ret ::board/board)
 
 
 (defn all-available-moves
@@ -100,7 +100,7 @@
   (dissoc
     (transduce
       (mapcat #(available-conversions-at board %))
-      #(update-in %1 [(:winner %2) (:point %2)] conj %2)
+      #(update-in %1 [(:winner %2) (:point %2)] conj %2)    ;; TODO - List of conversions
       {}
       (board/empty-cells board))
     nil))                                                   ;; TODO - find why we have nil
@@ -114,3 +114,28 @@
       board
       (conj moves (empty-cell-conversion (:winner move) (:point move)))
       )))
+
+
+;; (require '[clojure.test.check.generators :as gen])
+;; (def b (first (gen/sample (s/gen ::board/board) 1)))
+
+(defn available-transitions
+  [board]
+  (map
+
+    (fn [[winner moves-by-pos]]
+      [winner
+       (into {}
+         (map (fn [[pos moves]]
+                [pos {:transition moves
+                      :board (delay (apply-conversions board moves))}]
+                ))
+         moves-by-pos)
+       ])
+
+    (transduce
+      (mapcat #(available-conversions-at board %))
+      #(update-in %1 [(:winner %2) (:point %2)] conj %2)    ;; TODO - List of conversions
+      {}
+      (board/empty-cells board)))
+  )
