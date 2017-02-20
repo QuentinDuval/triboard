@@ -103,3 +103,12 @@
   [board move]
   (let [updates (map vector (:taken move) (repeat (:winner move)))]
     (board/update-cells board updates)))
+
+(defn apply-conversions
+  [board moves]
+  (if-let [move (first moves)]
+    (reduce
+      apply-conversion
+      board
+      (conj moves (empty-cell-conversion (:winner move) (:point move)))
+      )))
