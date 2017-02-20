@@ -16,6 +16,9 @@
 (s/def ::winner ::player/player)
 (s/def ::looser ::player/playable-cell)
 (s/def ::conversion (s/keys :req-un [::point ::taken ::winner ::looser]))
+(s/def ::conversions (s/every ::conversion))
+
+
 (s/def ::available-moves
   (s/map-of ::player/player
     (s/map-of ::board/coord
@@ -76,15 +79,9 @@
   (let [updates (map vector (:taken move) (repeat (:winner move)))]
     (board/update-cells board updates)))
 
-
 (defn- apply-conversions
   [board moves]
-  (if-let [move (first moves)]
-    (reduce
-      apply-conversion
-      board
-      (conj moves (empty-cell-conversion (:winner move) (:point move)))
-      )))
+  (reduce apply-conversion board moves))
 
 ;; -----------------------------------------
 ;; Public API
@@ -114,9 +111,11 @@
   (map-values
     (partial map-values
       (fn [moves]
-        {:transition moves                                  ;; TODO - Add empty move (or add one to score...)
-         :scores 0                                          ;; TODO - Put a score diff (more by player, less by player)
-         :board (delay (apply-conversions board moves))}
+        (if-let [move (first moves)]
+          (let [all-moves (conj moves (empty-cell-conversion (:winner move) (:point move)))]
+            {:transition all-moves                          ;; TODO - Add empty move (or add one to score...)
+             :scores 0                                      ;; TODO - Put a score diff (more by player, less by player)
+             :board (delay (apply-conversions board all-moves))}))
         ))
 
     (transduce
