@@ -9,15 +9,9 @@
     ))
 
 
-(s/def ::game
-  #(every? (partial s/valid? ::turn/turn) %))
+(s/def ::game-state ::turn/turn)
 
-(s/def ::game-state
-  (s/keys :req-un
-    [::board/board
-     ::player/player
-     ::move/available-moves
-     ::scores/scores]))
+(s/def ::game #(every? (partial s/valid? ::game-state) %))
 
 (s/fdef current-state :args (s/tuple ::game) :ret ::game-state)
 (s/fdef play-move :args (s/tuple ::game ::board/coord) :ret ::game)
