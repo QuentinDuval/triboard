@@ -60,6 +60,14 @@
     (keep #(available-cells-by-dir board point %))
     (map #(partial walk-dir %) cst/directions)))
 
+(defn empty-cell-conversion
+  "Create a move to take an empty cell"
+  [player point]
+  {:point point
+   :winner player
+   :looser :empty
+   :taken [point]})
+
 
 ;; -----------------------------------------
 ;; Public API
@@ -70,13 +78,6 @@
 ;; 2. A list of the converted cells
 ;; All grouped by point and by player
 
-(defn empty-cell-conversion
-  "Create a move to take an empty cell"
-  [player point]
-  {:point point
-   :winner player
-   :looser :empty
-   :taken [point]})
 
 (s/fdef all-available-moves
   :args (s/tuple ::board/board)

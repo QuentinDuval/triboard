@@ -25,8 +25,9 @@
     ))
 
 (defn- apply-moves
-  [turn moves]
-  (let [new-board (reduce move/apply-conversion (:board turn) moves)
+  [turn moves]                                              ;; TODO - Remove moves update
+  (let [moves (conj moves (move/empty-cell-conversion (:player turn) (:point (first moves))))
+        new-board (reduce move/apply-conversion (:board turn) moves)
         new-scores (reduce scores/update-scores (:scores turn) moves)]
     (-> turn
       (assoc :board new-board)
@@ -62,7 +63,7 @@
   [{:keys [player board] :as turn} point]
   (if-let [moves (get-in turn [:moves player point])]
     (-> turn
-      (apply-moves (conj moves (move/empty-cell-conversion player point)))
+      (apply-moves moves)
       (with-available-moves)
       (with-next-player))
     turn))

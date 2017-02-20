@@ -26,8 +26,7 @@
   (reduce
     #(scores/update-scores-with %1 %2 cell-weights)
     scores/null-scores
-    (conj conversions (move/empty-cell-conversion player point))
-    ))
+    conversions))
 
 (defn- worst-possible-score-from
   [{:keys [player other-players] :as ai} moves]
