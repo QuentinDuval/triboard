@@ -107,6 +107,8 @@
 ;; TODO - Tree of game allows to move between ai fake games
 ;; TODO => play-move becomes useless for the turn !
 ;; TODO /!\ memory usage might explode? the tree will not be cut...
+;; TODO /!\ to avoid memory usage issue, we could just give a function to compute next moves...
+;;          but we have to break a cycle anyway... either with lazyness or functions
 
 #_(s/fdef available-transitions
     :args (s/tuple ::board/board)
