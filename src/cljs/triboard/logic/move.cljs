@@ -104,7 +104,8 @@
 ;; TODO - Tree of turn can be mapped to tree of game
 ;; TODO - Tree of game allows to move between games (play-move)
 ;; TODO - Tree of game allows to move between ai fake games
-;; TOOD => play-move becomes useless for the turn !
+;; TODO => play-move becomes useless for the turn !
+;; TODO /!\ memory usage might explode? the tree will not be cut...
 
 #_(s/fdef all-available-moves
     :args (s/tuple ::board/board)
