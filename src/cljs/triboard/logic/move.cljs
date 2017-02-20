@@ -64,6 +64,11 @@
 ;; Public API
 ;; -----------------------------------------
 
+;; TODO - Refactor to get two things out
+;; 1. A new board
+;; 2. A list of the converted cells
+;; All grouped by point and by player
+
 (defn empty-cell-conversion
   "Create a move to take an empty cell"
   [player point]
