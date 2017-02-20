@@ -83,6 +83,18 @@
   [board moves]
   (reduce apply-conversion board moves))
 
+(defn- to-game-transition
+  [board moves]
+  {:transition moves
+   :scores 0                         ;; TODO - Put a score diff (more by player, less by player)
+   :board (delay (apply-conversions board moves))})
+
+(defn- add-empty-cell-conversion
+  [moves]
+  (if-let [move (first moves)]
+    (conj moves (empty-cell-conversion (:winner move) (:point move)))
+    moves))
+
 ;; -----------------------------------------
 ;; Public API
 ;; -----------------------------------------
@@ -110,17 +122,11 @@
   [board]
   (map-values
     (partial map-values
-      (fn [moves]
-        (if-let [move (first moves)]
-          (let [all-moves (conj moves (empty-cell-conversion (:winner move) (:point move)))]
-            {:transition all-moves                          ;; TODO - Add empty move (or add one to score...)
-             :scores 0                                      ;; TODO - Put a score diff (more by player, less by player)
-             :board (delay (apply-conversions board all-moves))}))
-        ))
+      #(to-game-transition board (add-empty-cell-conversion %)))
 
     (transduce
-      (mapcat #(available-conversions-at board %))
-      (group-by-reducer [:winner :point])
+      (mapcat #(available-conversions-at board %))          ;; TODO - Cut that in two? (moves vs transitions)
+      (group-by-reducer [:winner :point])                   ;; TODO - it creates nil...
       (board/empty-cells board))
     ))
 
