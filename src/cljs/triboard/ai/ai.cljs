@@ -3,7 +3,6 @@
     [cljs.spec :as s :include-macros true]
     [triboard.ai.scoring :as scoring]
     [triboard.logic.game :as game]
-    [triboard.logic.move :as move]
     [triboard.logic.player :as player]
     [triboard.logic.scores :as scores]
     ))
@@ -39,7 +38,7 @@
     other-players))
 
 (defn- move-best-outcome
-  [ai game [_ transition]]
+  [ai [_ transition]]
   (let [new-game (-> transition :board deref)
         move-diff (get (score-move ai transition) (:player ai))
         new-moves (:moves (game/current-state new-game))
@@ -59,13 +58,13 @@
   :args (s/tuple ::game/game ::player/player)
   :ret ::game/game)
 
-(defn- best-move                                            ;; TODO - Compute games directly...
+(defn- best-move                                    ;; TODO - Compute games directly...
   [game player]
   (let [game-state (game/current-state game)
         ai (make-ai (:board game-state) player)]
     (first
-      (max-by #(move-best-outcome ai game %)
-        (get-in game-state [:moves player]))
+      (max-by #(move-best-outcome ai %)
+        (get-in game-state [:moves player]))        ;; TODO - To compute game directly, need of a transition between games
       )))
 
 (defn play-best-move
