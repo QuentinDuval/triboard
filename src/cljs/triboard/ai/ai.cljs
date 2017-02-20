@@ -26,7 +26,7 @@
   (reduce                                                   ;; TODO - Factor in move
     #(scores/update-scores-with %1 %2 cell-weights)
     scores/null-scores
-    conversions))
+    (:transition conversions)))
 
 (defn- worst-possible-score-from
   [{:keys [player other-players] :as ai} moves]

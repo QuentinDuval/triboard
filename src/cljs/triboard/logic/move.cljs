@@ -19,7 +19,9 @@
 (s/def ::available-moves
   (s/map-of ::player/player
     (s/map-of ::board/coord
-      (s/every ::conversion))))
+      #_(s/every ::conversion)                              ;; TODO map with conversion in it, but also next board
+      any?
+      )))
 
 
 ;; -----------------------------------------
@@ -121,21 +123,22 @@
 
 (defn available-transitions
   [board]
-  (map
+  (into {}
+    (map
 
-    (fn [[winner moves-by-pos]]
-      [winner
-       (into {}
-         (map (fn [[pos moves]]
-                [pos {:transition moves
-                      :board (delay (apply-conversions board moves))}]
-                ))
-         moves-by-pos)
-       ])
+      (fn [[winner moves-by-pos]]                           ;; TODO - This is double Map.fmap
+        [winner
+         (into {}
+           (map (fn [[pos moves]]
+                  [pos {:transition moves                   ;; TODO - Add empty move
+                        :board (delay (apply-conversions board moves))}]
+                  ))
+           moves-by-pos)
+         ])
 
-    (transduce
-      (mapcat #(available-conversions-at board %))
-      #(update-in %1 [(:winner %2) (:point %2)] conj %2)    ;; TODO - List of conversions
-      {}
-      (board/empty-cells board)))
+      (transduce
+        (mapcat #(available-conversions-at board %))
+        #(update-in %1 [(:winner %2) (:point %2)] conj %2)  ;; TODO - List of conversions
+        {}
+        (board/empty-cells board))))
   )
