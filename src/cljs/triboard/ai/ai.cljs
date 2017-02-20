@@ -23,7 +23,7 @@
 (defn- score-move
   "Compute the strength of a move, based on the converted cells"
   [{:keys [player cell-weights]} [point conversions]]
-  (reduce
+  (reduce                                                   ;; TODO - Factor in move
     #(scores/update-scores-with %1 %2 cell-weights)
     scores/null-scores
     conversions))

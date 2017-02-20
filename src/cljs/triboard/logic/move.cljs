@@ -60,13 +60,19 @@
     (keep #(available-cells-by-dir board point %))
     (map #(partial walk-dir %) cst/directions)))
 
-(defn empty-cell-conversion
+(defn- empty-cell-conversion
   "Create a move to take an empty cell"
   [player point]
   {:point point
    :winner player
    :looser :empty
    :taken [point]})
+
+(defn- apply-conversion
+  "Apply a move onto the board, yielding a new board"
+  [board move]
+  (let [updates (map vector (:taken move) (repeat (:winner move)))]
+    (board/update-cells board updates)))
 
 
 ;; -----------------------------------------
@@ -79,9 +85,14 @@
 ;; All grouped by point and by player
 
 
-(s/fdef all-available-moves
+#_(s/fdef all-available-moves
   :args (s/tuple ::board/board)
   :ret ::available-moves)
+
+#_(s/fdef apply-conversion
+  :args (s/tuple ::board/board ::conversion)
+  :ret ::board/board)
+
 
 (defn all-available-moves
   "Return all move available on the board, grouped by player and by move"
@@ -94,15 +105,6 @@
       (board/empty-cells board))
     nil))                                                   ;; TODO - find why we have nil
 
-(s/fdef apply-conversion
-  :args (s/tuple ::board/board ::conversion)
-  :ret ::board/board)
-
-(defn apply-conversion
-  "Apply a move onto the board, yielding a new board"
-  [board move]
-  (let [updates (map vector (:taken move) (repeat (:winner move)))]
-    (board/update-cells board updates)))
 
 (defn apply-conversions
   [board moves]
