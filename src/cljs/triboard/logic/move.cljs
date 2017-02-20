@@ -77,38 +77,7 @@
     (board/update-cells board updates)))
 
 
-;; -----------------------------------------
-;; Public API
-;; -----------------------------------------
-
-;; TODO - Refactor to get two things out
-;; 1. A new board
-;; 2. A list of the converted cells
-;; All grouped by point and by player
-
-
-#_(s/fdef all-available-moves
-    :args (s/tuple ::board/board)
-    :ret ::available-moves)
-
-#_(s/fdef apply-conversion
-    :args (s/tuple ::board/board ::conversion)
-    :ret ::board/board)
-
-
-(defn all-available-moves
-  "Return all move available on the board, grouped by player and by move"
-  [board]
-  (dissoc
-    (transduce
-      (mapcat #(available-conversions-at board %))
-      #(update-in %1 [(:winner %2) (:point %2)] conj %2)    ;; TODO - List of conversions
-      {}
-      (board/empty-cells board))
-    nil))                                                   ;; TODO - find why we have nil
-
-
-(defn apply-conversions
+(defn- apply-conversions
   [board moves]
   (if-let [move (first moves)]
     (reduce
@@ -117,19 +86,21 @@
       (conj moves (empty-cell-conversion (:winner move) (:point move)))
       )))
 
+;; -----------------------------------------
+;; Public API
+;; -----------------------------------------
+
+#_(s/fdef all-available-moves
+    :args (s/tuple ::board/board)
+    :ret ::available-moves)
+
 
 ;; (require '[clojure.test.check.generators :as gen])
 ;; (def b (first (gen/sample (s/gen ::board/board) 1)))
 
-(defn group-by-in
-  "Group a collection of elements based on some keys to extract"
-  [xf keys coll]
-  (dissoc (transduce
-            xf
-            #(update-in %1 ((apply juxt keys) %2) conj %2)
-            {}
-            coll)
-    nil))
+(defn group-by-reducer
+  [keys]
+  #(update-in %1 ((apply juxt keys) %2) conj %2))
 
 (defn map-values
   "Apply a function to the values of a key-value collection"
@@ -148,11 +119,9 @@
          :board (delay (apply-conversions board moves))}
         ))
 
-    (group-by-in
+    (transduce
       (mapcat #(available-conversions-at board %))
-      [:winner :point]
-      (board/empty-cells board)))
-  )
-
-
+      (group-by-reducer [:winner :point])
+      (board/empty-cells board))
+    ))
 
