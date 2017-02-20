@@ -121,6 +121,16 @@
 ;; (require '[clojure.test.check.generators :as gen])
 ;; (def b (first (gen/sample (s/gen ::board/board) 1)))
 
+(defn group-by-in
+  "Group a collection of elements based on some keys to extract"
+  [xf keys coll]
+  (dissoc (transduce
+            xf
+            #(update-in %1 ((apply juxt keys) %2) conj %2)
+            {}
+            coll)
+    nil))
+
 (defn map-values
   "Apply a function to the values of a key-value collection"
   [xf coll]
@@ -134,13 +144,13 @@
     (partial map-values
       (fn [moves]
         {:transition moves                                  ;; TODO - Add empty move (or add one to score...)
+         :scores 0                                          ;; TODO - Put a score diff (more by player, less by player)
          :board (delay (apply-conversions board moves))}
         ))
 
-    (transduce
+    (group-by-in
       (mapcat #(available-conversions-at board %))
-      #(update-in %1 [(:winner %2) (:point %2)] conj %2)    ;; TODO - List of conversions
-      {}
+      [:winner :point]
       (board/empty-cells board)))
   )
 
