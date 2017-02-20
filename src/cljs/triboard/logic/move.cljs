@@ -4,6 +4,7 @@
     [triboard.logic.board :as board]
     [triboard.logic.constants :as cst]
     [triboard.logic.player :as player]
+    [triboard.utils :as utils]
     ))
 
 
@@ -107,36 +108,18 @@
 ;; TODO => play-move becomes useless for the turn !
 ;; TODO /!\ memory usage might explode? the tree will not be cut...
 
-#_(s/fdef all-available-moves
+#_(s/fdef available-transitions
     :args (s/tuple ::board/board)
     :ret ::available-moves)
 
-
-;; (require '[clojure.test.check.generators :as gen])
-;; (def b (first (gen/sample (s/gen ::board/board) 1)))
-
-(defn group-by-reducer
-  [& key-fns]
-  (fn
-    ([] {})
-    ([result] result)
-    ([result val]
-      (let [keys ((apply juxt key-fns) val)]
-        (update-in result keys conj val)))))
-
-(defn map-values
-  "Apply a function to the values of a key-value collection"
-  ([xf] (map (fn [[k v]] [k (xf v)])))
-  ([xf coll] (into {} (map-values xf) coll)))
-
 (defn available-transitions
   [board]
-  (map-values
-    (partial map-values
+  (utils/map-values
+    (partial utils/map-values
       #(to-game-transition board (add-empty-cell-conversion %)))
 
     (transduce
       (mapcat #(available-conversions-at board %))          ;; TODO - Cut that in two? (moves vs transitions)
-      (group-by-reducer :winner :point)                     ;; TODO - Move the game computation into turn computation for next turn
+      (utils/group-by-reducer :winner :point)               ;; TODO - Move the game computation into turn computation for next turn
       (board/empty-cells board))
     ))
