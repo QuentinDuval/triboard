@@ -121,24 +121,28 @@
 ;; (require '[clojure.test.check.generators :as gen])
 ;; (def b (first (gen/sample (s/gen ::board/board) 1)))
 
+(defn map-values
+  "Apply a function to the values of a key-value collection"
+  [xf coll]
+  (into {}
+    (map (fn [[k v]] [k (xf v)]))
+    coll))
+
 (defn available-transitions
   [board]
-  (into {}
-    (map
+  (map-values
+    (partial map-values
+      (fn [moves]
+        {:transition moves                                  ;; TODO - Add empty move (or add one to score...)
+         :board (delay (apply-conversions board moves))}
+        ))
 
-      (fn [[winner moves-by-pos]]                           ;; TODO - This is double Map.fmap
-        [winner
-         (into {}
-           (map (fn [[pos moves]]
-                  [pos {:transition moves                   ;; TODO - Add empty move
-                        :board (delay (apply-conversions board moves))}]
-                  ))
-           moves-by-pos)
-         ])
-
-      (transduce
-        (mapcat #(available-conversions-at board %))
-        #(update-in %1 [(:winner %2) (:point %2)] conj %2)  ;; TODO - List of conversions
-        {}
-        (board/empty-cells board))))
+    (transduce
+      (mapcat #(available-conversions-at board %))
+      #(update-in %1 [(:winner %2) (:point %2)] conj %2)    ;; TODO - List of conversions
+      {}
+      (board/empty-cells board)))
   )
+
+
+
