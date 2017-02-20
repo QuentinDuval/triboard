@@ -108,8 +108,13 @@
 ;; (def b (first (gen/sample (s/gen ::board/board) 1)))
 
 (defn group-by-reducer
-  [keys]
-  #(update-in %1 ((apply juxt keys) %2) conj %2))
+  [& key-fns]
+  (fn
+    ([] {})
+    ([result] result)
+    ([result val]
+      (let [keys ((apply juxt key-fns) val)]
+        (update-in result keys conj val)))))
 
 (defn map-values
   "Apply a function to the values of a key-value collection"
@@ -126,7 +131,7 @@
 
     (transduce
       (mapcat #(available-conversions-at board %))          ;; TODO - Cut that in two? (moves vs transitions)
-      (group-by-reducer [:winner :point])                   ;; TODO - it creates nil...
+      (group-by-reducer :winner :point)
       (board/empty-cells board))
     ))
 
