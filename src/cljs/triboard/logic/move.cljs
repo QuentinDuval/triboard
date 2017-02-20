@@ -86,7 +86,7 @@
 (defn- to-game-transition
   [board moves]
   {:transition moves
-   :scores 0                         ;; TODO - Put a score diff (more by player, less by player)
+   :scores 0                                                ;; TODO - Put a score diff (more by player, less by player)
    :board (delay (apply-conversions board moves))})
 
 (defn- add-empty-cell-conversion
@@ -118,10 +118,8 @@
 
 (defn map-values
   "Apply a function to the values of a key-value collection"
-  [xf coll]
-  (into {}
-    (map (fn [[k v]] [k (xf v)]))
-    coll))
+  ([xf] (map (fn [[k v]] [k (xf v)])))
+  ([xf coll] (into {} (map-values xf) coll)))
 
 (defn available-transitions
   [board]
@@ -131,7 +129,6 @@
 
     (transduce
       (mapcat #(available-conversions-at board %))          ;; TODO - Cut that in two? (moves vs transitions)
-      (group-by-reducer :winner :point)
+      (group-by-reducer :winner :point)                     ;; TODO - Move the game computation into turn computation for next turn
       (board/empty-cells board))
     ))
-
