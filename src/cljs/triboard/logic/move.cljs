@@ -99,6 +99,12 @@
 ;; Public API
 ;; -----------------------------------------
 
+;; TODO - Create a tree of reachable board (with their associated transition)
+;; TODO - Tree of board can be mapped to tree of trun
+;; TODO - Tree of turn can be mapped to tree of game
+;; TODO - Tree of game allows to move between games (play-move)
+;; TODO - Tree of game allows to move between ai fake games
+
 #_(s/fdef all-available-moves
     :args (s/tuple ::board/board)
     :ret ::available-moves)
