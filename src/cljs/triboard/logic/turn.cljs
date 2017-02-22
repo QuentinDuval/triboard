@@ -26,7 +26,7 @@
 
 (defn- apply-moves
   [turn moves]
-  (let [new-board (-> moves :board deref)
+  (let [new-board (-> moves :board)
         new-scores (reduce scores/update-scores (:scores turn) (:transition moves))] ;; TODO - Factor in move
     (-> turn
       (assoc :board new-board)

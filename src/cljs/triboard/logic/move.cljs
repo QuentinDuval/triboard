@@ -87,8 +87,7 @@
 (defn- to-game-transition
   [board moves]
   {:transition moves
-   :scores 0                                                ;; TODO - Put a score diff (more by player, less by player)
-   :board (delay (apply-conversions board moves))})
+   :board (apply-conversions board moves)})
 
 (defn- add-empty-cell-conversion
   [moves]
@@ -114,11 +113,14 @@
     :args (s/tuple ::board/board)
     :ret ::available-moves)
 
+(defn map-game-tree                                         ;; TODO - Maybe just get rid of the player?
+  [xf game-tree]
+  (utils/map-values (partial utils/map-values xf) game-tree))
+
 (defn available-transitions
   [board]
-  (utils/map-values
-    (partial utils/map-values
-      #(to-game-transition board (add-empty-cell-conversion %)))
+  (map-game-tree
+    #(to-game-transition board (add-empty-cell-conversion %))
 
     (transduce
       (mapcat #(available-conversions-at board %))          ;; TODO - Cut that in two? (moves vs transitions)
