@@ -28,13 +28,19 @@
   [game]
   (first game))
 
+(defn available-games
+  "Get the reachable games from the current position, by player and position"
+  [game]
+  (move/map-game-tree
+    (fn [next-turn] (delay (conj game (turn/complete-move next-turn)))) ;; TODO - create a real new game, and put the thing in cache (delay for each recursive game)
+    (turn/available-turns (peek game))))
+
 (defn play-move
   "Play a move, adding a new turn into the game"
   [game coord]
-  (let [curr-turn (current-state game)
-        next-turn (turn/play-move curr-turn coord)]
-    (if (not= next-turn curr-turn)
-      (conj game next-turn)
+  (let [player (:player (current-state game))]
+    (if-let [next-game (deref (get-in (available-games game) [player coord]))]
+      next-game
       game)))
 
 (defn undo-player-move
@@ -44,13 +50,3 @@
     (if (empty? new-game)
       (take-last 1 game)
       new-game)))
-
-;; TODO - Plug the available games into the AI and play-move
-;; TODO - Store them into the game object as well
-
-(defn available-games
-  "Get the reachable games from the current position, by player and position"
-  [game]
-  (move/map-game-tree
-    (fn [next-turn] (conj game next-turn))                  ;; TODO - create a real new game, and put the thing in cache (delay for each recursive game)
-    (turn/available-turns (peek game))))

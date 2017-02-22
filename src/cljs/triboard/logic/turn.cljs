@@ -42,7 +42,6 @@
   (s/keys :req-un
     [::board/board
      ::player/player
-     ::move/available-moves                                 ;;TODO - wrong!!!! :moves
      ::scores/scores]))
 
 (defn new-init-turn []
@@ -53,11 +52,11 @@
     with-available-moves
     with-next-player))
 
-(s/fdef play-move
+#_(s/fdef play-move
   :args (s/cat :turn ::board/coord)
   :ret ::turn)
 
-(defn play-move
+#_(defn play-move
   "On player playing the move [x y] - update all the game state accordingly"
   [{:keys [player board] :as turn} point]
   (if-let [moves (get-in turn [:moves player point])]
@@ -66,6 +65,10 @@
       (with-available-moves)
       (with-next-player))
     turn))
+
+(defn complete-move
+  [turn]
+  (-> turn (with-available-moves) (with-next-player)))
 
 ;; TODO - Available moves from the current position
 ;; TODO - To be used inside the game

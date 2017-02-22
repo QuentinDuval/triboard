@@ -19,7 +19,8 @@
   (case player
     :blue :red
     :red :green
-    :green :blue))
+    :green :blue
+    nil nil))                                               ;; TODO - remove
 
 (defn next-three
   [player]
