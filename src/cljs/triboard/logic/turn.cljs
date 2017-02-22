@@ -66,3 +66,13 @@
       (with-available-moves)
       (with-next-player))
     turn))
+
+;; TODO - Available moves from the current position
+;; TODO - To be used inside the game
+
+(defn available-turns
+  "Transform the available moves into available turns"
+  [turn]
+  (move/map-game-tree
+    #(apply-moves turn %)
+    (move/available-transitions (:board turn))))
