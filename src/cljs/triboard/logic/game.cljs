@@ -52,5 +52,5 @@
   "Get the reachable games from the current position, by player and position"
   [game]
   (move/map-game-tree
-    (fn [next-turn] (conj game next-turn))
+    (fn [next-turn] (conj game next-turn))                  ;; TODO - create a real new game, and put the thing in cache (delay for each recursive game)
     (turn/available-turns (peek game))))
