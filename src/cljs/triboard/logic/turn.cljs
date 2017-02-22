@@ -71,7 +71,7 @@
 ;; TODO - To be used inside the game
 
 (defn available-turns
-  "Transform the available moves into available turns"
+  "Get the available turns from the current turn, by player and positions"
   [turn]
   (move/map-game-tree
     #(apply-moves turn %)

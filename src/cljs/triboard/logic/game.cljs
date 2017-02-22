@@ -44,3 +44,13 @@
     (if (empty? new-game)
       (take-last 1 game)
       new-game)))
+
+;; TODO - Plug the available games into the AI and play-move
+;; TODO - Store them into the game object as well
+
+(defn available-games
+  "Get the reachable games from the current position, by player and position"
+  [game]
+  (move/map-game-tree
+    (fn [next-turn] (conj game next-turn))
+    (turn/available-turns (peek game))))
