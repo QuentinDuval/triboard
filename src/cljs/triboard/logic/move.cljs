@@ -17,8 +17,7 @@
 (s/def ::winner ::player/player)
 (s/def ::looser ::player/playable-cell)
 (s/def ::conversion (s/keys :req-un [::point ::taken ::winner ::looser]))
-(s/def ::conversions (s/every ::conversion))
-
+(s/def ::transition (s/every ::conversion))
 
 (s/def ::available-moves
   (s/map-of ::player/player
@@ -89,11 +88,11 @@
   {:transition moves
    :board (apply-conversions board moves)})
 
-(defn- add-empty-cell-conversion
-  [moves]
-  (if-let [move (first moves)]
-    (conj moves (empty-cell-conversion (:winner move) (:point move)))
-    moves))
+(defn conversions->transition
+  [conversions]
+  (if-let [{:keys [winner point]} (first conversions)]
+    (conj conversions (empty-cell-conversion winner point))
+    conversions))
 
 ;; -----------------------------------------
 ;; Public API
@@ -103,20 +102,28 @@
     :args (s/tuple ::board/board)
     :ret ::available-moves)
 
-(defn all-transitions
-  [board]
-  (transduce
-    (mapcat #(available-conversions-at board %))
-    (utils/group-by-reducer :winner :point)
-    (board/empty-cells board)))
+;; TODO: Keep the transition & have a function to apply a transition
 
-(defn map-game-tree                                         ;; TODO - Maybe just get rid of the player?
+(defn map-game-tree
   [xf game-tree]
   (utils/map-values (partial utils/map-values xf) game-tree))
 
-(defn available-transitions
+(defn all-transitions
   [board]
   (map-game-tree
-    #(to-game-transition board (add-empty-cell-conversion %))
-    (all-transitions board)))
+    conversions->transition
+    (transduce
+      (mapcat #(available-conversions-at board %))
+      (utils/group-by-reducer :winner :point)
+      (board/empty-cells board))))
+
+(defn apply-transition
+  [board transition]
+  (reduce apply-conversion board transition))
+
+;; TODO - The following should be moved to higher levels or deprecated
+
+(defn available-transitions
+  [board]
+  (map-game-tree #(to-game-transition board %) (all-transitions board)))
 
