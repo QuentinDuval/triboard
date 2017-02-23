@@ -1,4 +1,4 @@
-(ns triboard.core-test
+(ns ^:figwheel-always triboard.core-test
   (:require-macros
     [cljs.test :refer (is deftest testing)]
     [clojure.test.check.clojure-test :refer [defspec]]

@@ -1,10 +1,6 @@
-(ns triboard.test-runner
+(ns ^:figwheel-always triboard.test-runner
   (:require
-   [doo.runner :refer-macros [doo-tests]]
-   [triboard.core-test]
-   [triboard.common-test]))
+    [cljs.test :refer-macros [run-all-tests]]
+    ))
 
-(enable-console-print!)
-
-(doo-tests 'triboard.core-test
-           'triboard.common-test)
+(run-all-tests #"triboard.*test")
