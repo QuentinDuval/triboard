@@ -99,19 +99,16 @@
 ;; Public API
 ;; -----------------------------------------
 
-;; TODO - Create a tree of reachable board (with their associated transition)
-;; TODO - Tree of board can be mapped to tree of trun
-;; TODO - Tree of turn can be mapped to tree of game
-;; TODO - Tree of game allows to move between games (play-move)
-;; TODO - Tree of game allows to move between ai fake games
-;; TODO => play-move becomes useless for the turn !
-;; TODO /!\ memory usage might explode? the tree will not be cut...
-;; TODO /!\ to avoid memory usage issue, we could just give a function to compute next moves...
-;;          but we have to break a cycle anyway... either with lazyness or functions
-
 #_(s/fdef available-transitions
     :args (s/tuple ::board/board)
     :ret ::available-moves)
+
+(defn all-transitions
+  [board]
+  (transduce
+    (mapcat #(available-conversions-at board %))
+    (utils/group-by-reducer :winner :point)
+    (board/empty-cells board)))
 
 (defn map-game-tree                                         ;; TODO - Maybe just get rid of the player?
   [xf game-tree]
@@ -121,9 +118,5 @@
   [board]
   (map-game-tree
     #(to-game-transition board (add-empty-cell-conversion %))
+    (all-transitions board)))
 
-    (transduce
-      (mapcat #(available-conversions-at board %))          ;; TODO - Cut that in two? (moves vs transitions)
-      (utils/group-by-reducer :winner :point)               ;; TODO - Move the game computation into turn computation for next turn
-      (board/empty-cells board))
-    ))
