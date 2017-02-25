@@ -60,17 +60,17 @@
   :ret ::game/game)
 
 (defn- best-move                                    ;; TODO - Compute games directly...
-  [game player]
-  (let [game-state (game/current-state game)
-        ai (make-ai (:board game-state) player)]
+  [game]
+  (let [turn (game/current-state game)
+        ai (make-ai (:board turn) (:player turn))]
     (first
       (max-by #(move-best-outcome ai game %)
-        (turn/player-transitions game-state))        ;; TODO - To compute game directly, need of a transition between games
+        (turn/player-transitions turn))        ;; TODO - To compute game directly, need of a transition between games
       )))
 
 (defn play-best-move
   "[SIMPLISTIC] Play the best move for a player based on:
    * The immediate gain
    * The worse immediate lost afterwards"
-  [game player]
-  (game/play-move game (best-move game player)))
+  [game]
+  (game/play-move game (best-move game)))

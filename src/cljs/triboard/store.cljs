@@ -56,6 +56,6 @@
     :toggle-help (swap! app-state update :help not)
     :restart (swap! app-state update :game #(take-last 1 %))
     :undo (swap! app-state update :game game/undo-player-move player/is-ai?)
-    :ai-play (swap! app-state update :game ai/play-best-move @current-player)
+    :ai-play (swap! app-state update :game ai/play-best-move)
     :player-move (swap! app-state update :game game/play-move (second msg))
     ))
