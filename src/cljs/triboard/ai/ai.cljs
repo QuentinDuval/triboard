@@ -28,6 +28,54 @@
     scores/null-scores
     transition))
 
+;; -----------------------------------------
+;; Attempts game - tree (later minimax decoupled)
+;; -----------------------------------------
+
+(defn build-game-tree
+  [game depth]
+  (if (= 0 depth)
+    game
+    (let [transitions (turn/player-transitions (game/current-turn game))
+          next-games (map #(game/play-move game (first %)) transitions)]
+      (map vector
+        transitions
+        (map #(build-game-tree % (dec depth)) next-games)))
+    ))
+
+(defn test-build-game-tree
+  []
+  (let [init-game (game/new-game)]
+    (build-game-tree init-game 1)))
+
+;; -----------------------------------------
+;; Attempts minimax
+;; -----------------------------------------
+
+(defn leaf-score
+  [ai game]
+  (:scores (game/current-turn game)))
+
+(defn tree-score
+  [ai game depth]
+  (if (= 0 depth)
+    (leaf-score ai game)
+    (let [turn (game/current-turn game)
+          transitions (turn/player-transitions turn)
+          next-games (map #(game/play-move game (first %)) transitions)
+          min-max (if (= (:player ai) (:player turn)) max min)]
+      (apply min-max (map #(tree-score ai % (dec depth)) next-games)))
+    ))
+
+(defn test-score-tree
+  []
+  (let [init-game (game/new-game)
+        turn (game/current-turn init-game)
+        ai (make-ai (:board turn) (:player turn))]
+    (tree-score ai init-game 2)))
+
+;; -----------------------------------------
+
 (defn- worst-possible-score-from
   [{:keys [player other-players] :as ai} moves]
   (transduce
