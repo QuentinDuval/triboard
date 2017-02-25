@@ -44,11 +44,10 @@
         move-diff (get (score-move ai transition) (:player ai))
         new-moves (:transitions (game/current-state new-game))
         next-diff (worst-possible-score-from ai new-moves)]
-    (+ move-diff next-diff)))
+    {:scoring (+ move-diff next-diff)
+     :game new-game}))
 
-(defn- max-by
-  [key-fn coll]
-  (apply max-key (memoize key-fn) coll))
+(defn- max-by [key-fn coll] (apply max-key key-fn coll))
 
 
 ;; -----------------------------------------
@@ -59,18 +58,16 @@
   :args (s/tuple ::game/game ::player/player)
   :ret ::game/game)
 
-(defn- best-move                                    ;; TODO - Compute games directly...
-  [game]
-  (let [turn (game/current-state game)
-        ai (make-ai (:board turn) (:player turn))]
-    (first
-      (max-by #(move-best-outcome ai game %)
-        (turn/player-transitions turn))        ;; TODO - To compute game directly, need of a transition between games
-      )))
-
-(defn play-best-move
+(defn- play-best-move
   "[SIMPLISTIC] Play the best move for a player based on:
    * The immediate gain
    * The worse immediate lost afterwards"
   [game]
-  (game/play-move game (best-move game)))
+  (let [turn (game/current-state game)
+        ai (make-ai (:board turn) (:player turn))]
+    (:game
+      (max-by :scoring
+        (map
+          #(move-best-outcome ai game %)
+          (turn/player-transitions turn)))
+      )))
