@@ -56,7 +56,7 @@
   :args (s/cat :turn ::board/coord)
   :ret ::turn)
 
-#_(defn play-move
+(defn play-move
   "On player playing the move [x y] - update all the game state accordingly"
   [{:keys [player board] :as turn} point]
   (if-let [moves (get-in turn [:moves player point])]
@@ -66,14 +66,14 @@
       (with-next-player))
     turn))
 
-(defn complete-move
+#_(defn complete-move
   [turn]
   (-> turn (with-available-moves) (with-next-player)))
 
 ;; TODO - Available moves from the current position
 ;; TODO - To be used inside the game
 
-(defn available-turns
+#_(defn available-turns
   "Get the available turns from the current turn, by player and positions"
   [turn]
   (move/map-game-tree

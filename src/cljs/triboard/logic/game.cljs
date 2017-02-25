@@ -28,7 +28,7 @@
   [game]
   (first game))
 
-(defn available-games
+#_(defn available-games
   "Get the reachable games from the current position, by player and position"
   [game]
   (move/map-game-tree
@@ -38,9 +38,10 @@
 (defn play-move
   "Play a move, adding a new turn into the game"
   [game coord]
-  (let [player (:player (current-state game))]
-    (if-let [next-game (deref (get-in (available-games game) [player coord]))]
-      next-game
+  (let [curr-turn (current-state game)
+        next-turn (turn/play-move curr-turn coord)]
+    (if (not= next-turn curr-turn)
+      (conj game next-turn)
       game)))
 
 (defn undo-player-move
