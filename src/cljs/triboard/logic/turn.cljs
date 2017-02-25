@@ -63,3 +63,8 @@
   [{:keys [player board] :as turn} point]
   (if-let [transitions (get-in turn [:transitions player point])]
     (apply-transition turn transitions)))
+
+(defn player-transitions
+  "Return the transitions available for the next player"
+  [turn]
+  (get-in turn [:transitions (:player turn)]))

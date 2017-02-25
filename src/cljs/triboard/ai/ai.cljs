@@ -5,6 +5,7 @@
     [triboard.logic.game :as game]
     [triboard.logic.player :as player]
     [triboard.logic.scores :as scores]
+    [triboard.logic.turn :as turn]
     ))
 
 
@@ -37,7 +38,7 @@
     min
     other-players))
 
-(defn- move-best-outcome                                    ;; TODO - Output scoring + next game
+(defn- move-best-outcome
   [ai game [coord transition]]
   (let [new-game (game/play-move game coord)
         move-diff (get (score-move ai transition) (:player ai))
@@ -64,7 +65,7 @@
         ai (make-ai (:board game-state) player)]
     (first
       (max-by #(move-best-outcome ai game %)
-        (get-in game-state [:transitions player]))        ;; TODO - To compute game directly, need of a transition between games
+        (turn/player-transitions game-state))        ;; TODO - To compute game directly, need of a transition between games
       )))
 
 (defn play-best-move
