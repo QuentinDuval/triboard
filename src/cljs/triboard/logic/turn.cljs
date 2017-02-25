@@ -20,7 +20,7 @@
   (let [transitions (move/all-transitions board)
         who-can-play (filter #(get transitions %) (player/next-three player))]
     (-> turn
-      (assoc :moves transitions)
+      (assoc :transitions transitions)
       (assoc :player (first who-can-play))
       )))
 
@@ -44,13 +44,14 @@
   (s/keys :req-un
     [::board/board
      ::player/player
+     ::move/transitions
      ::scores/scores]))
 
 (defn new-init-turn []
   (with-next-player
     {:board (board/new-board)
      :player (rand-nth player/all)
-     :moves {}
+     :transitions {}
      :scores scores/initial-scores}))
 
 (s/fdef play-move
@@ -60,5 +61,5 @@
 (defn play-move
   "On player playing the move [x y] - update all the game state accordingly"
   [{:keys [player board] :as turn} point]
-  (if-let [transitions (get-in turn [:moves player point])]
+  (if-let [transitions (get-in turn [:transitions player point])]
     (apply-transition turn transitions)))

@@ -32,7 +32,7 @@
 (def suggestions
   (reaction
     (if (and (:help @app-state) (not @ai-player?))
-      (get (:moves @current-state) @current-player)
+      (get (:transitions @current-state) @current-player)
       {})))
 
 
