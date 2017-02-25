@@ -92,10 +92,11 @@
     (leaf-score ai game)
     (let [turn (game/current-turn game)
           transitions (turn/player-transitions turn)
-          next-games (map #(game/play-move game (first %)) transitions)
           min-max (if (= (:player ai) (:player turn)) max min)]
       (apply min-max
-        (map #(tree-score ai % (dec depth)) next-games)))
+        (map
+          #(tree-score ai (game/play-move game (first %)) (dec depth))
+          transitions)))
     ))
 
 (defn test-score-tree
@@ -105,10 +106,10 @@
         ai (make-ai (:board turn) (:player turn))]
     (tree-score ai init-game 2)))
 
-#_(defn benchmark
+(defn benchmark
   []
   (time (dotimes [i 10]
-          (test-score-tree)
+          (time (test-score-tree))
           )))
 
 ;; -----------------------------------------
