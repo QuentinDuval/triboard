@@ -27,7 +27,7 @@
 ;; -----------------------------------------
 
 (def game (reaction (:game @app-state)))
-(def current-state (reaction (game/current-state @game)))
+(def current-state (reaction (game/current-turn @game)))
 (def current-player (reaction (:player @current-state)))
 (def ai-player? (reaction (player/is-ai? @current-player)))
 

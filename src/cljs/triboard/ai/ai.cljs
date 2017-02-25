@@ -42,7 +42,7 @@
   [ai game [coord transition]]
   (let [new-game (game/play-move game coord)
         move-diff (get (score-move ai transition) (:player ai))
-        new-moves (:transitions (game/current-state new-game))
+        new-moves (:transitions (game/current-turn new-game))
         next-diff (worst-possible-score-from ai new-moves)]
     {:scoring (+ move-diff next-diff)
      :game new-game}))
@@ -63,7 +63,7 @@
    * The immediate gain
    * The worse immediate lost afterwards"
   [game]
-  (let [turn (game/current-state game)
+  (let [turn (game/current-turn game)
         ai (make-ai (:board turn) (:player turn))]
     (:game
       (max-by :scoring

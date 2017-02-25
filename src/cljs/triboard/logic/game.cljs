@@ -5,16 +5,15 @@
     [triboard.logic.turn :as turn]))
 
 
-(s/def ::game-state ::turn/turn)
-(s/def ::game #(every? (partial s/valid? ::game-state) %))
-(s/fdef current-state :args (s/tuple ::game) :ret ::game-state)
+(s/def ::game #(every? (partial s/valid? ::turn/turn) %))
+(s/fdef current-turn :args (s/tuple ::game) :ret ::turn/turn)
 (s/fdef play-move :args (s/tuple ::game ::board/coord) :ret ::game)
 (s/fdef undo-player-move :args (s/tuple ::game fn?) :ret ::game)
 
 (defn new-game []
   (list (turn/new-init-turn)))
 
-(defn current-state
+(defn current-turn
   "Return the current state of the game:
    * Board (cells and owners)
    * Player score
@@ -25,7 +24,7 @@
 (defn play-move
   "Play a move, adding a new turn into the game"
   [game coord]
-  (let [curr-turn (current-state game)]
+  (let [curr-turn (current-turn game)]
     (if-let [next-turn (turn/play-move curr-turn coord)]
       (conj game next-turn)
       game)))

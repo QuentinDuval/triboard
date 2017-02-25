@@ -31,7 +31,7 @@
 
 (defn current-score
   [game]
-  (:scores (game/current-state game)))
+  (:scores (game/current-turn game)))
 
 (defn sum-player-scores
   [score]
