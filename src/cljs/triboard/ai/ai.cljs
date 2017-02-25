@@ -152,15 +152,15 @@
       )))
 
 #_(defn- play-best-move
-  "[SIMPLISTIC] Play the best move for a player based on:
-   * The immediate gain
-   * The worse immediate lost afterwards"
-  [game]
-  (let [turn (game/current-turn game)
-        ai (make-ai (:board turn) (:player turn))]
-    (:game
-      (max-by :scoring
-        (map
-          #(move-best-outcome ai game %)
-          (turn/player-transitions turn)))
-      )))
+    "[SIMPLISTIC] Play the best move for a player based on:
+     * The immediate gain
+     * The worse immediate lost afterwards"
+    [game]
+    (let [turn (game/current-turn game)
+          ai (make-ai (:board turn) (:player turn))]
+      (:game
+        (max-by :scoring
+          (map
+            #(move-best-outcome ai game %)
+            (turn/player-transitions turn)))
+        )))

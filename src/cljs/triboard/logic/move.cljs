@@ -37,8 +37,8 @@
 
 (defn- available-cells-by-dir
   "Indicates the convertible cells when clicking at [x y]"  ;; TODO - Refactor & Test
-  [board init-coord next-coord]
-  (loop [coord (next-coord init-coord)
+  [board init-coord dir]
+  (loop [coord (walk-dir init-coord dir)
          looser nil
          taken []]
     (let [cell (board/get-cell-at board coord)]
@@ -49,7 +49,7 @@
                                          :point init-coord  ;; The move performed
                                          :taken taken}      ;; The cells taken
         :else (recur
-                (next-coord coord)
+                (walk-dir coord dir)
                 cell
                 (conj taken coord)))
       )))
@@ -59,7 +59,7 @@
   [board point]
   (eduction
     (keep #(available-cells-by-dir board point %))
-    (map #(partial walk-dir %) cst/directions)))
+    cst/directions))
 
 (defn- empty-cell-conversion
   "Create a move to take an empty cell"
