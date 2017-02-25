@@ -32,7 +32,7 @@
   (or (nil? cell) (= cell :empty) (= cell :wall)))
 
 (defn- walk-dir
-  [[dx dy] [x y]]
+  [[x y] [dx dy]]
   [(+ x dx) (+ y dy)])
 
 (defn- available-cells-by-dir
@@ -105,3 +105,14 @@
 (defn apply-transition
   [board transition]
   (reduce apply-conversion board transition))
+
+#_(defn benchmarks
+  []
+  (let [b (board/new-board)]
+    (time (dotimes [i 10]
+            (all-transitions b)
+            ))
+    (time (dotimes [i 10]
+            (doall (map #(apply-transition b %) (all-transitions b)))
+            ))
+    ))
