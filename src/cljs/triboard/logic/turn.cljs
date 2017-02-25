@@ -60,8 +60,8 @@
 
 (defn play-move
   "On player playing the move [x y] - update all the game state accordingly"
-  [{:keys [player board] :as turn} point]
-  (if-let [transitions (get-in turn [:transitions player point])]
+  [{:keys [player board] :as turn} coord]
+  (if-let [transitions (get-in turn [:transitions player coord])]
     (apply-transition turn transitions)))
 
 (defn player-transitions

@@ -83,19 +83,19 @@
 
 ;; TODO - use the heuristic for the scoring (worse move after)
 (defn leaf-score
-  [ai game]
-  (get (:scores (game/current-turn game)) (:player ai)))
+  [ai turn]
+  (get (:scores turn) (:player ai)))
 
 (defn tree-score
-  [ai game depth]
+  [ai turn depth]
   (if (= 0 depth)
-    (leaf-score ai game)
-    (let [turn (game/current-turn game)
+    (leaf-score ai turn)
+    (let [                                                  ;;turn (game/current-turn game)
           transitions (turn/player-transitions turn)
           min-max (if (= (:player ai) (:player turn)) max min)]
       (apply min-max
         (map
-          #(tree-score ai (game/play-move game (first %)) (dec depth))
+          #(tree-score ai (turn/play-move turn (first %)) (dec depth))
           transitions)))
     ))
 
@@ -104,7 +104,7 @@
   (let [init-game (game/new-game)
         turn (game/current-turn init-game)
         ai (make-ai (:board turn) (:player turn))]
-    (tree-score ai init-game 2)))
+    (tree-score ai (game/current-turn init-game) 2)))
 
 (defn benchmark
   []
@@ -152,9 +152,10 @@
       (max-by :scoring
         (map
           (fn [[coord _]]
-            (let [new-game (game/play-move game coord)]
+            (let [new-game (game/play-move game coord)
+                  new-turn (game/current-turn new-game)]
               {:game new-game
-               :scoring (tree-score ai new-game 1)}))
+               :scoring (tree-score ai new-turn 1)}))
           (turn/player-transitions turn)))
       )))
 
