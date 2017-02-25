@@ -18,17 +18,14 @@
   (let [is-wall? #(= :wall (board/get-cell-at board %))]
     (eduction (filter is-wall?) (neighbors-coordinates point))))
 
-(defn- cell-weight
-  [board point]
-  (let [wall-nb (count (neighbouring-walls board point))]
-    (+ 1 (* wall-nb wall-nb 0.25))))                        ;; TODO - Cell weight does not work...
+(defn- wall-count->weight
+  [wall-count]
+  (+ 1 (* wall-count wall-count 0.25)))
 
-(defn- all-weights
-  [board]
-  (into {}
-    (for [point cst/all-positions]
-      [point (cell-weight board point)]
-      )))
+(defn- pair-cell-with-weight
+  [board point]
+  (let [wall-count (count (neighbouring-walls board point))]
+    [point (wall-count->weight wall-count)]))
 
 
 ;; ----------------------------------------------------------------------------
@@ -38,5 +35,5 @@
 (defn get-weighting
   "Return a weighting strategy for all the cells of the board"
   [board]
-  (let [weights (all-weights board)]
+  (let [weights (into {} (map #(pair-cell-with-weight board %)) board)]
     (fn [coord] (get weights coord 0))))
