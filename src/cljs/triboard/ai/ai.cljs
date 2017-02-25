@@ -37,9 +37,9 @@
     min
     other-players))
 
-(defn- move-best-outcome
+(defn- move-best-outcome                                    ;; TODO - Output scoring + next game
   [ai game [coord transition]]
-  (let [new-game (game/play-move game coord) ;; TODO - Should be the next game (not NEW BOARD)
+  (let [new-game (game/play-move game coord)
         move-diff (get (score-move ai transition) (:player ai))
         new-moves (:transitions (game/current-state new-game))
         next-diff (worst-possible-score-from ai new-moves)]
