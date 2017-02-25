@@ -105,6 +105,12 @@
         ai (make-ai (:board turn) (:player turn))]
     (tree-score ai init-game 2)))
 
+#_(defn benchmark
+  []
+  (time (dotimes [i 10]
+          (test-score-tree)
+          )))
+
 ;; -----------------------------------------
 
 (defn- worst-possible-score-from
