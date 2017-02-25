@@ -81,17 +81,18 @@
 
 ;; -----------------------------------------
 
-;; TODO - use the heuristic for the scoring (worse move after)
+;; TODO - use the heuristic for the scoring (worse move after - look-ahead)
 (defn leaf-score
   [ai turn]
-  (get (:scores turn) (:player ai)))
+  (get (:scores turn) (:player ai))
+  ;; (* -1 (get-in turn [:scores :blue])) ;; TODO - Make AI aligned against blue
+  )
 
 (defn tree-score
   [ai turn depth]
   (if (= 0 depth)
     (leaf-score ai turn)
-    (let [                                                  ;;turn (game/current-turn game)
-          transitions (turn/player-transitions turn)
+    (let [transitions (turn/player-transitions turn)
           min-max (if (= (:player ai) (:player turn)) max min)]
       (apply min-max
         (map
