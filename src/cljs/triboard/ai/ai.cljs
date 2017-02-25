@@ -53,7 +53,7 @@
 ;; -----------------------------------------
 
 ;; TODO - How to add the custom scoring? How to keep the game? (use keys)
-;; TODO - Sort by score and use alpha-beta min/max functions instead of standard min/max
+;; TODO - Use mapmin from http://worrydream.com/refs/Hughes-WhyFunctionalProgrammingMatters.pdf
 (defn leaf-score
   [ai game]
   (:scores (game/current-turn game)))
