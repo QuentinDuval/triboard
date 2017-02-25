@@ -96,7 +96,10 @@
           min-max (if (= (:player ai) (:player turn)) max min)]
       (apply min-max
         (map
-          #(tree-score ai (turn/play-move turn (first %)) (dec depth))
+          (fn [[coord transition]]
+            (tree-score ai
+              (turn/apply-transition turn transition)
+              (dec depth)))
           transitions)))
     ))
 
