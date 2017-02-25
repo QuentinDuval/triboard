@@ -54,9 +54,13 @@
 
 ;; TODO - How to add the custom scoring? How to keep the game? (use keys)
 ;; TODO - Use mapmin from http://worrydream.com/refs/Hughes-WhyFunctionalProgrammingMatters.pdf
+;; TODO - Sort by scores as well
 (defn leaf-score
   [ai game]
   (:scores (game/current-turn game)))
+
+#_(defn map-min
+  [scoring])
 
 (defn tree-score
   [ai game depth]
