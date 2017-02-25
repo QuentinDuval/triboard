@@ -12,7 +12,7 @@
     [reagent.ratom :refer [reaction]]))
 
 
-;; (stest/instrument)
+;; (stest/instrument) ;; TODO - Does not work
 ;; (enable-console-print!)
 ;; (set! *assert* false)
 

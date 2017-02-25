@@ -55,7 +55,7 @@
 ;; -----------------------------------------
 
 (s/fdef play-best-move
-  :args (s/tuple ::game/game ::player/player)
+  :args (s/tuple ::game/game)
   :ret ::game/game)
 
 (defn- play-best-move
