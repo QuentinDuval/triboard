@@ -52,7 +52,7 @@
     with-available-moves
     with-next-player))
 
-#_(s/fdef play-move
+(s/fdef play-move
   :args (s/cat :turn ::board/coord)
   :ret ::turn)
 
@@ -63,8 +63,7 @@
     (-> turn
       (apply-moves moves)
       (with-available-moves)
-      (with-next-player))
-    turn))
+      (with-next-player))))
 
 #_(defn complete-move
   [turn]
