@@ -4,8 +4,7 @@
     [triboard.logic.board :as board]
     [triboard.logic.constants :as cst]
     [triboard.logic.player :as player]
-    [triboard.utils :as utils]
-    ))
+    [triboard.utils :as utils]))
 
 
 ;; -----------------------------------------
@@ -19,12 +18,9 @@
 (s/def ::conversion (s/keys :req-un [::point ::taken ::winner ::looser]))
 (s/def ::transition (s/every ::conversion))
 
-(s/def ::available-moves
+(s/def ::transitions
   (s/map-of ::player/player
-    (s/map-of ::board/coord
-      #_(s/every ::conversion)                              ;; TODO map with conversion in it, but also next board
-      any?
-      )))
+    (s/map-of ::board/coord ::transition)))
 
 
 ;; -----------------------------------------
@@ -79,34 +75,23 @@
   (let [updates (map vector (:taken move) (repeat (:winner move)))]
     (board/update-cells board updates)))
 
-(defn- apply-conversions
-  [board moves]
-  (reduce apply-conversion board moves))
-
-(defn- to-game-transition
-  [board moves]
-  {:transition moves
-   :board (apply-conversions board moves)})
-
 (defn conversions->transition
   [conversions]
   (if-let [{:keys [winner point]} (first conversions)]
     (conj conversions (empty-cell-conversion winner point))
     conversions))
 
+(defn- map-game-tree
+  [xf game-tree]
+  (utils/map-values (partial utils/map-values xf) game-tree))
+
 ;; -----------------------------------------
 ;; Public API
 ;; -----------------------------------------
 
-#_(s/fdef available-transitions
-    :args (s/tuple ::board/board)
-    :ret ::available-moves)
-
-;; TODO: Keep the transition & have a function to apply a transition
-
-(defn map-game-tree
-  [xf game-tree]
-  (utils/map-values (partial utils/map-values xf) game-tree))
+(s/fdef available-transitions
+  :args (s/tuple ::board/board)
+  :ret ::transitions)
 
 (defn all-transitions
   [board]
@@ -120,10 +105,3 @@
 (defn apply-transition
   [board transition]
   (reduce apply-conversion board transition))
-
-;; TODO - The following should be moved to higher levels or deprecated
-
-(defn available-transitions
-  [board]
-  (map-game-tree #(to-game-transition board %) (all-transitions board)))
-

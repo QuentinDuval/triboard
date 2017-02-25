@@ -15,7 +15,7 @@
 (defn- with-available-moves
   "Add the available moves on the board"
   [{:keys [board] :as turn}]
-  (assoc turn :moves (move/available-transitions board)))
+  (assoc turn :moves (move/all-transitions board)))
 
 (defn- with-next-player
   "Find the next player to act - dismiss those that cannot play any move"
@@ -25,9 +25,9 @@
     ))
 
 (defn- apply-moves
-  [turn moves]
-  (let [new-board (-> moves :board)
-        new-scores (reduce scores/update-scores (:scores turn) (:transition moves))] ;; TODO - Factor in move
+  [turn transition]
+  (let [new-board (move/apply-transition (:board turn) transition)
+        new-scores (reduce scores/update-scores (:scores turn) transition)]
     (-> turn
       (assoc :board new-board)
       (assoc :scores new-scores)
@@ -64,17 +64,3 @@
       (apply-moves moves)
       (with-available-moves)
       (with-next-player))))
-
-#_(defn complete-move
-  [turn]
-  (-> turn (with-available-moves) (with-next-player)))
-
-;; TODO - Available moves from the current position
-;; TODO - To be used inside the game
-
-#_(defn available-turns
-  "Get the available turns from the current turn, by player and positions"
-  [turn]
-  (move/map-game-tree
-    #(apply-moves turn %)
-    (move/available-transitions (:board turn))))
