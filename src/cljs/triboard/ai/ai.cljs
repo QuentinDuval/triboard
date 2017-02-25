@@ -55,12 +55,36 @@
 ;; TODO - How to add the custom scoring? How to keep the game? (use keys)
 ;; TODO - Use mapmin from http://worrydream.com/refs/Hughes-WhyFunctionalProgrammingMatters.pdf
 ;; TODO - Sort by scores as well
+
+
+(defn contains-lower-value?
+  [coll pot]
+  (cond
+    (empty? coll) false
+    (<= (first coll) pot) true
+    :else (recur (rest coll) pot)
+    ))
+
+(defn map-min-impl
+  [max-min-val coll]
+  (cond
+    (empty? coll) max-min-val
+    (contains-lower-value? (first coll) max-min-val) max-min-val ;; Will depend on player
+    :else (recur
+            (max max-min-val (apply min (first coll)))      ;; Will depend on player
+            (rest coll))
+    ))
+
+(defn map-min
+  [coll]
+  (map-min-impl (min (first coll)) (rest coll)))
+
+;; -----------------------------------------
+
+;; TODO - use the heuristic for the scoring (worse move after)
 (defn leaf-score
   [ai game]
-  (:scores (game/current-turn game)))
-
-#_(defn map-min
-  [scoring])
+  (get (:scores (game/current-turn game)) (:player ai)))
 
 (defn tree-score
   [ai game depth]
@@ -70,7 +94,8 @@
           transitions (turn/player-transitions turn)
           next-games (map #(game/play-move game (first %)) transitions)
           min-max (if (= (:player ai) (:player turn)) max min)]
-      (apply min-max (map #(tree-score ai % (dec depth)) next-games)))
+      (apply min-max
+        (map #(tree-score ai % (dec depth)) next-games)))
     ))
 
 (defn test-score-tree
@@ -113,6 +138,20 @@
   :ret ::game/game)
 
 (defn- play-best-move
+  [game]
+  (let [turn (game/current-turn game)
+        ai (make-ai (:board turn) (:player turn))]
+    (:game
+      (max-by :scoring
+        (map
+          (fn [[coord _]]
+            (let [new-game (game/play-move game coord)]
+              {:game new-game
+               :scoring (tree-score ai new-game 1)}))
+          (turn/player-transitions turn)))
+      )))
+
+#_(defn- play-best-move
   "[SIMPLISTIC] Play the best move for a player based on:
    * The immediate gain
    * The worse immediate lost afterwards"
