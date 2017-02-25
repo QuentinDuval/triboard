@@ -12,25 +12,27 @@
 ;; Private
 ;; -----------------------------------------
 
-(defn- with-available-moves
-  "Add the available moves on the board"
-  [{:keys [board] :as turn}]
-  (assoc turn :moves (move/all-transitions board)))
-
 (defn- with-next-player
-  "Find the next player to act - dismiss those that cannot play any move"
-  [{:keys [moves player] :as turn}]
-  (let [who-can-play (filter #(get moves %) (player/next-three player))]
-    (assoc turn :player (first who-can-play))
-    ))
+  "Complete the turn to compute to find the next player than can act
+   * Requires to look-ahead for the next possible transitions
+   * To save computation, keep this look-ahead available"
+  [{:keys [board player] :as turn}]
+  (let [transitions (move/all-transitions board)
+        who-can-play (filter #(get transitions %) (player/next-three player))]
+    (-> turn
+      (assoc :moves transitions)
+      (assoc :player (first who-can-play))
+      )))
 
-(defn- apply-moves
+(defn- apply-transition
+  "Apply the transtion to the current turn, yielding a new turn"
   [turn transition]
   (let [new-board (move/apply-transition (:board turn) transition)
         new-scores (reduce scores/update-scores (:scores turn) transition)]
     (-> turn
       (assoc :board new-board)
       (assoc :scores new-scores)
+      (with-next-player)
       )))
 
 
@@ -45,12 +47,11 @@
      ::scores/scores]))
 
 (defn new-init-turn []
-  (-> {:board (board/new-board)
-       :player (rand-nth player/all)
-       :moves {}
-       :scores scores/initial-scores}
-    with-available-moves
-    with-next-player))
+  (with-next-player
+    {:board (board/new-board)
+     :player (rand-nth player/all)
+     :moves {}
+     :scores scores/initial-scores}))
 
 (s/fdef play-move
   :args (s/cat :turn ::board/coord)
@@ -59,8 +60,5 @@
 (defn play-move
   "On player playing the move [x y] - update all the game state accordingly"
   [{:keys [player board] :as turn} point]
-  (if-let [moves (get-in turn [:moves player point])]
-    (-> turn
-      (apply-moves moves)
-      (with-available-moves)
-      (with-next-player))))
+  (if-let [transitions (get-in turn [:moves player point])]
+    (apply-transition turn transitions)))
