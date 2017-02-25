@@ -42,6 +42,8 @@
     (for [[position cell] (model/to-iterable board)]
       ^{:key position}
       (if (= :empty cell)
-        [empty-cell position cb (if (suggestions position) :help :empty)]
+        [empty-cell position cb
+         (if (and suggestions (suggestions position))       ;; Avoids crash !
+           :help :empty)]
         [rect-cell position cell])
       )))
