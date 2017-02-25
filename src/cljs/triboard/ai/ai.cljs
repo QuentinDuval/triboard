@@ -52,7 +52,7 @@
 ;; Attempts minimax
 ;; -----------------------------------------
 
-;; TODO - How to add the custom scoring?
+;; TODO - How to add the custom scoring? How to keep the game? (use keys)
 (defn leaf-score
   [ai game]
   (:scores (game/current-turn game)))
