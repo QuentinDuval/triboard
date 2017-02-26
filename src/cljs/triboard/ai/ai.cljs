@@ -92,15 +92,14 @@
   [ai turn depth]
   (if (= 0 depth)
     (leaf-score ai turn)
-    (let [transitions (turn/player-transitions turn)
-          min-max (if (= (:player ai) (:player turn)) max min)]
+    (let [min-max (if (= (:player ai) (:player turn)) max min)]
       (apply min-max
         (map
           (fn [[coord transition]]
             (tree-score ai
               (turn/apply-transition turn transition)
               (dec depth)))
-          transitions)))
+          (turn/player-transitions turn))))
     ))
 
 (defn test-score-tree
