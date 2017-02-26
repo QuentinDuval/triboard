@@ -31,9 +31,6 @@
 (s/fdef update-scores
   :args (s/tuple ::scores ::move/conversion) :ret ::scores)
 
-(s/fdef update-scores-with
-  :args (s/tuple ::scores ::move/conversion ::weighting) :ret ::scores)
-
 (def null-scores
   {:blue 0 :red 0 :green 0})
 
@@ -41,12 +38,6 @@
   {:blue cst/init-block-count
    :red cst/init-block-count
    :green cst/init-block-count})
-
-(defn update-scores-with
-  "Update the scoring based on the provided move, and a weighting policy"
-  [scores conversion weight-of]
-  (let [delta (transduce (map weight-of) + (:taken conversion))]
-    (transfer-delta scores conversion delta)))
 
 (defn update-scores
   "Update the scoring based on the provided move"

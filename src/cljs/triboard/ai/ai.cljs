@@ -1,7 +1,6 @@
 (ns triboard.ai.ai
   (:require
     [cljs.spec :as s :include-macros true]
-    [triboard.ai.scoring :as scoring]
     [triboard.logic.game :as game]
     [triboard.logic.scores :as scores]
     [triboard.logic.turn :as turn]
@@ -14,40 +13,40 @@
 
 (defn- make-ai
   [board player]
-  {:player player
-   :cell-weights (scoring/get-weighting board)              ;; TODO
-   })
+  {:player player})
 
-(defn- max-by [key-fn coll] (apply max-key key-fn coll))
+(defn- max-by
+  [key-fn coll]
+  (apply max-key key-fn coll))
+
+(defn- min-max-step
+  [ai turn recur-fn]
+  (apply
+    (if (= (:player ai) (:player turn)) max min)
+    (map
+      (fn [[_ transition]] (recur-fn transition))
+      (turn/player-transitions turn))))
 
 ;; -----------------------------------------
 
-(defn- compute-score
-  [ai turn transition]
-  (get
-    (reduce scores/update-scores (:scores turn) transition)
-    (:player ai))) ;; TODO - Blue score + min-max modification for AI Aliance
-
 (defn- leaf-score
   [ai turn]
-  (let [min-max (if (= (:player ai) (:player turn)) max min)]
-    (apply min-max
-      (map
-        (fn [[_ transition]] (compute-score ai turn transition))
-        (turn/player-transitions turn)))))
+  (min-max-step ai turn
+    (fn look-ahead [transition]
+      (get
+        (reduce scores/update-scores (:scores turn) transition)
+        (:player ai)) ;; TODO - Blue score + min-max modification for AI Aliance
+      )))
 
 (defn tree-score
   [ai turn depth]
   (if (= 0 depth)
     (leaf-score ai turn)
-    (let [min-max (if (= (:player ai) (:player turn)) max min)]
-      (apply min-max
-        (map
-          (fn [[_ transition]]
-            (tree-score ai
-              (turn/apply-transition turn transition)
-              (dec depth)))
-          (turn/player-transitions turn))))
+    (min-max-step ai turn
+      (fn look-lower [transition]
+        (tree-score ai
+          (turn/apply-transition turn transition)
+          (dec depth))))
     ))
 
 ;; -----------------------------------------
