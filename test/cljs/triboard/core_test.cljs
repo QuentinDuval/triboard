@@ -92,18 +92,6 @@
   (testing "trivial assumption"
     (is (= 1 1))))
 
-(defn prop-update-score
-  [score conversion]
-  (=
-    (scores/update-scores score conversion)
-    (scores/update-scores-with score conversion (constantly 1))
-    ))
-
-(defspec test-prop-update-score 100
-  (prop/for-all [score (s/gen ::scores/scores)
-                 conversion (s/gen ::move/conversion)]
-    (prop-update-score score conversion)))
-
 
 ;; ----------------------------------------------------------------------------
 ;; Property based tests
