@@ -12,20 +12,20 @@
 ;; -----------------------------------------
 
 (defprotocol AIStrategy
-  (summarize-score [this scores] "Extract data from the score to compare")
+  (optimized-score [this scores] "Extract data from the score to compare")
   (maximizing-turn? [this turn] "Indicates whether we are in min or max"))
 
 (defn- make-ai
   [player]
   (reify AIStrategy
-    (summarize-score [_ scores] (get scores player))
+    (optimized-score [_ scores] (get scores player))
     (maximizing-turn? [_ turn] (= (:player turn) player))
     ))
 
 (defn- make-cheating-ai
   [player]
   (reify AIStrategy
-    (summarize-score [_ scores] (+ (:red scores) (:green scores)))
+    (optimized-score [_ scores] (+ (:red scores) (:green scores)))
     (maximizing-turn? [_ turn] (not= (:player turn) :blue))
     ))
 
@@ -50,7 +50,7 @@
   [ai {:keys [scores] :as turn}]
   (min-max-step ai turn
     (fn look-ahead [_ transition]
-      (summarize-score ai (reduce scores/update-scores scores transition))
+      (optimized-score ai (reduce scores/update-scores scores transition))
       )))
 
 (defn- tree-score
