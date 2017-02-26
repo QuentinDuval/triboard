@@ -83,7 +83,7 @@
 
 (defn- map-game-tree
   [xf game-tree]
-  (utils/map-values (partial utils/map-values xf) game-tree))
+  (utils/map-values #(utils/map-values xf %) game-tree))
 
 ;; -----------------------------------------
 ;; Public API
@@ -117,7 +117,7 @@
     (time (dotimes [i 100]
             (all-transitions b)
             ))
-    (time (dotimes [i 100]
+    #_(time (dotimes [i 100]
             (doall (map #(apply-transition b %) (all-transitions b)))
             ))
     ))
