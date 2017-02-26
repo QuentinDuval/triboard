@@ -42,7 +42,7 @@
 
 (defn- min-max-step
   [ai turn on-transition]
-  (min-max-step-by identity ai turn on-transition)) ;; TODO - avoid projection
+  (min-max-step-by identity ai turn on-transition))         ;; TODO - avoid projection
 
 ;; -----------------------------------------
 
@@ -53,7 +53,7 @@
       (summarize-score ai (reduce scores/update-scores scores transition))
       )))
 
-(defn tree-score
+(defn- tree-score
   [ai turn depth]
   (if (= 0 depth)
     (leaf-score ai turn)
@@ -63,6 +63,16 @@
           (turn/apply-transition turn transition)
           (dec depth))))
     ))
+
+(defn- best-move
+  [ai turn]
+  (first
+    (min-max-step-by
+      second ai turn
+      (fn [coord transition]
+        (let [new-turn (turn/apply-transition turn transition)]
+          [coord (tree-score ai new-turn 1)]))
+      )))
 
 ;; -----------------------------------------
 ;; Public API
@@ -76,15 +86,7 @@
   [game]
   (let [turn (game/current-turn game)
         ai (make-ai (:player turn))]
-    (:game
-      (min-max-step-by
-        :score ai turn
-        (fn [coord _]
-          (let [new-game (game/play-move game coord)
-                new-turn (game/current-turn new-game)]
-            {:game new-game                             ;; TODO - Not sure keeping game in memory is wise
-             :score (tree-score ai new-turn 1)})))
-      )))
+    (game/play-move game (best-move ai turn))))
 
 
 ;; -----------------------------------------
