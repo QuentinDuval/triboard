@@ -11,23 +11,23 @@
 ;; Private
 ;; -----------------------------------------
 
-;; TODO - Blue score + min-max modification for AI Aliance
+(defprotocol AIStrategy
+  (summarize-score [this scores] "Extract data from the score to compare")
+  (maximizing-turn? [this turn] "Indicates whether we are in min or max"))
 
 (defn- make-ai
-  [board player]
-  {:player player})
+  [player]
+  (reify AIStrategy
+    (summarize-score [_ scores] (get scores player))
+    (maximizing-turn? [_ turn] (= (:player turn) player))
+    ))
 
-(defn- summarize-score
-  [ai scores]
-  (get scores (:player ai))
-  ;; (+ (:red scores) (:green scores)) ;; Aligned against player
-  )
-
-(defn- maximizing-turn?
-  [ai turn]
-  (= (:player ai) (:player turn))
-  ;; (not= :blue (:player turn)) ;; Aligned against player
-  )
+(defn- make-cheating-ai
+  [player]
+  (reify AIStrategy
+    (summarize-score [_ scores] (+ (:red scores) (:green scores)))
+    (maximizing-turn? [_ turn] (not= (:player turn) :blue))
+    ))
 
 ;; -----------------------------------------
 
@@ -75,7 +75,7 @@
 (defn- play-best-move
   [game]
   (let [turn (game/current-turn game)
-        ai (make-ai (:board turn) (:player turn))]
+        ai (make-ai (:player turn))]
     (:game
       (min-max-step-by
         :score ai turn
