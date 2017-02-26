@@ -11,17 +11,23 @@
 ;; Private
 ;; -----------------------------------------
 
+;; TODO - Blue score + min-max modification for AI Aliance
+
 (defn- make-ai
   [board player]
   {:player player})
 
 (defn- summarize-score
   [ai scores]
-  (get scores (:player ai))) ;; TODO - Blue score + min-max modification for AI Aliance
+  (get scores (:player ai))
+  ;; (+ (:red scores) (:green scores)) ;; Aligned against player
+  )
 
 (defn- maximizing-turn?
   [ai turn]
-  (= (:player ai) (:player turn)))
+  (= (:player ai) (:player turn))
+  ;; (not= :blue (:player turn)) ;; Aligned against player
+  )
 
 ;; -----------------------------------------
 
