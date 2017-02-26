@@ -15,31 +15,36 @@
   [board player]
   {:player player})
 
-(defn- max-by
-  [key-fn coll]
-  (apply max-key key-fn coll))
+(defn- summarize-score
+  [ai scores]
+  (get scores (:player ai))) ;; TODO - Blue score + min-max modification for AI Aliance
 
 (defn- maximizing-turn?
   [ai turn]
   (= (:player ai) (:player turn)))
 
+;; -----------------------------------------
+
+(defn- min-max-step-by
+  [compare-key ai turn on-transition]
+  (apply
+    (if (maximizing-turn? ai turn) max-key min-key)
+    compare-key
+    (map
+      (fn [[coord transition]] (on-transition coord transition))
+      (turn/player-transitions turn))))
+
 (defn- min-max-step
   [ai turn on-transition]
-  (apply
-    (if (maximizing-turn? ai turn) max min)
-    (map
-      (fn [[_ transition]] (on-transition transition))
-      (turn/player-transitions turn))))
+  (min-max-step-by identity ai turn on-transition)) ;; TODO - avoid projection
 
 ;; -----------------------------------------
 
 (defn- leaf-score
-  [ai turn]
+  [ai {:keys [scores] :as turn}]
   (min-max-step ai turn
-    (fn look-ahead [transition]
-      (get
-        (reduce scores/update-scores (:scores turn) transition)
-        (:player ai)) ;; TODO - Blue score + min-max modification for AI Aliance
+    (fn look-ahead [_ transition]
+      (summarize-score ai (reduce scores/update-scores scores transition))
       )))
 
 (defn tree-score
@@ -47,7 +52,7 @@
   (if (= 0 depth)
     (leaf-score ai turn)
     (min-max-step ai turn
-      (fn look-lower [transition]
+      (fn look-lower [_ transition]
         (tree-score ai
           (turn/apply-transition turn transition)
           (dec depth))))
@@ -66,14 +71,13 @@
   (let [turn (game/current-turn game)
         ai (make-ai (:board turn) (:player turn))]
     (:game
-      (max-by :scoring
-        (map
-          (fn [[coord _]]
-            (let [new-game (game/play-move game coord)
-                  new-turn (game/current-turn new-game)]
-              {:game new-game
-               :scoring (tree-score ai new-turn 1)}))
-          (turn/player-transitions turn)))
+      (min-max-step-by
+        :score ai turn
+        (fn [coord _]
+          (let [new-game (game/play-move game coord)
+                new-turn (game/current-turn new-game)]
+            {:game new-game                             ;; TODO - Not sure keeping game in memory is wise
+             :score (tree-score ai new-turn 1)})))
       )))
 
 
