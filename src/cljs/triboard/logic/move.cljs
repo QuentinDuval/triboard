@@ -106,13 +106,18 @@
   [board transition]
   (reduce apply-conversion board transition))
 
-#_(defn benchmarks
+
+;; -----------------------------------------
+;; TESTS
+;; -----------------------------------------
+
+(defn benchmarks
   []
   (let [b (board/new-board)]
-    (time (dotimes [i 10]
+    (time (dotimes [i 100]
             (all-transitions b)
             ))
-    (time (dotimes [i 10]
+    (time (dotimes [i 100]
             (doall (map #(apply-transition b %) (all-transitions b)))
             ))
     ))
