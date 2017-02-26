@@ -106,12 +106,11 @@
   [board transition]
   (reduce apply-conversion board transition))
 
-
 ;; -----------------------------------------
 ;; TESTS
 ;; -----------------------------------------
 
-(defn benchmarks
+(defn benchmark
   []
   (let [b (board/new-board)]
     (time (dotimes [i 100]
