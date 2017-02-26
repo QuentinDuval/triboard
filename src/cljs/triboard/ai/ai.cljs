@@ -19,12 +19,16 @@
   [key-fn coll]
   (apply max-key key-fn coll))
 
+(defn- maximizing-turn?
+  [ai turn]
+  (= (:player ai) (:player turn)))
+
 (defn- min-max-step
-  [ai turn recur-fn]
+  [ai turn on-transition]
   (apply
-    (if (= (:player ai) (:player turn)) max min)
+    (if (maximizing-turn? ai turn) max min)
     (map
-      (fn [[_ transition]] (recur-fn transition))
+      (fn [[_ transition]] (on-transition transition))
       (turn/player-transitions turn))))
 
 ;; -----------------------------------------
@@ -77,15 +81,7 @@
 ;; TESTS
 ;; -----------------------------------------
 
-(defn test-on-game
-  [g]
-  (let [turn (game/current-turn g)
-        ai (make-ai (:board turn) (:player turn))]
-    (tree-score ai (game/current-turn g) 2)))
-
-(defn test-score-tree [] (test-on-game (game/new-game)))
-
 (defn benchmark []
   (time (dotimes [i 10]
-          (time (test-score-tree))
+          (time (play-best-move (game/new-game)))
           )))
