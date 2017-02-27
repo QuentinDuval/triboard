@@ -37,7 +37,7 @@
 
 (s/fdef empty-cells
   :args (s/cat :board ::board)
-  :ret (partial every? #(s/valid? ::coord %))) ;; TODO - Fails with coll-of ::coord or s/every. WHY?
+  :ret (partial every? #(s/valid? ::coord %)))              ;; TODO - Fails with coll-of ::coord or s/every. WHY?
 
 
 ;; -----------------------------------------
@@ -73,3 +73,22 @@
   (eduction
     (filter #(= (get-cell-at board %) :empty))
     cst/all-positions))
+
+
+#_(defn test-array
+    []
+    (let [n 1000000
+          a (into-array (range n))]
+      (time (dotimes [i n]
+              (aget a n)
+              ))
+      ))
+
+#_(defn test-vector
+    []
+    (let [n 1000000
+          a (into [] (range n))]
+      (time (dotimes [i n]
+              (get a n)
+              ))
+      ))

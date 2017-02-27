@@ -152,4 +152,4 @@
 ;; (cljs.spec.test/instrument)
 ;; (cljs.spec.test/unstrument)
 
-(test/run-tests)
+;; (test/run-tests)
