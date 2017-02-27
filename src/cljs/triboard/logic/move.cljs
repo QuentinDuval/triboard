@@ -31,16 +31,20 @@
   [cell]
   (or (= cell :empty) (= cell :wall)))
 
+(defn- aboard-cell-at
+  [board x y]
+  (if (and (< -1 x cst/board-width) (< -1 y cst/board-height))
+    (aget board x y)
+    :wall))
+
 (defn- available-cells-by-dir
-  "Indicates the convertible cells when clicking at [x y]"  ;; TODO - Refactor & Test
-  [board init-coord [dx dy]]
-  (loop [x (+ (first init-coord) dx)
-         y (+ (second init-coord) dy)
+  "Indicates the convertible cells when clicking at [x y]"
+  [board [x-init y-init :as init-coord] [dx dy]]
+  (loop [x (+ x-init dx)
+         y (+ y-init dy)
          looser nil
          taken []]
-    (let [cell (if (and (<= 0 x (dec cst/board-width)) (<= 0 y (dec cst/board-height)))
-                 (aget board x y)
-                 :wall)]
+    (let [cell (aboard-cell-at board x y)]
       (cond
         (is-not-convertible? cell) nil                      ;; No move: reached end and only 1 type of cell
         (and looser (not= looser cell)) {:winner cell       ;; Who wins the cells
