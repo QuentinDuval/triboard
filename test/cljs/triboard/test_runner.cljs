@@ -3,7 +3,4 @@
     [cljs.test]
     ))
 
-;;(cljs.test/run-all-tests #"triboard.*test")
-
-(cljs.test/run-tests
-  'triboard.core-test)
+(cljs.test/run-all-tests #"triboard.*test")
