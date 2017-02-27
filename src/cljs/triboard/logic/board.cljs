@@ -74,6 +74,11 @@
     (filter #(= (get-cell-at board %) :empty))
     cst/all-positions))
 
+(defn board->array
+  "Converts the board into a JavaScript array (for performance)"
+  [board]
+  (into-array (map into-array board)))
+
 
 #_(defn test-array
     []

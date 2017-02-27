@@ -29,19 +29,18 @@
 
 (defn- ^boolean is-not-convertible?
   [cell]
-  (or (nil? cell) (= cell :empty) (= cell :wall)))
-
-(defn- walk-dir
-  [[x y] [dx dy]]
-  [(+ x dx) (+ y dy)])
+  (or (= cell :empty) (= cell :wall)))
 
 (defn- available-cells-by-dir
   "Indicates the convertible cells when clicking at [x y]"  ;; TODO - Refactor & Test
-  [board init-coord dir]
-  (loop [coord (walk-dir init-coord dir)
+  [board init-coord [dx dy]]
+  (loop [x (+ (first init-coord) dx)
+         y (+ (second init-coord) dy)
          looser nil
          taken []]
-    (let [cell (board/get-cell-at board coord)]
+    (let [cell (if (and (<= 0 x (dec cst/board-width)) (<= 0 y (dec cst/board-height)))
+                 (aget board x y)
+                 :wall)]
       (cond
         (is-not-convertible? cell) nil                      ;; No move: reached end and only 1 type of cell
         (and looser (not= looser cell)) {:winner cell       ;; Who wins the cells
@@ -49,9 +48,10 @@
                                          :point init-coord  ;; The move performed
                                          :taken taken}      ;; The cells taken
         :else (recur
-                (walk-dir coord dir)
+                (+ x dx)
+                (+ y dy)
                 cell
-                (conj taken coord)))
+                (conj taken [x y])))
       )))
 
 (defn- available-conversions-at
@@ -95,12 +95,13 @@
 
 (defn all-transitions
   [board]
-  (map-game-tree
-    conversions->transition
-    (transduce
-      (mapcat #(available-conversions-at board %))
-      (utils/group-by-reducer :winner :point)
-      (board/empty-cells board))))
+  (let [aboard (board/board->array board)]
+    (map-game-tree
+      conversions->transition
+      (transduce
+        (mapcat #(available-conversions-at aboard %))
+        (utils/group-by-reducer :winner :point)
+        (board/empty-cells board)))))
 
 (defn apply-transition
   [board transition]
@@ -117,6 +118,6 @@
             (all-transitions b)
             ))
     #_(time (dotimes [i 100]
-            (doall (map #(apply-transition b %) (all-transitions b)))
-            ))
+              (doall (map #(apply-transition b %) (all-transitions b)))
+              ))
     ))
