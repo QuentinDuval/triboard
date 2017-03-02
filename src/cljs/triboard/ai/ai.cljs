@@ -82,14 +82,14 @@
   :args (s/tuple ::game/game)
   :ret ::game/game)
 
-(defn- one-ai-below-player?
-  [scores]
-  (< (+ (:red scores) (:green scores)) (* 2 (:blue scores))))
+(defn- is-player-first?
+  [{:keys [blue red green] :as scores}]
+  (and (< red blue) (< green blue)))
 
 (defn- play-best-move
   [game]
   (let [turn (game/current-turn game)
-        hard-mode? (one-ai-below-player? (:scores turn))
+        hard-mode? (is-player-first? (:scores turn))
         ai ((if hard-mode? make-cheating-ai make-ai) (:player turn))]
     (game/play-move game (best-move ai turn))))
 
