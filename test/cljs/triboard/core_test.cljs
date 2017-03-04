@@ -14,7 +14,7 @@
     [triboard.logic.constants :as cst]
     [triboard.logic.board :as board]
     [triboard.logic.game :as game]
-    [triboard.logic.move :as move]
+    [triboard.logic.transition :as transition]
     [triboard.logic.player :as player]
     [triboard.logic.scores :as scores]
     [triboard.logic.turn :as turn]

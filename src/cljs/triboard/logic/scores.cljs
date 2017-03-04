@@ -3,7 +3,7 @@
     [cljs.spec :as s :include-macros true]
     [triboard.logic.board :as board]
     [triboard.logic.constants :as cst]
-    [triboard.logic.move :as move]
+    [triboard.logic.transition :as transition]
     [triboard.logic.player :as player]
     ))
 
@@ -29,7 +29,7 @@
 (s/fdef weighting :args (s/tuple ::board/coord) :ret ::weight)
 
 (s/fdef update-scores
-  :args (s/tuple ::scores ::move/conversion) :ret ::scores)
+  :args (s/tuple ::scores ::transition/conversion) :ret ::scores)
 
 (def null-scores
   {:blue 0 :red 0 :green 0})
@@ -40,7 +40,7 @@
    :green cst/init-block-count})
 
 (defn update-scores
-  "Update the scoring based on the provided move"
+  "Update the scoring based on the provided transition"
   [scores conversion]
   (let [delta (count (:taken conversion))]
     (transfer-delta scores conversion delta)))

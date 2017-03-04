@@ -1,4 +1,4 @@
-(ns triboard.logic.move
+(ns triboard.logic.transition
   (:require
     [cljs.spec :as s :include-macros true]
     [triboard.logic.board :as board]
