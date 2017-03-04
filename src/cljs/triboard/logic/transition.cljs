@@ -31,38 +31,37 @@
   [cell]
   (or (= cell :empty) (= cell :wall)))
 
-(defn- is-source?
+(defn- ^boolean is-source?
   [looser cell]
   (and looser (not= looser cell)))
 
-(defn- aboard-cell-at
-  [board x y]
-  (if (and (< -1 x board/width) (< -1 y board/height))
-    (aget board x y)
-    :wall))
+(defn- ^boolean? in-board?
+  [x y]
+  (and (< -1 x board/width) (< -1 y board/height)))
 
 (defn- seek-jump-source-toward
   "Starting from the destination of a jump (an empty cell):
-   * search for valid source for the jump
-   * collect the jumped cells along the way"                ;; TODO - Separate this? (could be faster)
+   * Search for valid source for the jump
+   * Collect the jumped cells along the way"                ;; TODO - Separate this? (could be faster)
   [board [x-init y-init :as destination] [dx dy]]
   (loop [x (+ x-init dx)
          y (+ y-init dy)
          looser nil
          taken []]
-    (let [cell (aboard-cell-at board x y)]
-      (cond
-        (block-jump? cell) nil
-        (is-source? looser cell) {:winner cell
-                                  :looser looser
-                                  :destination destination
-                                  :taken taken}
-        :else (recur
-                (+ x dx)
-                (+ y dy)
-                cell
-                (conj taken [x y])))
-      )))
+    (if (in-board? x y)
+      (let [owner (aget board x y)]
+        (cond
+          (block-jump? owner) nil
+          (is-source? looser owner) {:winner owner
+                                     :looser looser
+                                     :destination destination
+                                     :taken taken}
+          :else (recur
+                  (+ x dx)
+                  (+ y dy)
+                  owner
+                  (conj taken [x y])))
+        ))))
 
 (defn- available-jumps-at
   "Provides the list of moves that can be done from a cell"
