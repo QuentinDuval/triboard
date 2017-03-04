@@ -31,6 +31,10 @@
   [cell]
   (or (= cell :empty) (= cell :wall)))
 
+(defn- is-source?
+  [looser cell]
+  (and looser (not= looser cell)))
+
 (defn- aboard-cell-at
   [board x y]
   (if (and (< -1 x board/width) (< -1 y board/height))
@@ -40,7 +44,7 @@
 (defn- seek-jump-source-toward
   "Starting from the destination of a jump (an empty cell):
    * search for valid source for the jump
-   * collect the jumped cells along the way" ;; TODO - Separate this? (could be faster)
+   * collect the jumped cells along the way"                ;; TODO - Separate this? (could be faster)
   [board [x-init y-init :as destination] [dx dy]]
   (loop [x (+ x-init dx)
          y (+ y-init dy)
@@ -49,10 +53,10 @@
     (let [cell (aboard-cell-at board x y)]
       (cond
         (block-jump? cell) nil
-        (and looser (not= looser cell)) {:winner cell
-                                         :looser looser
-                                         :destination destination
-                                         :taken taken}
+        (is-source? looser cell) {:winner cell
+                                  :looser looser
+                                  :destination destination
+                                  :taken taken}
         :else (recur
                 (+ x dx)
                 (+ y dy)
