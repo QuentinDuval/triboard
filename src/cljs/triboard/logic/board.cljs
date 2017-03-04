@@ -28,6 +28,37 @@
     positions
     (mapcat #(repeat n %) (conj player/all :wall))))
 
+#_(deftype Board
+  [grid]
+
+  ILookup
+  (-lookup
+    [board coord not-found] (get-in (.-grid board) coord not-found))
+  (-lookup
+    [board coord] (-lookup board coord :wall))
+
+  IAssociative
+  (-contains-key? [board coord]
+    (-lookup board coord nil))
+  (-assoc [board coord owner]
+    (Board. (assoc-in (.-grid board) coord owner)))
+
+  ISeqable
+  (-seq [board]
+    (for [coord coordinates]
+      [coord (get-in (.-grid board) coord)]))
+  )
+
+#_(defn test-board-type
+  []
+  (let [b (Board. empty-board)]
+    (println b)
+    (println (get b [0 0]))
+    (println (contains? b [0 0]))
+    (println (get (assoc b [0 0] :wall) [0 0]))
+    (println (seq b))
+    ))
+
 
 ;; -----------------------------------------
 ;; Public Types
