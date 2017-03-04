@@ -50,7 +50,7 @@
   [ai {:keys [scores] :as turn}]
   (min-max-step ai turn
     (fn look-ahead [_ transition]
-      (optimized-score ai (reduce scores/update-scores scores transition))
+      (optimized-score ai (scores/update-scores scores transition))
       )))
 
 (defn- tree-score

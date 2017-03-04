@@ -1,7 +1,6 @@
 (ns triboard.logic.scores
   (:require
     [cljs.spec :as s :include-macros true]
-    [triboard.logic.board :as board]
     [triboard.logic.constants :as cst]
     [triboard.logic.transition :as transition]
     [triboard.logic.player :as player]
@@ -12,24 +11,25 @@
 ;; Private API
 ;; ----------------------------------------------------------------------------
 
-(defn- transfer-delta
-  [scores conversion delta]
-  (-> scores
-    (update (:winner conversion) + delta)
-    (update (:looser conversion) - delta)
-    (dissoc :empty)))
+(defn- update-from-jump
+  [scores jump]
+  (let [delta (count (:taken jump))]
+    (-> scores
+      (update (:winner jump) + delta)
+      (update (:looser jump) - delta)
+      (dissoc :empty))))
 
 
 ;; ----------------------------------------------------------------------------
 ;; Public API
 ;; ----------------------------------------------------------------------------
 
-(s/def ::weight (s/double-in :NaN? false))
-(s/def ::scores (s/map-of ::player/player ::weight))         ;; TODO - parameterized specs?
-(s/fdef weighting :args (s/tuple ::board/coord) :ret ::weight)
+(s/def ::weight number?)
+(s/def ::scores (s/map-of ::player/player ::weight))
 
 (s/fdef update-scores
-  :args (s/tuple ::scores ::transition/conversion) :ret ::scores)
+  :args (s/tuple ::scores ::transition/transition)
+  :ret ::scores)
 
 (def null-scores
   {:blue 0 :red 0 :green 0})
@@ -41,6 +41,5 @@
 
 (defn update-scores
   "Update the scoring based on the provided transition"
-  [scores conversion]
-  (let [delta (count (:taken conversion))]
-    (transfer-delta scores conversion delta)))
+  [scores transition]
+  (reduce update-from-jump scores transition))

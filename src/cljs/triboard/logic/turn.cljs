@@ -50,13 +50,10 @@
 (defn apply-transition
   "Apply the transtion to the current turn, yielding a new turn"
   [turn transition]
-  (let [new-board (transition/apply-transition (:board turn) transition)
-        new-scores (reduce scores/update-scores (:scores turn) transition)]
-    (-> turn
-      (assoc :board new-board)
-      (assoc :scores new-scores)
-      (with-next-player)
-      )))
+  (-> turn
+    (update :board transition/apply-transition transition)
+    (update :scores scores/update-scores transition)
+    (with-next-player)))
 
 (defn play-move
   "On player playing the move [x y] - update all the game state accordingly"
