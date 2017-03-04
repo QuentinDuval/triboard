@@ -25,6 +25,8 @@
 ;; Utils
 ;; ----------------------------------------------------------------------------
 
+(def max-score (- (* board/board-width board/board-height) cst/init-block-count))
+
 (defn play-moves
   [init-game moves]
   (reduce game/play-move init-game moves))
