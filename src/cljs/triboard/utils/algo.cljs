@@ -1,4 +1,4 @@
-(ns triboard.utils)
+(ns triboard.utils.algo)
 
 
 (defn group-by-reducer
@@ -21,11 +21,4 @@
         (fn [m k v] (assoc! m k (xf v)))
         (transient {})
         coll))
-    ))
-
-#_(defn- benchmark
-  []
-  (let [m (zipmap (range 1000) (range 1000))]
-    (time (dotimes [i 100]
-            (map-values #(* % 2) m)))
     ))

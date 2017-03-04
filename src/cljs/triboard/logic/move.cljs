@@ -4,7 +4,7 @@
     [triboard.logic.board :as board]
     [triboard.logic.constants :as cst]
     [triboard.logic.player :as player]
-    [triboard.utils :as utils]))
+    [triboard.utils.algo :as algo]))
 
 
 ;; -----------------------------------------
@@ -87,7 +87,7 @@
 
 (defn- map-game-tree
   [xf game-tree]
-  (utils/map-values #(utils/map-values xf %) game-tree))
+  (algo/map-values #(algo/map-values xf %) game-tree))
 
 ;; -----------------------------------------
 ;; Public API
@@ -104,7 +104,7 @@
       conversions->transition
       (transduce
         (mapcat #(available-conversions-at aboard %))
-        (utils/group-by-reducer :winner :point)
+        (algo/group-by-reducer :winner :point)
         (board/empty-cells board)))))
 
 (defn apply-transition
