@@ -27,7 +27,7 @@
 ;; Private
 ;; -----------------------------------------
 
-(defn- ^boolean is-not-convertible?
+(defn- ^boolean block-jump?
   [cell]
   (or (= cell :empty) (= cell :wall)))
 
@@ -37,8 +37,10 @@
     (aget board x y)
     :wall))
 
-(defn- available-cells-by-dir
-  "Indicates the convertible cells when clicking at [x y]"
+(defn- seek-jump-source-toward
+  "Starting from the destination of a jump (an empty cell):
+   * search for valid source for the jump
+   * collect the jumped cells along the way" ;; TODO - Separate this? (could be faster)
   [board [x-init y-init :as destination] [dx dy]]
   (loop [x (+ x-init dx)
          y (+ y-init dy)
@@ -46,11 +48,11 @@
          taken []]
     (let [cell (aboard-cell-at board x y)]
       (cond
-        (is-not-convertible? cell) nil                            ;; No move: reached end and only 1 type of cell
-        (and looser (not= looser cell)) {:winner cell             ;; Who wins the cells
-                                         :looser looser           ;; Who looses the cells
-                                         :destination destination ;; The move performed
-                                         :taken taken}            ;; The cells taken
+        (block-jump? cell) nil
+        (and looser (not= looser cell)) {:winner cell
+                                         :looser looser
+                                         :destination destination
+                                         :taken taken}
         :else (recur
                 (+ x dx)
                 (+ y dy)
@@ -62,7 +64,7 @@
   "Provides the list of moves that can be done from a cell"
   [board point]
   (eduction
-    (keep #(available-cells-by-dir board point %))
+    (keep #(seek-jump-source-toward board point %))
     cst/directions))
 
 (defn- empty-cell-conversion

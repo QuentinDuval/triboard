@@ -135,7 +135,7 @@
     (let [new-game (game/play-at old-game coord)]
       (or
         (= old-game new-game)
-        (= old-game (game/undo-player-move new-game (fn [_] false)))
+        (= old-game (game/undo-player-move new-game (fn [_] false))) ;; TODO
         ))))
 
 (defspec try-move-from-valid-game 100
