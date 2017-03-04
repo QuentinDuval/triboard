@@ -2,6 +2,7 @@
   (:require
     [cljs.spec :as s :include-macros true]
     [triboard.logic.board :as board]
+    [triboard.logic.player :as player]
     [triboard.logic.turn :as turn]))
 
 
@@ -32,8 +33,8 @@
 
 (defn undo-player-move
   "Cancel the last player move, getting back to the previous player move"
-  [game is-ai?]
-  (let [new-game (drop-while #(is-ai? (:player %)) (drop 1 game))]
+  [game]
+  (let [new-game (drop-while #(player/is-ai? (:player %)) (drop 1 game))]
     (if (empty? new-game)
       (take-last 1 game)
       new-game)))
