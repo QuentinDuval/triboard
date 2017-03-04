@@ -102,7 +102,7 @@
 #_(
     (deftest board-test
       (is (check-spec-test (stest/check `board/empty-cells)))
-      (is (check-spec-test (stest/check `board/to-iterable))))
+      (is (check-spec-test (stest/check `board/to-seq))))
 
     (deftest scores-test
       (is (check-spec-test (stest/check `scores/update-scores))))

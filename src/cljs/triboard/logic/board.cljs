@@ -70,7 +70,7 @@
 (s/fdef new-board
   :ret ::board)
 
-(s/fdef to-iterable
+(s/fdef to-seq
   :args (s/cat :board ::board)
   :ret (s/every (s/tuple ::coord ::player/cell)))
 
@@ -98,7 +98,7 @@
 
 (def get-cell-at get-in)                                    ;; TODO - instance of lookup
 
-(defn to-iterable                                           ;; TODO - instance of seq
+(defn to-seq                                                ;; TODO - instance of seq
   "Access to the board as a list of coordinates with corresponding owner"
   [board]
   (for [coord coordinates] [coord (get-cell-at board coord)]))

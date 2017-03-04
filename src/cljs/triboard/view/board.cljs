@@ -37,7 +37,7 @@
   [board suggestions cb]
   (into
     (empty-svg-board)
-    (for [[position cell] (board/to-iterable board)]
+    (for [[position cell] (board/to-seq board)]
       ^{:key position}
       (if (= :empty cell)
         [empty-cell position cb
