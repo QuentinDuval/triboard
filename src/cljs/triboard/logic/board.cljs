@@ -52,7 +52,7 @@
 ;; Public API
 ;; -----------------------------------------
 
-(defn convert-cell
+(defn convert-cell                                          ;; TODO -instance of assoc
   [board coord owner]
   (assoc-in board coord owner))
 
@@ -65,7 +65,7 @@
       (fn [board [coord owner]] (convert-cell board coord owner))
       empty-board updates)))
 
-(def get-cell-at get-in)
+(def get-cell-at get-in)                                    ;; TODO - instance of lookup
 
 (defn to-iterable                                           ;; TODO - instance of seq
   "Access to the board as a list of coordinates with corresponding owner"

@@ -40,8 +40,8 @@
 
   :cljsbuild {:builds
               [{:id "app"
-                :source-paths ["src/cljs" "src/cljc"]
-
+                :source-paths ["src/cljs" "src/cljc"
+                               "test/cljs"]
                 :figwheel true
                 ;; Alternatively, you can configure a function to run every time figwheel reloads.
                 ;; :figwheel {:on-jsload "triboard.core/on-figwheel-reload"}
