@@ -29,7 +29,7 @@
 
 (defn play-moves
   [init-game moves]
-  (reduce game/play-move init-game moves))
+  (reduce game/play-at init-game moves))
 
 (defn current-score
   [game]
@@ -123,7 +123,7 @@
 (defn game-move-properties
   [old-game]
   (prop/for-all [coord coord-gen]
-    (let [new-game (game/play-move old-game coord)]
+    (let [new-game (game/play-at old-game coord)]
       (or
         (= old-game new-game)                               ;; TODO - test contained in empty cells
         (valid-game-transition? old-game new-game coord)
@@ -132,7 +132,7 @@
 (defn game-undo-properties
   [old-game]
   (prop/for-all [coord coord-gen]
-    (let [new-game (game/play-move old-game coord)]
+    (let [new-game (game/play-at old-game coord)]
       (or
         (= old-game new-game)
         (= old-game (game/undo-player-move new-game (fn [_] false)))

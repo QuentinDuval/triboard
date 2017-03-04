@@ -21,12 +21,13 @@
   [game]
   (first game))
 
-(defn play-move
+(defn play-at
   "Play a move, adding a new turn into the game"
   [game coord]
-  (let [curr-turn (current-turn game)]
-    (if-let [next-turn (turn/play-move curr-turn coord)]
-      (conj game next-turn)
+  (let [curr-turn (current-turn game)
+        transitions (turn/player-transitions curr-turn)]
+    (if-let [transition (get transitions coord)]
+      (conj game (turn/next-turn curr-turn transition))
       game)))
 
 (defn undo-player-move

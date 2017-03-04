@@ -60,7 +60,7 @@
     (min-max-step ai turn
       (fn look-lower [_ transition]
         (tree-score ai
-          (turn/apply-transition turn transition)
+          (turn/next-turn turn transition)
           (dec depth))))
     ))
 
@@ -70,7 +70,7 @@
     (min-max-step-by
       second ai turn
       (fn [coord transition]
-        (let [new-turn (turn/apply-transition turn transition)]
+        (let [new-turn (turn/next-turn turn transition)]
           [coord (tree-score ai new-turn 1)]))
       )))
 
@@ -91,7 +91,7 @@
   (let [turn (game/current-turn game)
         hard-mode? (is-player-first? (:scores turn))
         ai ((if hard-mode? make-cheating-ai make-ai) (:player turn))]
-    (game/play-move game (best-move ai turn))))
+    (game/play-at game (best-move ai turn))))
 
 
 ;; -----------------------------------------

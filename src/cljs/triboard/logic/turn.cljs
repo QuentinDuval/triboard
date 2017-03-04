@@ -47,19 +47,13 @@
   :args (s/cat :turn ::board/coord)
   :ret ::turn)
 
-(defn apply-transition
+(defn next-turn
   "Apply the transtion to the current turn, yielding a new turn"
   [turn transition]
   (-> turn
     (update :board transition/apply-transition transition)
     (update :scores scores/update-scores transition)
-    (with-next-player)))
-
-(defn play-move
-  "On player playing the move [x y] - update all the game state accordingly"
-  [{:keys [player board] :as turn} coord]
-  (if-let [transitions (get-in turn [:transitions player coord])]
-    (apply-transition turn transitions)))
+    with-next-player))
 
 (defn player-transitions
   "Return the transitions available for the next player"
