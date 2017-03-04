@@ -61,7 +61,7 @@
 (def coord-gen (s/gen ::board/coord))
 
 (def initial-empty-cell-count
-  (- (* cst/board-width cst/board-height) (* 4 cst/init-block-count)))
+  (- (* board/board-width board/board-height) (* 4 cst/init-block-count)))
 
 (def game-gen
   (gen/fmap

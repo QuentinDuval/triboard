@@ -10,9 +10,18 @@
 ;; Private
 ;; -----------------------------------------
 
+(def board-width 16)
+(def board-height 11)
+
+(def coordinates
+  (vec
+    (for [x (range board-width)
+          y (range board-height)]
+      [x y])))
+
 (def empty-board
-  (let [column (vec (repeat cst/board-height :empty))]
-    (vec (repeat cst/board-width column))))
+  (let [column (vec (repeat board-height :empty))]
+    (vec (repeat board-width column))))
 
 (defn pick-n-cells-for-each-player
   "Pick N initial positions for each player and the walls"
@@ -25,7 +34,7 @@
 ;; Public Types
 ;; -----------------------------------------
 
-(s/def ::coord (set cst/all-positions))
+(s/def ::coord (set coordinates))
 (s/def ::board (s/every (s/every ::player/cell :count 11) :count 16))
 
 (s/fdef new-board
@@ -51,7 +60,7 @@
 (defn new-board
   "Creates a new board with initial positions of each players"
   []
-  (let [positions (shuffle cst/all-positions)
+  (let [positions (shuffle coordinates)
         updates (pick-n-cells-for-each-player cst/init-block-count positions)]
     (reduce
       (fn [board [coord owner]] (convert-cell board coord owner))
@@ -59,17 +68,17 @@
 
 (def get-cell-at get-in)
 
-(defn to-iterable  ;; TODO - instance of seq
+(defn to-iterable                                           ;; TODO - instance of seq
   "Access to the board as a list of coordinates with corresponding owner"
   [board]
-  (for [coord cst/all-positions] [coord (get-cell-at board coord)]))
+  (for [coord coordinates] [coord (get-cell-at board coord)]))
 
 (defn empty-cells
   "Access to the empty cells of the board as a list of coordinates"
   [board]
   (eduction
     (filter #(= (get-cell-at board %) :empty))
-    cst/all-positions))
+    coordinates))
 
 (defn board->array
   "Converts the board into a JavaScript array (for performance)"

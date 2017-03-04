@@ -1,10 +1,8 @@
 (ns triboard.view.board
   (:require
-    [triboard.logic.board :as model]
-    [triboard.logic.constants :as cst]
+    [triboard.logic.board :as board]
     [triboard.view.callbacks :as cb]
-    [triboard.view.utils :as vutils]
-    ))
+    [triboard.view.utils :as vutils]))
 
 
 ;; ----------------------------------------------------------------------------
@@ -27,7 +25,7 @@
 
 (defn- empty-svg-board []
   [:svg.board
-   {:view-box (str "0 0 " cst/board-width " " cst/board-height)
+   {:view-box (str "0 0 " board/board-width " " board/board-height)
     :style {:max-height (str (vutils/max-board-height) "px")}}])
 
 
@@ -39,7 +37,7 @@
   [board suggestions cb]
   (into
     (empty-svg-board)
-    (for [[position cell] (model/to-iterable board)]
+    (for [[position cell] (board/to-iterable board)]
       ^{:key position}
       (if (= :empty cell)
         [empty-cell position cb
