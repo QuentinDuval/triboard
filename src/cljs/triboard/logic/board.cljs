@@ -47,12 +47,17 @@
   (-seq [board]
     (for [coord coordinates]
       [coord (get-in (.-grid board) coord)]))
-  )
+
+  Object
+  (toString [board]
+    (.toString (.-grid board))
+    ))
+
 
 #_(defn test-board-type
   []
   (let [b (Board. empty-board)]
-    (println b)
+    (println (str b))
     (println (get b [0 0]))
     (println (contains? b [0 0]))
     (println (get (assoc b [0 0] :wall) [0 0]))
