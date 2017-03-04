@@ -3,6 +3,7 @@
     [cljs.spec :as s :include-macros true]
     [triboard.logic.constants :as cst]
     [triboard.logic.player :as player]
+    [triboard.utils.algo :as algo]
     ))
 
 
@@ -10,24 +11,22 @@
 ;; Private
 ;; -----------------------------------------
 
-(def board-width 16)
-(def board-height 11)
+(def width 16)
+(def height 11)
 
 (def coordinates
-  (vec
-    (for [x (range board-width)
-          y (range board-height)]
-      [x y])))
+  (for [x (range width) y (range height)] [x y]))
 
 (def empty-board
-  (let [column (vec (repeat board-height :empty))]
-    (vec (repeat board-width column))))
+  (let [empty-column (vec (repeat height :empty))]
+    (vec (repeat width empty-column))))
 
 (defn pick-n-cells-for-each-player
   "Pick N initial positions for each player and the walls"
   [n positions]
-  (let [tiles (conj player/all :wall)]
-    (map vector positions (mapcat #(repeat n %) tiles))))
+  (algo/zip
+    positions
+    (mapcat #(repeat n %) (conj player/all :wall))))
 
 
 ;; -----------------------------------------

@@ -33,7 +33,7 @@
 
 (defn- aboard-cell-at
   [board x y]
-  (if (and (< -1 x board/board-width) (< -1 y board/board-height))
+  (if (and (< -1 x board/width) (< -1 y board/height))
     (aget board x y)
     :wall))
 

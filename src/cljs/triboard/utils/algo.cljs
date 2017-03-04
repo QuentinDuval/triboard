@@ -22,3 +22,8 @@
         (transient {})
         coll))
     ))
+
+(defn zip
+  "Create a sequence of tuples, each element being drawn from one collection"
+  [& colls]
+  (apply map vector colls))

@@ -25,7 +25,7 @@
 ;; Utils
 ;; ----------------------------------------------------------------------------
 
-(def max-score (- (* board/board-width board/board-height) cst/init-block-count))
+(def max-score (- (* board/width board/height) cst/init-block-count))
 
 (defn play-moves
   [init-game moves]
@@ -63,7 +63,7 @@
 (def coord-gen (s/gen ::board/coord))
 
 (def initial-empty-cell-count
-  (- (* board/board-width board/board-height) (* 4 cst/init-block-count)))
+  (- (* board/width board/height) (* 4 cst/init-block-count)))
 
 (def game-gen
   (gen/fmap
