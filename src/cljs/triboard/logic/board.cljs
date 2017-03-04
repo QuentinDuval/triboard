@@ -44,25 +44,22 @@
 ;; Public API
 ;; -----------------------------------------
 
-(defn update-cells
-  "Updates the cells at the provided positions"
-  [initial-board updates]
-  (reduce
-    (fn [board [coord color]] (assoc-in board coord color))
-    initial-board
-    updates))
+(defn convert-cell
+  [board coord owner]
+  (assoc-in board coord owner))
 
 (defn new-board
   "Creates a new board with initial positions of each players"
   []
-  (->>
-    (shuffle cst/all-positions)
-    (pick-n-cells-for-each-player cst/init-block-count)
-    (update-cells empty-board)))
+  (let [positions (shuffle cst/all-positions)
+        updates (pick-n-cells-for-each-player cst/init-block-count positions)]
+    (reduce
+      (fn [board [coord owner]] (convert-cell board coord owner))
+      empty-board updates)))
 
 (def get-cell-at get-in)
 
-(defn to-iterable
+(defn to-iterable  ;; TODO - instance of seq
   "Access to the board as a list of coordinates with corresponding owner"
   [board]
   (for [coord cst/all-positions] [coord (get-cell-at board coord)]))

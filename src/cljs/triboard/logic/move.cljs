@@ -75,9 +75,8 @@
 
 (defn- apply-conversion
   "Apply a move onto the board, yielding a new board"
-  [board move]
-  (let [updates (map vector (:taken move) (repeat (:winner move)))]
-    (board/update-cells board updates)))
+  [board {:keys [winner taken]}]
+  (reduce #(board/convert-cell %1 %2 winner) board taken))
 
 (defn conversions->transition
   [conversions]
@@ -85,7 +84,7 @@
     (conj conversions (empty-cell-conversion winner point))
     conversions))
 
-(defn- map-game-tree
+(defn- map-transition-tree
   [xf game-tree]
   (algo/map-values #(algo/map-values xf %) game-tree))
 
@@ -100,7 +99,7 @@
 (defn all-transitions
   [board]
   (let [aboard (board/board->array board)]
-    (map-game-tree
+    (map-transition-tree
       conversions->transition
       (transduce
         (mapcat #(available-conversions-at aboard %))
@@ -121,7 +120,7 @@
     (time (dotimes [i 100]
             (all-transitions b)
             ))
-    #_(time (dotimes [i 100]
-              (doall (map #(apply-transition b %) (all-transitions b)))
-              ))
+    (time (dotimes [i 100]
+            (doall (map #(apply-transition b %) (all-transitions b)))
+            ))
     ))
