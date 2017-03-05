@@ -105,9 +105,11 @@
     (map-transition-tree
       add-destination
       (transduce
-        (mapcat #(available-jumps-at aboard %))
+        (comp
+          (filter (fn [[x y]] (= :none (aget aboard x y))))
+          (mapcat #(available-jumps-at aboard %)))
         (algo/group-by-reducer :winner :destination)
-        (board/empty-cells board)))))
+        board/coordinates))))
 
 (defn apply-transition
   [board transition]

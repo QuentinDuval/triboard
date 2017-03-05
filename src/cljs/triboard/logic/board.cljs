@@ -79,10 +79,6 @@
   :args (s/cat :board ::board)
   :ret (s/every (s/tuple ::coord ::player/cell)))
 
-(s/fdef empty-cells
-  :args (s/cat :board ::board)
-  :ret (partial every? #(s/valid? ::coord %)))              ;; TODO - Fails with coll-of ::coord or s/every. WHY?
-
 
 ;; -----------------------------------------
 ;; Public API
@@ -107,13 +103,6 @@
   "Access to the board as a list of coordinates with corresponding owner"
   [board]
   (for [coord coordinates] [coord (get-cell-at board coord)]))
-
-(defn empty-cells
-  "Access to the empty cells of the board as a list of coordinates"
-  [board]
-  (eduction
-    (filter #(= (get-cell-at board %) :none))
-    coordinates))
 
 (defn board->array
   "Converts the board into a JavaScript array (for performance)"
