@@ -128,6 +128,7 @@
     ;; The add-destination removal makes us gain around 50 ms
     ;; Getting rid of the systematic conj wins about 10 ms
     ;; One dimentional arrow could gain us only 2-3 ms
+    ;; empty-cells is super slow: 36 ms.
     (time (dotimes [i 100]
             (doall
               (map
