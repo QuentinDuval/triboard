@@ -39,9 +39,9 @@
     (empty-svg-board)
     (for [[position cell] (board/to-seq board)]
       ^{:key position}
-      (if (= :empty cell)
+      (if (= :none cell)
         [empty-cell position cb
          (if (and suggestions (suggestions position))       ;; Avoids crash !
-           :help :empty)]
+           :help :none)]
         [rect-cell position cell])
       )))

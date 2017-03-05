@@ -39,4 +39,4 @@
 (defn update-scores
   "Update the scoring based on the provided transition"
   [scores transition]
-  (dissoc (reduce update-from-jump scores transition) :empty))
+  (dissoc (reduce update-from-jump scores transition) :none))

@@ -27,7 +27,7 @@
 
 (defn- ^boolean block-jump?
   [cell]
-  (or (= cell :empty) (= cell :wall)))
+  (or (= cell :none) (= cell :wall)))
 
 (defn- ^boolean is-source?
   [looser cell]
@@ -73,7 +73,7 @@
   [player destination]
   {:destination destination
    :winner player
-   :looser :empty
+   :looser :none
    :taken [destination]})
 
 (defn- apply-jump

@@ -18,7 +18,7 @@
   (for [x (range width) y (range height)] [x y]))
 
 (def empty-board
-  (let [empty-column (vec (repeat height :empty))]
+  (let [empty-column (vec (repeat height :none))]
     (vec (repeat width empty-column))))
 
 (defn pick-n-cells-for-each-player
@@ -112,7 +112,7 @@
   "Access to the empty cells of the board as a list of coordinates"
   [board]
   (eduction
-    (filter #(= (get-cell-at board %) :empty))
+    (filter #(= (get-cell-at board %) :none))
     coordinates))
 
 (defn board->array

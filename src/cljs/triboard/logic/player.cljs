@@ -7,12 +7,12 @@
 (def all [:blue :red :green])
 
 (def player? (set all))
-(def cell? (conj player? :wall :empty))
+(def cell? (conj player? :wall :none))
 (def is-ai? #{:red :green})
 
 (s/def ::player player?)
 (s/def ::cell cell?)
-(s/def ::playable-cell (conj player? :empty))
+(s/def ::playable-cell (conj player? :none))
 
 (defn next-one
   [player]
