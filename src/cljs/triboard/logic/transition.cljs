@@ -121,7 +121,7 @@
   []
   (let [b (board/new-board)
         t (all-transitions b)]
-    (time (dotimes [i 100] (all-transitions b)))
+    (time (dotimes [i 100] (all-transitions b))) ;; TODO - 12300 turns in loop (55 ms for a transduce)
     (time (dotimes [i 100]
             (doall
               (map
