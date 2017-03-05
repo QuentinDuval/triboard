@@ -12,14 +12,19 @@
 ;; Private
 ;; -----------------------------------------
 
+(defn- who-can-play
+  "Given the current player and the transitions for the next turn,
+   returns the next player that has at least one transition available"
+  [player transitions]
+  (filter #(contains? transitions %) (player/next-three player)))
+
 (defn- with-next-player
   "Complete the turn to compute to find the next player than can act
    * Requires to look-ahead for the next possible transitions
    * To save computation, keep this look-ahead available"
   [{:keys [board player] :as turn}]
   (let [transitions (transition/all-transitions board)
-        who-can-play (filter #(get transitions %) (player/next-three player))
-        next-player (first who-can-play)]
+        next-player (first (who-can-play player transitions))]
     (-> turn
       (assoc :transitions (get transitions next-player))
       (assoc :player next-player)
