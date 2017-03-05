@@ -121,11 +121,16 @@
 
 (defn benchmark
   []
-  (let [b (board/new-board)]
+  (let [b (board/new-board)
+        t (all-transitions b)]
     (time (dotimes [i 100]
             (all-transitions b)
             ))
     (time (dotimes [i 100]
-            (doall (map #(apply-transition b %) (all-transitions b)))
+            (doall
+              (map
+                #(apply-transition b (second %))
+                (mapcat #(get t %) [:blue :red :green])
+                ))
             ))
     ))
