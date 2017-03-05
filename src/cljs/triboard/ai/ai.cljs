@@ -79,7 +79,7 @@
 ;; -----------------------------------------
 
 (s/fdef play-best-move
-  :args (s/tuple ::game/game)
+  :args ::game/game
   :ret ::game/game)
 
 (defn- is-player-first?

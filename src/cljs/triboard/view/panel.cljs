@@ -1,7 +1,6 @@
 (ns triboard.view.panel
   (:require
     [clojure.string :as str]
-    [cljs.spec :as s]
     [triboard.logic.player :as player]
     [triboard.view.callbacks :as cb]
     [triboard.view.utils :as vutils]
@@ -39,9 +38,6 @@
 ;; ----------------------------------------------------------------------------
 ;; Public
 ;; ----------------------------------------------------------------------------
-
-(s/fdef show-scores
-  :args (s/tuple #(every? % player/all)))
 
 (defn show-top-panel
   "Show the top panel of the game that contains

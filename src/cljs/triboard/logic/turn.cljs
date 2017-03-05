@@ -4,8 +4,7 @@
     [triboard.logic.board :as board]
     [triboard.logic.transition :as transition]
     [triboard.logic.player :as player]
-    [triboard.logic.scores :as scores]
-    ))
+    [triboard.logic.scores :as scores]))
 
 
 ;; -----------------------------------------
@@ -18,10 +17,11 @@
    * To save computation, keep this look-ahead available"
   [{:keys [board player] :as turn}]
   (let [transitions (transition/all-transitions board)
-        who-can-play (filter #(get transitions %) (player/next-three player))]
+        who-can-play (filter #(get transitions %) (player/next-three player))
+        next-player (first who-can-play)]
     (-> turn
-      (assoc :transitions transitions)
-      (assoc :player (first who-can-play))
+      (assoc :transitions (get transitions next-player))
+      (assoc :player next-player)
       )))
 
 
@@ -29,11 +29,14 @@
 ;; Public API
 ;; -----------------------------------------
 
+(s/def ::transitions
+  ::transition/coord->transition)
+
 (s/def ::turn
   (s/keys :req-un
     [::board/board
      ::player/player
-     ::transition/transitions
+     ::transitions
      ::scores/scores]))
 
 (defn new-init-turn []
@@ -44,7 +47,7 @@
      :scores scores/initial-scores}))
 
 (s/fdef next-turn
-  :args (s/cat ::turn ::board/coord)
+  :args (s/cat :turn ::turn :transition ::transition/transition)
   :ret ::turn)
 
 (defn next-turn
@@ -58,4 +61,4 @@
 (defn player-transitions
   "Return the transitions available for the next player"
   [turn]
-  (get-in turn [:transitions (:player turn)]))
+  (:transitions turn))

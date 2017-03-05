@@ -1,21 +1,21 @@
 (ns triboard.view.frame
   (:require
     [cljs.spec :as s]
-    [triboard.logic.game :as game]
+    [triboard.logic.turn :as turn]
     [triboard.view.board :as board]
     [triboard.view.callbacks :as cb]
     [triboard.view.panel :as panel]
     ))
 
-(s/fdef main-frame
-  :args (s/tuple
-          ::game/game-state
-          (s/fspec :args (s/tuple ::board/coord) :ret any?)
-          #(satisfies? cb/CallBacks %)))
+#_(s/fdef main-frame
+  :args (s/cat
+          :turn ::turn/turn
+          :suggestion fn?
+          :callback #(satisfies? cb/CallBacks %)))
 
 (defn main-frame
-  [game-state suggestions interactions]
+  [turn suggestions interactions]
   [:div.game-panel
-   [panel/show-top-panel (:scores game-state) (:player game-state) interactions]
-   [board/render-board (:board game-state) suggestions interactions]
+   [panel/show-top-panel (:scores turn) (:player turn) interactions]
+   [board/render-board (:board turn) suggestions interactions]
    ])

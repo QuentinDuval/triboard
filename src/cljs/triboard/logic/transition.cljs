@@ -17,10 +17,8 @@
 (s/def ::looser ::player/playable-cell)
 (s/def ::jump (s/keys :req-un [::destination ::taken ::winner ::looser]))
 (s/def ::transition (s/every ::jump))
-
-(s/def ::transitions
-  (s/map-of ::player/player
-    (s/map-of ::destination ::transition)))
+(s/def ::coord->transition (s/map-of ::destination ::transition))
+(s/def ::all-transitions (s/map-of ::player/player ::coord->transition))
 
 
 ;; -----------------------------------------
@@ -99,7 +97,7 @@
 
 (s/fdef available-transitions
   :args (s/tuple ::board/board)
-  :ret ::transitions)
+  :ret ::all-transitions)
 
 (defn all-transitions
   [board]

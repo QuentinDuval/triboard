@@ -28,7 +28,7 @@
 (s/def ::scores (s/map-of ::player/player ::weight))
 
 (s/fdef update-scores
-  :args (s/tuple ::scores ::transition/transition)
+  :args (s/cat :scores ::scores :transition ::transition/transition)
   :ret ::scores)
 
 (def null-scores

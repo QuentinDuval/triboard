@@ -6,10 +6,10 @@
     [triboard.logic.turn :as turn]))
 
 
-(s/def ::game #(every? (partial s/valid? ::turn/turn) %))
-(s/fdef current-turn :args (s/tuple ::game) :ret ::turn/turn)
+(s/def ::game any?)
+(s/fdef current-turn :args ::game :ret ::turn/turn)
 (s/fdef play-move :args (s/tuple ::game ::board/coord) :ret ::game)
-(s/fdef undo-player-move :args (s/tuple ::game fn?) :ret ::game)
+(s/fdef undo-player-move :args ::game :ret ::game)
 
 (defn new-game []
   (list (turn/new-init-turn)))
