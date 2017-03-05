@@ -91,7 +91,9 @@
   (let [turn (game/current-turn game)
         hard-mode? (is-player-first? (:scores turn))
         ai ((if hard-mode? make-cheating-ai make-ai) (:player turn))]
-    (game/play-at game (best-move ai turn))))
+    (game/play-at game
+      (time (best-move ai turn)) ;; TODO - Remove time
+      )))
 
 
 ;; -----------------------------------------
