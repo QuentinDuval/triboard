@@ -53,7 +53,7 @@
   (-> turn
     (update :board transition/apply-transition transition)
     (update :scores scores/update-scores transition)
-    with-next-player))
+    (with-next-player)))
 
 (defn player-transitions
   "Return the transitions available for the next player"
