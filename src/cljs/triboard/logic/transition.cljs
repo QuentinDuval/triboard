@@ -121,7 +121,9 @@
   []
   (let [b (board/new-board)
         t (all-transitions b)]
-    (time (dotimes [i 100] (all-transitions b))) ;; TODO - 12300 turns in loop (55 ms for a transduce)
+    (time (dotimes [i 100] (all-transitions b)))
+    ;; TODO - 12300 turns in loop (55 ms for a transduce) => need better algo
+    ;; The add-destination removal makes us gain around 50 ms
     (time (dotimes [i 100]
             (doall
               (map
