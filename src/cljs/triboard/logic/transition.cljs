@@ -129,8 +129,7 @@
     ;; TODO - 12300 turns in loop (55 ms for a transduce) => need better algo
     ;; The add-destination removal makes us gain around 50 ms
     ;; Getting rid of the systematic conj does not win anything
-    ;; One dimentional arrow could gain us only 2-3 ms
-    ;; empty-cells is super slow: 36 ms.
+    ;; One dimentional array could gain us only 2-3 ms
     (time (dotimes [i 100]
             (doall
               (map
