@@ -33,6 +33,8 @@
 
 ;; -----------------------------------------
 
+;; TODO - Try to develop a transducer for min-max
+
 (defn- min-max-step-with
   [min-fn max-fn ai turn on-transition]
   (apply
