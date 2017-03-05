@@ -95,8 +95,8 @@
 ;; Public API
 ;; -----------------------------------------
 
-(s/fdef available-transitions
-  :args (s/tuple ::board/board)
+(s/fdef all-transitions
+  :args (s/cat :board ::board/board)
   :ret ::all-transitions)
 
 (defn all-transitions
