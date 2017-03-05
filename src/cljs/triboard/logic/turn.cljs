@@ -2,6 +2,7 @@
   (:require
     [cljs.spec :as s :include-macros true]
     [triboard.logic.board :as board]
+    [triboard.logic.constants :as cst]
     [triboard.logic.transition :as transition]
     [triboard.logic.player :as player]
     [triboard.logic.scores :as scores]))
@@ -44,7 +45,7 @@
     {:board (board/new-board)
      :player (rand-nth player/all)
      :transitions {}
-     :scores scores/initial-scores}))
+     :scores (scores/initial-scores cst/init-block-count)}))
 
 (s/fdef next-turn
   :args (s/cat :turn ::turn :transition ::transition/transition)

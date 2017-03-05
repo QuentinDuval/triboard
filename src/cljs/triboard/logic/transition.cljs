@@ -63,9 +63,9 @@
 
 (defn- available-jumps-at
   "Provides the list of moves that can be done from a cell"
-  [board point]
+  [board destination]
   (eduction
-    (keep #(seek-jump-source-toward board point %))
+    (keep #(seek-jump-source-toward board destination %))
     cst/directions))
 
 (defn- add-destination-jump

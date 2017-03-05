@@ -1,7 +1,6 @@
 (ns triboard.logic.scores
   (:require
     [cljs.spec :as s :include-macros true]
-    [triboard.logic.constants :as cst]
     [triboard.logic.transition :as transition]
     [triboard.logic.player :as player]
     ))
@@ -17,7 +16,7 @@
     (-> scores
       (update (:winner jump) + delta)
       (update (:looser jump) - delta)
-      (dissoc :empty))))
+      )))
 
 
 ;; ----------------------------------------------------------------------------
@@ -31,15 +30,13 @@
   :args (s/cat :scores ::scores :transition ::transition/transition)
   :ret ::scores)
 
-(def null-scores
-  {:blue 0 :red 0 :green 0})
-
-(def initial-scores
-  {:blue cst/init-block-count
-   :red cst/init-block-count
-   :green cst/init-block-count})
+(defn initial-scores
+  [score-val]
+  {:blue score-val
+   :red score-val
+   :green score-val})
 
 (defn update-scores
   "Update the scoring based on the provided transition"
   [scores transition]
-  (reduce update-from-jump scores transition))
+  (dissoc (reduce update-from-jump scores transition) :empty))
