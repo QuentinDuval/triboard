@@ -34,7 +34,7 @@
 (defn undo-player-move
   "Cancel the last player move, getting back to the previous player move"
   [game]
-  (let [new-game (drop-while #(player/is-ai? (:player %)) (drop 1 game))]
+  (let [new-game (drop-while (comp player/is-ai? :player) (drop 1 game))]
     (if (empty? new-game)
       (take-last 1 game)
       new-game)))
