@@ -42,12 +42,12 @@
 ;; Public API (updates)
 ;; -----------------------------------------
 
-(s/def ::game-event
+#_(s/def ::game-event
   (s/or
     :no-params (s/tuple #{:new-game :toggle-help :restart :undo :ai-play})
     :player-move (s/tuple #{:player-move} ::board/coord)))
 
-(s/fdef send-event! :args (s/tuple ::game-event))
+#_(s/fdef send-event! :args (s/tuple ::game-event))
 
 (defn- send-event!
   [msg]

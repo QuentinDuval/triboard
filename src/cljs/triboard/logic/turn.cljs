@@ -43,8 +43,8 @@
      :transitions {}
      :scores scores/initial-scores}))
 
-(s/fdef play-transition
-  :args (s/cat :turn ::board/coord)
+(s/fdef next-turn
+  :args (s/cat ::turn ::board/coord)
   :ret ::turn)
 
 (defn next-turn
