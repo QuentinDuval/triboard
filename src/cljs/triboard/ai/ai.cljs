@@ -33,18 +33,22 @@
 
 ;; -----------------------------------------
 
-(defn- min-max-step-by
-  [compare-key ai turn on-transition]
+(defn- min-max-step-with
+  [min-fn max-fn ai turn on-transition]
   (apply
-    (if (maximizing-turn? ai turn) max-key min-key)
-    compare-key
+    (if (maximizing-turn? ai turn) max-fn min-fn)
     (map
       (fn [[coord transition]] (on-transition coord transition))
       (turn/player-transitions turn))))
 
+(defn- min-max-step-by
+  [key-fn ai turn on-transition]
+  (min-max-step-with
+    #(min-key key-fn %) #(max-key key-fn %) ai turn on-transition))
+
 (defn- min-max-step
   [ai turn on-transition]
-  (min-max-step-by identity ai turn on-transition))         ;; TODO - avoid projection
+  (min-max-step-with min max ai turn on-transition))
 
 ;; -----------------------------------------
 
