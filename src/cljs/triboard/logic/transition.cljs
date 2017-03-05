@@ -121,9 +121,7 @@
   []
   (let [b (board/new-board)
         t (all-transitions b)]
-    (time (dotimes [i 100]
-            (all-transitions b)
-            ))
+    (time (dotimes [i 100] (all-transitions b)))
     (time (dotimes [i 100]
             (doall
               (map
