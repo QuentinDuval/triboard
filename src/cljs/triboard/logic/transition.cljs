@@ -117,13 +117,17 @@
 ;; TESTS
 ;; -----------------------------------------
 
+(defonce benchmark-board (board/new-board))
+
 (defn benchmark
   []
-  (let [b (board/new-board)
+  (let [b benchmark-board
         t (all-transitions b)]
     (time (dotimes [i 100] (all-transitions b)))
     ;; TODO - 12300 turns in loop (55 ms for a transduce) => need better algo
     ;; The add-destination removal makes us gain around 50 ms
+    ;; Getting rid of the systematic conj wins about 10 ms
+    ;; One dimentional arrow could gain us only 2-3 ms
     (time (dotimes [i 100]
             (doall
               (map
