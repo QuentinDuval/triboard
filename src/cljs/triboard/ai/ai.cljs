@@ -92,7 +92,7 @@
         hard-mode? (is-player-first? (:scores turn))
         ai ((if hard-mode? make-cheating-ai make-ai) (:player turn))]
     (game/play-at game
-      (time (best-move ai turn)) ;; TODO - Remove time
+      (time (best-move ai turn)) ;; TODO - Remove time + find a way to correlate with moves + sort then and take best
       )))
 
 
