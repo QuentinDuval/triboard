@@ -68,13 +68,13 @@
     (keep #(seek-jump-source-toward board point %))
     cst/directions))
 
-(defn- empty-cell-conversion
+(defn- add-destination-jump
   "Create a move to take an empty cell"
-  [player point]
-  {:destination point
+  [player destination]
+  {:destination destination
    :winner player
    :looser :empty
-   :taken [point]})
+   :taken [destination]})
 
 (defn- apply-jump
   "Apply a move onto the board, yielding a new board"
@@ -84,7 +84,7 @@
 (defn add-destination
   [jumps]
   (if-let [{:keys [winner destination]} (first jumps)]
-    (conj jumps (empty-cell-conversion winner destination))
+    (conj jumps (add-destination-jump winner destination))
     jumps))
 
 (defn- map-transition-tree
