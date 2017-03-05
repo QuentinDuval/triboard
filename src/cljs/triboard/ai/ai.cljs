@@ -11,6 +11,8 @@
 ;; Private
 ;; -----------------------------------------
 
+(def eval-counter (atom 0))
+
 (defprotocol AIStrategy
   (optimized-score [this scores] "Extract data from the score to compare")
   (maximizing-turn? [this turn] "Indicates whether we are in min or max"))
@@ -48,6 +50,7 @@
 
 (defn- leaf-score
   [ai {:keys [scores] :as turn}]
+  (swap! eval-counter inc)
   (min-max-step ai turn
     (fn look-ahead [_ transition]
       (optimized-score ai (scores/update-scores scores transition))
@@ -86,14 +89,15 @@
   [{:keys [blue red green] :as scores}]
   (and (< red blue) (< green blue)))
 
-(defn- play-best-move
+(defn play-best-move
   [game]
+  (reset! eval-counter 0)
   (let [turn (game/current-turn game)
         hard-mode? (is-player-first? (:scores turn))
-        ai ((if hard-mode? make-cheating-ai make-ai) (:player turn))]
-    (game/play-at game
-      (time (best-move ai turn)) ;; TODO - Remove time + find a way to correlate with moves + sort then and take best
-      )))
+        ai ((if hard-mode? make-cheating-ai make-ai) (:player turn))
+        m (time (best-move ai turn))]  ;; TODO - Remove time + find a way to correlate with moves + sort then and take best
+    (js/console.log @eval-counter)
+    (game/play-at game m)))
 
 
 ;; -----------------------------------------
