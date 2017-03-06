@@ -37,19 +37,10 @@
   [x y]
   (and (< -1 x board/width) (< -1 y board/height)))
 
-;; TODO - Completely change the algorithm (solution 1):
-;; - We only need one pass... for each dimention
-;; - partition-by to get the zones of same color
-;; - partition size 3 step 1 to get the surroundings
-;; - filter on "one side exactly is :none" and you get the jumps
-
-;; TODO - Completely change the algorithm (solution 2):
-;; Search from the cells owned by a player... allows more incremental mode
-
 (defn- seek-jump-source-toward
   "Starting from the destination of a jump (an empty cell):
    * Search for valid source for the jump
-   * Collect the jumped cells along the way"                ;; TODO - Separate this? (could be faster)
+   * Collect the jumped cells along the way"
   [board [x-init y-init :as destination] [dx dy]]
   (loop [x (+ x-init dx)
          y (+ y-init dy)
@@ -135,7 +126,7 @@
   (let [b benchmark-board
         t (all-transitions b)]
     (time (dotimes [i 100] (all-transitions b)))
-    ;; TODO - 12300 turns in loop (55 ms for a transduce) => need better algo
+    ;; TODO - 122700 turns in loop for 100 iterations (6.5 ms for a transduce) => need better algo
     ;; The add-destination removal makes us gain around 50 ms
     ;; Getting rid of the systematic conj does not win anything
     ;; One dimentional array could gain us only 2-3 ms
@@ -147,3 +138,80 @@
                 ))
             ))
     ))
+
+;; -----------------------------------------
+;; Random experiments
+;; -----------------------------------------
+
+;; TODO - Completely change the algorithm (solution 1):
+;; - We only need one pass... for each dimention
+;; - partition-by to get the zones of same color
+;; - partition size 3 step 1 to get the surroundings
+;; - filter on "one side exactly is :none" and you get the jumps
+
+;; TODO - Completely change the algorithm (solution 2):
+;; Search from the cells owned by a player... allows more incremental mode
+
+
+#_(let [b (board/new-board)]
+    (time
+      (dotimes [i 100]
+        (doall (partition-by
+                 second
+                 (map
+                   (fn [c] [c (board/get-cell-at b c)])
+                   board/coordinates))))))
+
+
+#_(def columns
+  (mapv
+    (fn [x] (mapv vector (repeat x) (range board/height)))
+    (range board/width)))
+
+#_(def rows
+  (apply mapv vector columns))
+
+#_(defn jumpables
+  [board [x-init y-init :as init-coord] [dx dy :as direction]]
+  (loop [prev (board/get-cell-at board init-coord)
+         prev-pos init-coord
+         x (+ x-init dx)
+         y (+ y-init dy)
+         jumps []]
+    (if-not (in-board? x y)
+      jumps
+      (let [curr (board/get-cell-at board [x y])]
+        (if (= curr prev)
+          (recur prev prev-pos (+ x dx) (+ y dy) jumps)
+          (recur curr [x y] (+ x dx) (+ y dy)
+            (conj jumps
+              {:start prev-pos
+               :end [(- x dx) (- y dy)]
+               :owner prev}))
+          ))
+      )))
+
+
+
+#_(defn test-new-algo
+  []
+  (let [b (board/new-board)]
+    (keep (fn [[p c n]]
+            (cond
+              (and (player/player? (:owner p)) (= :none (:owner n)))
+              {:winner (:owner p)
+               :looser (:owner c)
+               :destination (:start n)
+               :taken []}
+
+              (and (player/player? (:owner n)) (= :none (:owner p)))
+              {:winner (:owner n)
+               :looser (:owner c)
+               :destination (:end p)
+               :taken []}
+
+              :else nil)
+            )
+      (partition 3 1 (jumpables b [0 0] [0 1])))
+    ))
+
