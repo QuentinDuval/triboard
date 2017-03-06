@@ -29,40 +29,40 @@
     (mapcat #(repeat n %) (conj player/all :wall))))
 
 #_(deftype Board
-  [grid]
+    [grid]
 
-  ILookup
-  (-lookup
-    [board coord not-found] (get-in (.-grid board) coord not-found))
-  (-lookup
-    [board coord] (-lookup board coord :wall))
+    ILookup
+    (-lookup
+      [board coord not-found] (get-in (.-grid board) coord not-found))
+    (-lookup
+      [board coord] (-lookup board coord :wall))
 
-  IAssociative
-  (-contains-key? [board coord]
-    (-lookup board coord nil))
-  (-assoc [board coord owner]
-    (Board. (assoc-in (.-grid board) coord owner)))
+    IAssociative
+    (-contains-key? [board coord]
+      (-lookup board coord nil))
+    (-assoc [board coord owner]
+      (Board. (assoc-in (.-grid board) coord owner)))
 
-  ISeqable
-  (-seq [board]
-    (for [coord coordinates]
-      [coord (get-in (.-grid board) coord)]))
+    ISeqable
+    (-seq [board]
+      (for [coord coordinates]
+        [coord (get-in (.-grid board) coord)]))
 
-  Object
-  (toString [board]
-    (.toString (.-grid board))
-    ))
+    Object
+    (toString [board]
+      (.toString (.-grid board))
+      ))
 
 
 #_(defn test-board-type
-  []
-  (let [b (Board. empty-board)]
-    (println (str b))
-    (println (get b [0 0]))
-    (println (contains? b [0 0]))
-    (println (get (assoc b [0 0] :wall) [0 0]))
-    (println (seq b))
-    ))
+    []
+    (let [b (Board. empty-board)]
+      (println (str b))
+      (println (get b [0 0]))
+      (println (contains? b [0 0]))
+      (println (get (assoc b [0 0] :wall) [0 0]))
+      (println (seq b))
+      ))
 
 
 ;; -----------------------------------------
@@ -97,12 +97,12 @@
       (fn [board [coord owner]] (convert-cell board coord owner))
       empty-board updates)))
 
-(def get-cell-at get-in)                                    ;; TODO - instance of lookup
+(def get-owner-at get-in)                                   ;; TODO - instance of lookup
 
 (defn to-seq                                                ;; TODO - instance of seq
   "Access to the board as a list of coordinates with corresponding owner"
   [board]
-  (for [coord coordinates] [coord (get-cell-at board coord)]))
+  (for [coord coordinates] [coord (get-owner-at board coord)]))
 
 (defn board->array
   "Converts the board into a JavaScript array (for performance)"

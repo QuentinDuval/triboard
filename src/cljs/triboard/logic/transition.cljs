@@ -14,7 +14,7 @@
 (s/def ::destination ::board/coord)
 (s/def ::taken (s/coll-of ::board/coord))
 (s/def ::winner ::player/player)
-(s/def ::looser ::player/playable-cell)
+(s/def ::looser ::player/convertible-owner)
 (s/def ::jump (s/keys :req-un [::destination ::taken ::winner ::looser]))
 (s/def ::transition (s/every ::jump))
 (s/def ::coord->transition (s/map-of ::destination ::transition))
@@ -26,19 +26,19 @@
 ;; -----------------------------------------
 
 (defn- ^boolean block-jump?
-  [cell]
-  (or (= cell :none) (= cell :wall)))
+  [owner]
+  (or (= owner :none) (= owner :wall)))
 
 (defn- ^boolean is-source?
-  [looser cell]
-  (and looser (not= looser cell)))
+  [looser owner]
+  (and looser (not= looser owner)))
 
 (defn- ^boolean? in-board?
   [x y]
   (and (< -1 x board/width) (< -1 y board/height)))
 
 (defn- seek-jump-source-toward
-  "Starting from the destination of a jump (an empty cell):
+  "Starting from the destination of a jump (a non-owned cell):
    * Search for valid source for the jump
    * Collect the jumped cells along the way"
   [board [x-init y-init :as destination] [dx dy]]
@@ -158,7 +158,7 @@
         (doall (partition-by
                  second
                  (map
-                   (fn [c] [c (board/get-cell-at b c)])
+                   (fn [c] [c (board/get-owner-at b c)])
                    board/coordinates))))))
 
 
@@ -172,14 +172,14 @@
 
 #_(defn jumpables
     [board [x-init y-init :as init-coord] [dx dy :as direction]]
-    (loop [prev (board/get-cell-at board init-coord)
+    (loop [prev (board/get-owner-at board init-coord)
            prev-pos init-coord
            x (+ x-init dx)
            y (+ y-init dy)
            jumps []]
       (if-not (in-board? x y)
         jumps
-        (let [curr (board/get-cell-at board [x y])]
+        (let [curr (board/get-owner-at board [x y])]
           (if (= curr prev)
             (recur prev prev-pos (+ x dx) (+ y dy) jumps)
             (recur curr [x y] (+ x dx) (+ y dy)

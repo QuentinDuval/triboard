@@ -12,7 +12,7 @@
 
 (s/def ::player player?)
 (s/def ::cell cell?)
-(s/def ::playable-cell (conj player? :none))
+(s/def ::convertible-owner (conj player? :none))
 
 (defn next-one
   [player]
