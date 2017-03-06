@@ -3,11 +3,9 @@
     [cljs.spec :as s]
     [reagent.core :as reagent]
     [triboard.ai.ai :as ai]
-    [triboard.logic.board :as board]
     [triboard.logic.game :as game]
     [triboard.logic.player :as player]
-    [triboard.logic.turn :as turn]
-    )
+    [triboard.logic.turn :as turn])
   (:require-macros
     [reagent.ratom :refer [reaction]]))
 
@@ -27,27 +25,20 @@
 ;; -----------------------------------------
 
 (def game (reaction (:game @app-state)))
-(def current-state (reaction (game/current-turn @game)))
-(def current-player (reaction (:player @current-state)))
+(def current-turn (reaction (game/current-turn @game)))
+(def current-player (reaction (:player @current-turn)))
 (def ai-player? (reaction (player/is-ai? @current-player)))
 
 (def suggestions
   (reaction
     (if (and (:help @app-state) (not @ai-player?))
-      (turn/player-transitions @current-state)
+      (turn/player-transitions @current-turn)
       {})))
 
 
 ;; -----------------------------------------
 ;; Public API (updates)
 ;; -----------------------------------------
-
-#_(s/def ::game-event
-  (s/or
-    :no-params (s/tuple #{:new-game :toggle-help :restart :undo :ai-play})
-    :player-move (s/tuple #{:player-move} ::board/coord)))
-
-#_(s/fdef send-event! :args (s/tuple ::game-event))
 
 (defn- send-event!
   [msg]
