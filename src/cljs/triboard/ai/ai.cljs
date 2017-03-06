@@ -91,15 +91,16 @@
   :args ::game/game
   :ret ::game/game)
 
-(defn- is-player-first?
+(defn- focus-human-player?
   [{:keys [blue red green] :as scores}]
-  (and (< red blue) (< green blue)))
+  (let [human-score (* 1.2 blue)]
+    (and (< red human-score) (< green human-score))))
 
 (defn play-best-move
   [game]
   (reset! eval-counter 0)
   (let [turn (game/current-turn game)
-        hard-mode? (is-player-first? (:scores turn))
+        hard-mode? (focus-human-player? (:scores turn))
         ai ((if hard-mode? make-cheating-ai make-ai) (:player turn))
         m (time (best-move ai turn))]  ;; TODO - Remove time + find a way to correlate with moves + sort then and take best
     (js/console.log @eval-counter)
