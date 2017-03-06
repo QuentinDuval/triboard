@@ -33,8 +33,6 @@
 
 ;; -----------------------------------------
 
-;; TODO - Try to develop a transducer for min-max
-
 (defn- min-max-step-with
   [min-fn max-fn ai turn on-transition]
   (apply
@@ -46,7 +44,9 @@
 (defn- min-max-step-by
   [key-fn ai turn on-transition]
   (min-max-step-with
-    #(min-key key-fn %) #(max-key key-fn %) ai turn on-transition))
+    (partial min-key key-fn) ;; Lambda does not work here
+    (partial max-key key-fn)
+    ai turn on-transition))
 
 (defn- min-max-step
   [ai turn on-transition]
@@ -93,7 +93,7 @@
 
 (defn- focus-human-player?
   [{:keys [blue red green] :as scores}]
-  (let [human-score (* 1.2 blue)]
+  (let [human-score (* 1.1 blue)]
     (and (< red human-score) (< green human-score))))
 
 (defn play-best-move
