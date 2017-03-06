@@ -37,6 +37,15 @@
   [x y]
   (and (< -1 x board/width) (< -1 y board/height)))
 
+;; TODO - Completely change the algorithm (solution 1):
+;; - We only need one pass... for each dimention
+;; - partition-by to get the zones of same color
+;; - partition size 3 step 1 to get the surroundings
+;; - filter on "one side exactly is :none" and you get the jumps
+
+;; TODO - Completely change the algorithm (solution 2):
+;; Search from the cells owned by a player... allows more incremental mode
+
 (defn- seek-jump-source-toward
   "Starting from the destination of a jump (an empty cell):
    * Search for valid source for the jump
