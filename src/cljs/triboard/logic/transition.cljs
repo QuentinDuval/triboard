@@ -110,6 +110,7 @@
         (algo/group-by-reducer :winner :destination)
         board/coordinates))))
 
+;; TODO - Move in turn. The only reason for transition namespace is algorithm extraction.
 (defn apply-transition
   [board transition]
   (reduce apply-jump board transition))
