@@ -15,7 +15,7 @@
 (def height 11)
 
 (def coordinates
-  (for [x (range width) y (range height)] [x y]))
+  (vec (for [x (range width) y (range height)] [x y])))
 
 (def empty-board
   (let [empty-column (vec (repeat height :none))]
