@@ -63,10 +63,11 @@
 
 (defn- available-jumps-at
   "Provides the list of moves that can be done from a cell"
-  [board destination]
-  (eduction
-    (keep #(seek-jump-source-toward board destination %))
-    cst/directions))
+  [board [x y :as destination]]
+  (if (= :none (aget board x y))
+    (eduction
+      (keep #(seek-jump-source-toward board destination %))
+      cst/directions)))
 
 (defn- add-destination-jump
   "Create a move to take an empty cell"
@@ -105,9 +106,7 @@
     (map-transition-tree
       add-destination
       (transduce
-        (comp
-          (filter (fn [[x y]] (= :none (aget aboard x y))))
-          (mapcat #(available-jumps-at aboard %)))
+        (mapcat #(available-jumps-at aboard %))
         (algo/group-by-reducer :winner :destination)
         board/coordinates))))
 
@@ -164,54 +163,54 @@
 
 
 #_(def columns
-  (mapv
-    (fn [x] (mapv vector (repeat x) (range board/height)))
-    (range board/width)))
+    (mapv
+      (fn [x] (mapv vector (repeat x) (range board/height)))
+      (range board/width)))
 
 #_(def rows
-  (apply mapv vector columns))
+    (apply mapv vector columns))
 
 #_(defn jumpables
-  [board [x-init y-init :as init-coord] [dx dy :as direction]]
-  (loop [prev (board/get-cell-at board init-coord)
-         prev-pos init-coord
-         x (+ x-init dx)
-         y (+ y-init dy)
-         jumps []]
-    (if-not (in-board? x y)
-      jumps
-      (let [curr (board/get-cell-at board [x y])]
-        (if (= curr prev)
-          (recur prev prev-pos (+ x dx) (+ y dy) jumps)
-          (recur curr [x y] (+ x dx) (+ y dy)
-            (conj jumps
-              {:start prev-pos
-               :end [(- x dx) (- y dy)]
-               :owner prev}))
-          ))
-      )))
+    [board [x-init y-init :as init-coord] [dx dy :as direction]]
+    (loop [prev (board/get-cell-at board init-coord)
+           prev-pos init-coord
+           x (+ x-init dx)
+           y (+ y-init dy)
+           jumps []]
+      (if-not (in-board? x y)
+        jumps
+        (let [curr (board/get-cell-at board [x y])]
+          (if (= curr prev)
+            (recur prev prev-pos (+ x dx) (+ y dy) jumps)
+            (recur curr [x y] (+ x dx) (+ y dy)
+              (conj jumps
+                {:start prev-pos
+                 :end [(- x dx) (- y dy)]
+                 :owner prev}))
+            ))
+        )))
 
 
 
 #_(defn test-new-algo
-  []
-  (let [b (board/new-board)]
-    (keep (fn [[p c n]]
-            (cond
-              (and (player/player? (:owner p)) (= :none (:owner n)))
-              {:winner (:owner p)
-               :looser (:owner c)
-               :destination (:start n)
-               :taken []}
+    []
+    (let [b (board/new-board)]
+      (keep (fn [[p c n]]
+              (cond
+                (and (player/player? (:owner p)) (= :none (:owner n)))
+                {:winner (:owner p)
+                 :looser (:owner c)
+                 :destination (:start n)
+                 :taken []}
 
-              (and (player/player? (:owner n)) (= :none (:owner p)))
-              {:winner (:owner n)
-               :looser (:owner c)
-               :destination (:end p)
-               :taken []}
+                (and (player/player? (:owner n)) (= :none (:owner p)))
+                {:winner (:owner n)
+                 :looser (:owner c)
+                 :destination (:end p)
+                 :taken []}
 
-              :else nil)
-            )
-      (partition 3 1 (jumpables b [0 0] [0 1])))
-    ))
+                :else nil)
+              )
+        (partition 3 1 (jumpables b [0 0] [0 1])))
+      ))
 
