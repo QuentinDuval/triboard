@@ -75,6 +75,14 @@
 (s/fdef new-board
   :ret ::board)
 
+(s/fdef convert-cell
+  :args (s/cat :board ::board :coord ::coord :owner ::player/player)
+  :ret ::board)
+
+(s/fdef get-owner-at
+  :args (s/cat :board ::board :coord ::coord)
+  :ret ::player/player)
+
 (s/fdef to-seq
   :args (s/cat :board ::board)
   :ret (s/every (s/tuple ::coord ::player/cell)))
