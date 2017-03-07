@@ -17,7 +17,8 @@
   :ret ::game)
 
 (s/fdef undo-player-move
-  :args ::game :ret ::game)
+  :args (s/cat :game ::game)
+  :ret ::game)
 
 ;; ----------------------------------------------
 
