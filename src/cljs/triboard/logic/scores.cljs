@@ -39,4 +39,7 @@
 (defn update-scores
   "Update the scoring based on the provided transition"
   [scores transition]
-  (dissoc (reduce update-from-jump scores transition) :none))
+  (let [{:keys [winner]} (first transition)]
+    (->
+      (reduce update-from-jump scores transition)
+      (update winner inc))))

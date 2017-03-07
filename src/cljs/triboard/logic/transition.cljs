@@ -88,10 +88,6 @@
     (conj jumps (add-destination-jump winner destination))
     jumps))
 
-(defn- map-transition-tree
-  [xf game-tree]
-  (algo/map-values #(algo/map-values xf %) game-tree))
-
 ;; -----------------------------------------
 ;; Public API
 ;; -----------------------------------------
@@ -103,17 +99,14 @@
 (defn all-transitions
   [board]
   (let [aboard (board/board->array board)]
-    (map-transition-tree
-      add-destination
-      (transduce
-        (mapcat #(available-jumps-at aboard %))
-        (algo/group-by-reducer :winner :destination)
-        board/coordinates))))
+    (transduce
+      (mapcat #(available-jumps-at aboard %))
+      (algo/group-by-reducer :winner :destination)
+      board/coordinates)))
 
-;; TODO - Move in turn. The only reason for transition namespace is algorithm extraction.
 (defn apply-transition
   [board transition]
-  (reduce apply-jump board transition))
+  (reduce apply-jump board (add-destination transition)))
 
 ;; -----------------------------------------
 ;; TESTS

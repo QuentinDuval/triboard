@@ -35,15 +35,21 @@
 ;; Public API
 ;; -----------------------------------------
 
-(s/def ::transitions
-  ::transition/coord->transition)
-
 (s/def ::turn
   (s/keys :req-un
     [::board/board
      ::player/player
-     ::transitions
      ::scores/scores]))
+
+(s/fdef next-turn
+  :args (s/cat :turn ::turn :transition ::transition/transition)
+  :ret ::turn)
+
+(s/fdef player-transitions
+  :args (s/cat :turn ::turn)
+  :ret ::transition/coord->transition)
+
+;; -----------------------------------------
 
 (defn new-init-turn []
   (with-next-player
@@ -51,10 +57,6 @@
      :player (rand-nth player/all)
      :transitions {}
      :scores (scores/initial-scores cst/init-block-count)}))
-
-(s/fdef next-turn
-  :args (s/cat :turn ::turn :transition ::transition/transition)
-  :ret ::turn)
 
 (defn next-turn
   "Apply the transtion to the current turn, yielding a new turn"
