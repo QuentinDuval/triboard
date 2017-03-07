@@ -23,8 +23,7 @@
 ;; Public API
 ;; ----------------------------------------------------------------------------
 
-(s/def ::weight number?)
-(s/def ::scores (s/map-of ::player/player ::weight))
+(s/def ::scores (s/map-of ::player/player int?))
 
 (s/fdef update-scores
   :args (s/cat :scores ::scores :transition ::transition/transition)
