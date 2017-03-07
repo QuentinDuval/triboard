@@ -32,7 +32,7 @@
 (def suggestions
   (reaction
     (if (and (:help @app-state) (not @ai-player?))
-      (turn/player-transitions @current-turn)
+      (turn/transitions @current-turn)
       {})))
 
 

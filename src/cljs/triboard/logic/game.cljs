@@ -36,9 +36,8 @@
 (defn play-at
   "Play a move, adding a new turn into the game"
   [game coord]
-  (let [curr-turn (current-turn game)
-        transitions (turn/player-transitions curr-turn)]
-    (if-let [transition (get transitions coord)]
+  (let [curr-turn (current-turn game)]
+    (if-let [transition (get (turn/transitions curr-turn) coord)]
       (conj game (turn/next-turn curr-turn transition))
       game)))
 

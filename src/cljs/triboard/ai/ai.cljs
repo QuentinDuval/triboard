@@ -39,7 +39,7 @@
     (if (maximizing-turn? ai turn) max-fn min-fn)
     (map
       (fn [[coord transition]] (on-transition coord transition))
-      (turn/player-transitions turn))))
+      (turn/transitions turn))))
 
 (defn- min-max-step-by
   [key-fn ai turn on-transition]

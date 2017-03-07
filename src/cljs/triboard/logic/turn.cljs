@@ -45,7 +45,7 @@
   :args (s/cat :turn ::turn :transition ::transition/transition)
   :ret ::turn)
 
-(s/fdef player-transitions
+(s/fdef transitions
   :args (s/cat :turn ::turn)
   :ret ::transition/coord->transition)
 
@@ -66,7 +66,7 @@
     (update :scores scores/update-scores transition)
     (with-next-player)))
 
-(defn player-transitions
+(defn transitions
   "Return the transitions available for the next player"
   [turn]
   (:transitions turn))
