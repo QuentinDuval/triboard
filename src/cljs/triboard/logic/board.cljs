@@ -7,7 +7,7 @@
 
 
 ;; -----------------------------------------
-;; Private
+;; Public Types
 ;; -----------------------------------------
 
 (def width 16)
@@ -15,16 +15,6 @@
 
 (def coordinates
   (vec (for [x (range width) y (range height)] [x y])))
-
-(def empty-board
-  "An empty board of `width` columns times `height` owners"
-  (let [empty-column (vec (repeat height :none))]
-    (vec (repeat width empty-column))))
-
-
-;; -----------------------------------------
-;; Public Types
-;; -----------------------------------------
 
 (s/def ::coord (set coordinates))
 
@@ -52,6 +42,11 @@
 ;; -----------------------------------------
 ;; Public API
 ;; -----------------------------------------
+
+(def empty-board
+  "An empty board of `width` columns times `height` owners"
+  (let [empty-column (vec (repeat height :none))]
+    (vec (repeat width empty-column))))
 
 (defn convert-cell
   [board coord owner]
