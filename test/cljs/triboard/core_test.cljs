@@ -1,6 +1,6 @@
 (ns ^:figwheel-always triboard.core-test
   (:require-macros
-    [cljs.test :refer (is deftest testing)]
+    [cljs.test :refer (is are deftest testing)]
     [clojure.test.check.clojure-test :refer [defspec]]
     )
   (:require
@@ -18,6 +18,7 @@
     [triboard.logic.player :as player]
     [triboard.logic.scores :as scores]
     [triboard.logic.turn :as turn]
+    [triboard.utils.algo :as algo]
     ))
 
 
@@ -46,17 +47,6 @@
 
 
 ;; ----------------------------------------------------------------------------
-;; Example based tests
-;; ----------------------------------------------------------------------------
-
-(deftest example-passing-test
-  (testing "trivial assumption"
-    (is (= 1 1))))
-
-
-
-
-;; ----------------------------------------------------------------------------
 ;; Generators
 ;; ----------------------------------------------------------------------------
 
@@ -76,14 +66,12 @@
 ;; BOARD
 ;; ----------------------------------------------------------------------------
 
-(deftest test-pick-n-cells-for-each-player
-  (let [elements (range 1 100)]
-    (testing "Pick 2 elements for each player"
-      (is (=
-            [[1 :blue] [2 :blue] [3 :red] [4 :red]
-             [5 :green] [6 :green] [7 :wall] [8 :wall]]
-            (vec (board/pick-n-cells-for-each-player 2 elements))))
-      )))
+(deftest test-pick-n-of-each
+  (are [expected result] (= expected (vec result))
+    [] (algo/pick-n-of-each 0 (range 10) [:a :b])
+    [[0 :a] [1 :b]] (algo/pick-n-of-each 1 (range 10) [:a :b])
+    [[0 :a] [1 :a] [2 :b] [3 :b]] (algo/pick-n-of-each 2 (range 10) [:a :b])
+    ))
 
 
 ;; ----------------------------------------------------------------------------
@@ -129,19 +117,19 @@
         (valid-game-transition? old-game new-game coord)
         ))))
 
-(defn game-undo-properties
-  [old-game]
-  (prop/for-all [coord coord-gen]
-    (let [new-game (game/play-at old-game coord)]
-      (or
-        (= old-game new-game)
-        (= old-game (game/undo-player-move new-game (fn [_] false))) ;; TODO
-        ))))
+#_(defn game-undo-properties
+    [old-game]
+    (prop/for-all [coord coord-gen]
+      (let [new-game (game/play-at old-game coord)]
+        (or
+          (= old-game new-game)
+          (= old-game (game/undo-player-move new-game (fn [_] false))) ;; TODO
+          ))))
 
 (defspec try-move-from-valid-game 100
   (prop/for-all [g game-gen] (game-move-properties g)))
 
-(defspec try-undo-from-valid-game 100
+#_(defspec try-undo-from-valid-game 100
   (prop/for-all [g game-gen] (game-undo-properties g)))
 
 
