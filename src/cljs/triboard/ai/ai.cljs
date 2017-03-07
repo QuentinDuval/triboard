@@ -88,7 +88,7 @@
 ;; -----------------------------------------
 
 (s/fdef play-best-move
-  :args ::game/game
+  :args (s/cat :game ::game/game)
   :ret ::game/game)
 
 (defn- focus-human-player?
