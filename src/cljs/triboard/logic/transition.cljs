@@ -148,6 +148,7 @@
 ;; - partition-by to get the zones of same color
 ;; - partition size 3 step 1 to get the surroundings
 ;; - filter on "one side exactly is :none" and you get the jumps
+;; TODO - A newp partition that gives the tag... for the group.
 
 ;; TODO - Completely change the algorithm (solution 2):
 ;; Search from the cells owned by a player... allows more incremental mode
