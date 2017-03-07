@@ -25,10 +25,8 @@
   [{:keys [board player] :as turn}]
   (let [transitions (transition/all-transitions board)
         next-player (first (who-can-play player transitions))]
-    (-> turn
-      (assoc :transitions (get transitions next-player))
-      (assoc :player next-player)
-      )))
+    (merge turn
+      {:transitions (get transitions next-player) :player next-player})))
 
 
 ;; -----------------------------------------
