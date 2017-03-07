@@ -17,8 +17,9 @@
 (s/def ::looser ::player/convertible-owner)
 (s/def ::jump (s/keys :req-un [::destination ::taken ::winner ::looser]))
 (s/def ::transition (s/every ::jump))
-(s/def ::coord->transition (s/map-of ::destination ::transition))
-(s/def ::all-transitions (s/map-of ::player/player ::coord->transition))
+(s/def ::all-transitions
+  (s/map-of ::player/player
+    (s/map-of ::destination ::transition)))
 
 
 ;; -----------------------------------------

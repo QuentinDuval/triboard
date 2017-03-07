@@ -47,7 +47,7 @@
 
 (s/fdef transitions
   :args (s/cat :turn ::turn)
-  :ret ::transition/coord->transition)
+  :ret (s/map-of ::transition/destination ::transition/transition))
 
 ;; -----------------------------------------
 
