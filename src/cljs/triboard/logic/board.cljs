@@ -70,7 +70,7 @@
 ;; -----------------------------------------
 
 (s/def ::coord (set coordinates))
-(s/def ::board (s/every (s/every ::player/cell :count 11) :count 16))
+(s/def ::board (s/every (s/every ::player/owner :count 11) :count 16))
 
 (s/fdef new-board
   :ret ::board)
@@ -85,7 +85,7 @@
 
 (s/fdef to-seq
   :args (s/cat :board ::board)
-  :ret (s/every (s/tuple ::coord ::player/cell)))
+  :ret (s/every (s/tuple ::coord ::player/owner)))
 
 
 ;; -----------------------------------------

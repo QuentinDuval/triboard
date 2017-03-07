@@ -11,7 +11,7 @@
 (def is-ai? #{:red :green})
 
 (s/def ::player player?)
-(s/def ::cell cell?)
+(s/def ::owner cell?)
 (s/def ::convertible-owner (conj player? :none))
 
 (defn next-one
