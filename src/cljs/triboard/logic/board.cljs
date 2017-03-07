@@ -18,6 +18,7 @@
   (vec (for [x (range width) y (range height)] [x y])))
 
 (def empty-board
+  "An empty board of `width` columns times `height` owners"
   (let [empty-column (vec (repeat height :none))]
     (vec (repeat width empty-column))))
 
