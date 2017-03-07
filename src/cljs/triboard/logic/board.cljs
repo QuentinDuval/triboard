@@ -60,12 +60,12 @@
 (defn new-board
   "Creates a new board with initial positions of each players"
   []
-  (let [to-pick (conj player/all :wall)]
+  (->>
+    (conj player/all :wall)
+    (algo/randomly-pick-n-of-each cst/init-block-count coordinates)
     (reduce
       (fn [board [coord owner]] (convert-cell board coord owner))
-      empty-board
-      (algo/randomly-pick-n-of-each
-        cst/init-block-count coordinates to-pick))))
+      empty-board)))
 
 (def get-owner-at get-in)
 
