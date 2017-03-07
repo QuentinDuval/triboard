@@ -67,11 +67,24 @@
 ;; ----------------------------------------------------------------------------
 
 (deftest test-pick-n-of-each
-  (are [expected result] (= expected (vec result))
-    [] (algo/pick-n-of-each 0 (range 10) [:a :b])
-    [[0 :a] [1 :b]] (algo/pick-n-of-each 1 (range 10) [:a :b])
-    [[0 :a] [1 :a] [2 :b] [3 :b]] (algo/pick-n-of-each 2 (range 10) [:a :b])
-    ))
+  (let [pick-n-of-each (comp vec algo/pick-n-of-each)]
+    (testing "Varying number of each group"
+      (are
+        [expected n] (= expected (pick-n-of-each n (range) [:a :b]))
+        [] 0
+        [[0 :a] [1 :b]] 1
+        [[0 :a] [1 :a] [2 :b] [3 :b]] 2
+        ))
+    (testing "Varying number of groups"
+      (are
+        [expected groups] (= expected (pick-n-of-each 2 (range) groups))
+        [] []
+        [[0 :a] [1 :a]] [:a]
+        ))
+    (testing "No elements to choose from"
+      (is
+        (= [] (pick-n-of-each 1 [] [:a]))
+        ))))
 
 
 ;; ----------------------------------------------------------------------------
@@ -130,7 +143,7 @@
   (prop/for-all [g game-gen] (game-move-properties g)))
 
 #_(defspec try-undo-from-valid-game 100
-  (prop/for-all [g game-gen] (game-undo-properties g)))
+    (prop/for-all [g game-gen] (game-undo-properties g)))
 
 
 ;; ----------------------------------------------------------------------------
