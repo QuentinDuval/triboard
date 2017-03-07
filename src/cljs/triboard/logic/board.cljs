@@ -71,7 +71,11 @@
 ;; -----------------------------------------
 
 (s/def ::coord (set coordinates))
-(s/def ::board (s/every (s/every ::player/owner :count 11) :count 16))
+
+(s/def ::board
+  (s/every
+    (s/every ::player/owner :count height)
+    :count width))
 
 (s/fdef new-board
   :ret ::board)
