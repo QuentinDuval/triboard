@@ -30,19 +30,23 @@
   [owner]
   (or (= owner :none) (= owner :wall)))
 
-(defn- ^boolean is-source?
+(defn- ^boolean jump-start?
   [looser owner]
   (and looser (not= looser owner)))
 
-(defn- ^boolean? in-board?
+(defn- ^boolean in-board?
   [x y]
   (and (< -1 x board/width) (< -1 y board/height)))
+
+(defn- ^boolean empty-cell?
+  [board [x y]]
+  (= :none (aget board x y)))
 
 (defn- seek-jump-source-toward
   "Starting from the destination of a jump (a non-owned cell):
    * Search for valid source for the jump
    * Collect the jumped cells along the way"
-  [board [x-init y-init :as destination] [dx dy]]
+  [board [x-init y-init :as jump-destination] [dx dy]]
   (loop [x (+ x-init dx)
          y (+ y-init dy)
          looser nil
@@ -51,10 +55,10 @@
       (let [owner (aget board x y)]
         (cond
           (block-jump? owner) nil
-          (is-source? looser owner) {:winner owner
-                                     :looser looser
-                                     :destination destination
-                                     :taken taken}
+          (jump-start? looser owner) {:winner owner
+                                      :looser looser
+                                      :destination jump-destination
+                                      :taken taken}
           :else (recur
                   (+ x dx)
                   (+ y dy)
@@ -64,10 +68,10 @@
 
 (defn- available-jumps-at
   "Provides the list of moves that can be done from a cell"
-  [board [x y :as destination]]
-  (if (= :none (aget board x y))
+  [board jump-destination]
+  (if (empty-cell? board jump-destination)
     (eduction
-      (keep #(seek-jump-source-toward board destination %))
+      (keep #(seek-jump-source-toward board jump-destination %))
       cst/directions)))
 
 (defn- add-destination-jump
