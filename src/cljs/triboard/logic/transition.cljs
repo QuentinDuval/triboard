@@ -67,7 +67,7 @@
         ))))
 
 (defn- available-jumps-at
-  "Provides the list of moves that can be done from a cell"
+  "Provides the list of jumps that can be done at a given `jump-destination`"
   [board jump-destination]
   (if (empty-cell? board jump-destination)
     (eduction
