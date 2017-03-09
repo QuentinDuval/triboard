@@ -17,7 +17,6 @@
 
 ;; TODO - Extract the parts that are related to costmetic: Help
 ;; TODO - Rework the game loop to be a state machine (beware of consuming messages)
-;; TODO - Rework the AI part, to be able to keep data linked to the init board
 
 ;; -----------------------------------------
 ;; GAME LOOP
@@ -26,12 +25,12 @@
 (def ai-move-delay 1000)
 
 (defn ai-computation
-  []
+  [game]
   (let [out-chan (chan 1)
         ai-chan (chan 1)]
     (go
-      (<! (async/timeout 500))
-      (>! ai-chan (ai/play-best-move @store/game)))
+      (<! (async/timeout 500)) ;; Avoid animation stalling (not multi-threading)
+      (>! ai-chan (ai/play-best-move game)))
     (go
       (<! (async/timeout ai-move-delay))
       (async/pipe ai-chan out-chan))
@@ -45,7 +44,7 @@
         game-events (chan 1)]
     (go
       (while true
-        (let [ai-chan (if @store/ai-player? (ai-computation) (chan 1))]
+        (let [ai-chan (if @store/ai-player? (ai-computation @store/game) (chan 1))]
           (alt!
             game-events ([msg] (store/send-event! msg))
             player-events ([coord] (store/send-event! [:player-move coord]))
