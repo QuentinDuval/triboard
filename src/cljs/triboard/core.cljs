@@ -25,13 +25,14 @@
 ;; GAME LOOP
 ;; -----------------------------------------
 
+(def animation-delay 500)
 (def ai-move-delay 1000)
 
 (defn ai-computation
   [game]
   (let [out-chan (chan 1)]
     (go
-      (<! (async/timeout 500))
+      (<! (async/timeout animation-delay))
       (let [ai-chan (run-async (ai/find-best-move game))]
         (<! (async/timeout ai-move-delay))
         (>! out-chan (<! ai-chan))))
