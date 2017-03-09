@@ -33,7 +33,7 @@
       (>! ai-chan (ai/play-best-move game)))
     (go
       (<! (async/timeout ai-move-delay))
-      (async/pipe ai-chan out-chan))
+      (let [g (<! ai-chan)] (>! out-chan g)))
     out-chan))
 
 (defn start-game-loop
