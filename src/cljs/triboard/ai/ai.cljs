@@ -1,6 +1,7 @@
 (ns triboard.ai.ai
   (:require
     [cljs.spec :as s :include-macros true]
+    [triboard.logic.board :as board]
     [triboard.logic.game :as game]
     [triboard.logic.scores :as scores]
     [triboard.logic.turn :as turn]
@@ -83,20 +84,20 @@
           [coord (tree-score ai new-turn 1)]))
       )))
 
-;; -----------------------------------------
-;; Public API
-;; -----------------------------------------
-
-(s/fdef play-best-move
-  :args (s/cat :game ::game/game)
-  :ret ::game/game)
-
 (defn- focus-human-player?
   [{:keys [blue red green] :as scores}]
   (let [human-score (* 1.1 blue)]
     (and (< red human-score) (< green human-score))))
 
-(defn play-best-move
+;; -----------------------------------------
+;; Public API
+;; -----------------------------------------
+
+(s/fdef find-best-move
+  :args (s/cat :game ::game/game)
+  :ret ::board/coord)
+
+(defn find-best-move
   [game]
   (reset! eval-counter 0)
   (let [turn (game/current-turn game)
@@ -104,7 +105,7 @@
         ai ((if hard-mode? make-cheating-ai make-ai) (:player turn))
         coord (time (best-move ai turn))]  ;; TODO - Remove time + find a way to correlate with moves + sort then and take best
     (js/console.log @eval-counter)
-    (game/play-at game coord)))
+    coord))
 
 
 ;; -----------------------------------------

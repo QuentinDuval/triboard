@@ -11,7 +11,7 @@
     [reagent.ratom :refer [reaction]]))
 
 
-;; (cljs.spec.test/instrument) ;; TODO - Does not work
+;; (cljs.spec.test/instrument)
 ;; (enable-console-print!)
 ;; (set! *assert* false)
 
@@ -35,10 +35,9 @@
   (let [out-chan (chan 1)]
     (go
       (<! (async/timeout 500))
-      (let [ai-chan (run-async #(ai/play-best-move game))
-            _ (<! (async/timeout ai-move-delay))
-            g (<! ai-chan)]
-        (>! out-chan g)))
+      (let [ai-chan (run-async #(ai/find-best-move game))]
+        (<! (async/timeout ai-move-delay))
+        (>! out-chan (<! ai-chan))))
     out-chan))
 
 (defn start-game-loop
@@ -53,7 +52,7 @@
           (alt!
             game-events ([msg] (store/send-event! msg))
             player-events ([coord] (store/send-event! [:player-move coord]))
-            ai-chan ([game] (store/send-event! [:ai-play game]))
+            ai-chan ([coord] (store/send-event! [:player-move coord]))
             ))))
     {:player-events player-events
      :game-events game-events}))
