@@ -24,16 +24,21 @@
 
 (def ai-move-delay 1000)
 
+(defn run-async
+  [computation]
+  (let [out-chan (chan 1)]
+    (go (>! out-chan (computation)))
+    out-chan))
+
 (defn ai-computation
   [game]
-  (let [out-chan (chan 1)
-        ai-chan (chan 1)]
+  (let [out-chan (chan 1)]
     (go
-      (<! (async/timeout 500)) ;; Avoid animation stalling (not multi-threading)
-      (>! ai-chan (ai/play-best-move game)))
-    (go
-      (<! (async/timeout ai-move-delay))
-      (let [g (<! ai-chan)] (>! out-chan g)))
+      (<! (async/timeout 500))
+      (let [ai-chan (run-async #(ai/play-best-move game))
+            _ (<! (async/timeout ai-move-delay))
+            g (<! ai-chan)]
+        (>! out-chan g)))
     out-chan))
 
 (defn start-game-loop
