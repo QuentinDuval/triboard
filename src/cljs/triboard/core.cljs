@@ -1,18 +1,16 @@
 (ns triboard.core
   (:require
     [cljs.core.async :as async :refer [put! chan <! >!]]
-    [cljs.spec.test :as stest]
     [reagent.core :as reagent]
     [triboard.store :as store]
     [triboard.view.callbacks :as view]
-    [triboard.view.frame :as frame]
-    )
+    [triboard.view.frame :as frame])
   (:require-macros
     [cljs.core.async.macros :refer [go go-loop alt!]]
     [reagent.ratom :refer [reaction]]))
 
 
-;; (stest/instrument) ;; TODO - Does not work
+;; (cljs.spec.test/instrument) ;; TODO - Does not work
 ;; (enable-console-print!)
 ;; (set! *assert* false)
 
