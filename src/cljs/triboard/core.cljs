@@ -40,27 +40,29 @@
         (>! out-chan (<! ai-chan))))
     out-chan))
 
+(defn player-moves-chan
+  []
+  (chan 1 (filter #(not @store/ai-player?))))
+
 (defn start-game-loop
   "Manage transitions between player moves, ai moves, and generic game events"
   []
-  (let [is-human-xf (fn [_] (not @store/ai-player?))
-        player-events (chan 1 (filter is-human-xf))
-        game-events (chan 1)]
+  (let [player-moves (player-moves-chan)
+        menu-events (chan 1)]
     (go
       (while true
-        (let [ai-chan (if @store/ai-player? (ai-computation @store/game) (chan 1))]
+        (let [play-chan (if @store/ai-player? (ai-computation @store/game) player-moves)]
           (alt!
-            game-events ([msg] (store/send-event! msg))
-            player-events ([coord] (store/send-event! [:play-at coord]))
-            ai-chan ([coord] (store/send-event! [:play-at coord]))
+            menu-events ([msg] (store/send-event! msg))
+            play-chan ([coord] (store/send-event! [:play-at coord]))
             ))))
-    {:player-events player-events
-     :game-events game-events}))
+    {:game-events player-moves
+     :menu-events menu-events}))
 
 (defonce game-loop (start-game-loop))
 
-(defn send-player-event! [e] (put! (game-loop :player-events) e))
 (defn send-game-event! [e] (put! (game-loop :game-events) e))
+(defn sent-menu-event! [e] (put! (game-loop :menu-events) e))
 
 
 ;; -----------------------------------------
@@ -70,11 +72,11 @@
 (defn run-game []
   (frame/main-frame @store/current-turn @store/suggestions
     (reify view/CallBacks
-      (on-new-game [_] (send-game-event! [:new-game]))
-      (on-toogle-help [_] (send-game-event! [:toggle-help]))
-      (on-restart [_] (send-game-event! [:restart]))
-      (on-undo [_] (send-game-event! [:undo]))
-      (on-player-move [_ x y] (send-player-event! [x y]))
+      (on-new-game [_] (sent-menu-event! [:new-game]))
+      (on-toogle-help [_] (sent-menu-event! [:toggle-help]))
+      (on-restart [_] (sent-menu-event! [:restart]))
+      (on-undo [_] (sent-menu-event! [:undo]))
+      (on-player-move [_ x y] (send-game-event! [x y]))
       )))
 
 (reagent/render [run-game]
