@@ -13,10 +13,6 @@
 ;; TODO - Extract the parts that are related to costmetic: Help
 ;; TODO - Rework the game loop to be a state machine (beware of consuming messages)
 
-;; -----------------------------------------
-;; PLUGGING THE BLOCKS
-;; -----------------------------------------
-
 (defn run-game []
   (frame/main-frame @store/current-turn @store/suggestions
     (reify view/CallBacks
