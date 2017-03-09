@@ -2,6 +2,7 @@
   (:require
     [cljs.core.async :as async :refer [put! chan <! >!]]
     [reagent.core :as reagent]
+    [triboard.ai.ai :as ai]
     [triboard.store :as store]
     [triboard.view.callbacks :as view]
     [triboard.view.frame :as frame])
@@ -24,6 +25,18 @@
 
 (def ai-move-delay 1000)
 
+(defn ai-computation
+  []
+  (let [out-chan (chan 1)
+        ai-chan (chan 1)]
+    (go
+      (<! (async/timeout 500))
+      (>! ai-chan (ai/play-best-move @store/game)))
+    (go
+      (<! (async/timeout ai-move-delay))
+      (async/pipe ai-chan out-chan))
+    out-chan))
+
 (defn start-game-loop
   "Manage transitions between player moves, ai moves, and generic game events"
   []
@@ -32,11 +45,12 @@
         game-events (chan 1)]
     (go
       (while true
-        (alt!
-          game-events ([msg] (store/send-event! msg))
-          player-events ([coord] (store/send-event! [:player-move coord]))
-          (async/timeout ai-move-delay) ([_] (if @store/ai-player? (store/send-event! [:ai-play])))
-          )))
+        (let [ai-chan (if @store/ai-player? (ai-computation) (chan 1))]
+          (alt!
+            game-events ([msg] (store/send-event! msg))
+            player-events ([coord] (store/send-event! [:player-move coord]))
+            ai-chan ([game] (store/send-event! [:ai-play game]))
+            ))))
     {:player-events player-events
      :game-events game-events}))
 
