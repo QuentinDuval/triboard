@@ -102,9 +102,9 @@
   (let [turn (game/current-turn game)
         hard-mode? (focus-human-player? (:scores turn))
         ai ((if hard-mode? make-cheating-ai make-ai) (:player turn))
-        m (time (best-move ai turn))]  ;; TODO - Remove time + find a way to correlate with moves + sort then and take best
+        coord (time (best-move ai turn))]  ;; TODO - Remove time + find a way to correlate with moves + sort then and take best
     (js/console.log @eval-counter)
-    (game/play-at game m)))
+    (game/play-at game coord)))
 
 
 ;; -----------------------------------------
