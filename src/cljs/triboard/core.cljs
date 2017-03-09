@@ -51,8 +51,8 @@
         (let [ai-chan (if @store/ai-player? (ai-computation @store/game) (chan 1))]
           (alt!
             game-events ([msg] (store/send-event! msg))
-            player-events ([coord] (store/send-event! [:player-move coord]))
-            ai-chan ([coord] (store/send-event! [:player-move coord]))
+            player-events ([coord] (store/send-event! [:play-at coord]))
+            ai-chan ([coord] (store/send-event! [:play-at coord]))
             ))))
     {:player-events player-events
      :game-events game-events}))

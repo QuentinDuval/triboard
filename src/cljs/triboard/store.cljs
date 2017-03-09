@@ -2,7 +2,6 @@
   (:require
     [cljs.spec :as s]
     [reagent.core :as reagent]
-    [triboard.ai.ai :as ai]
     [triboard.logic.game :as game]
     [triboard.logic.player :as player]
     [triboard.logic.turn :as turn])
@@ -47,5 +46,5 @@
     :toggle-help (swap! app-state update :help not)
     :restart (swap! app-state update :game #(take-last 1 %))
     :undo (swap! app-state update :game game/undo-player-move)
-    :player-move (swap! app-state update :game game/play-at (second msg))
+    :play-at (swap! app-state update :game game/play-at (second msg))
     ))
