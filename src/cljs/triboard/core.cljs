@@ -4,11 +4,14 @@
     [reagent.core :as reagent]
     [triboard.ai.ai :as ai]
     [triboard.store :as store]
+    [triboard.utils.async :refer [run-async-fn]]
     [triboard.view.callbacks :as view]
     [triboard.view.frame :as frame])
   (:require-macros
     [cljs.core.async.macros :refer [go go-loop alt!]]
-    [reagent.ratom :refer [reaction]]))
+    [reagent.ratom :refer [reaction]]
+    [triboard.utils.async :refer [run-async]]
+    ))
 
 
 ;; (cljs.spec.test/instrument)
@@ -24,18 +27,12 @@
 
 (def ai-move-delay 1000)
 
-(defn run-async
-  [computation]
-  (let [out-chan (chan 1)]
-    (go (>! out-chan (computation)))
-    out-chan))
-
 (defn ai-computation
   [game]
   (let [out-chan (chan 1)]
     (go
       (<! (async/timeout 500))
-      (let [ai-chan (run-async #(ai/find-best-move game))]
+      (let [ai-chan (run-async (ai/find-best-move game))]
         (<! (async/timeout ai-move-delay))
         (>! out-chan (<! ai-chan))))
     out-chan))
