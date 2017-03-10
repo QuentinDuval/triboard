@@ -2,11 +2,9 @@
   (:require
     [cljs.core.async :as async :refer [put! chan <! >!]]
     [triboard.ai.ai :as ai]
-    [triboard.store :as store]
-    [triboard.utils.async :refer [run-async-fn]])
+    [triboard.store :as store])
   (:require-macros
     [cljs.core.async.macros :refer [go go-loop alt!]]
-    [triboard.utils.async :refer [run-async]]
     ))
 
 
@@ -22,7 +20,7 @@
   (let [out-chan (chan 1)]
     (go
       (<! (async/timeout animation-delay))
-      (let [ai-chan (run-async (ai/find-best-move game))]
+      (let [ai-chan (go (ai/find-best-move game))]
         (<! (async/timeout ai-move-delay))
         (>! out-chan (<! ai-chan))))
     out-chan))
