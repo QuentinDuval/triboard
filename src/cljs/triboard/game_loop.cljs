@@ -16,6 +16,9 @@
 (def ai-move-delay 1000)
 
 (defn ai-computation
+  "Run the computation of the AI asynchronously:
+   * Wait 500ms to start (animation might be frozen otherwise)
+   * Wait 1s to play the move (avoid moves being played too fast)"
   [game]
   (let [out-chan (chan 1)]
     (go
