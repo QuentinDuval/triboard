@@ -22,14 +22,14 @@
   [player]
   (reify AIStrategy
     (optimized-score [_ scores] (get scores player))
-    (maximizing-turn? [_ turn] (= (:player turn) player))
+    (maximizing-turn? [_ turn] (= (:player (turn/turn->info turn)) player))
     ))
 
 (defn- make-cheating-ai
   [player]
   (reify AIStrategy
     (optimized-score [_ scores] (+ (:red scores) (:green scores)))
-    (maximizing-turn? [_ turn] (not= (:player turn) :blue))
+    (maximizing-turn? [_ turn] (not= (:player (turn/turn->info turn)) :blue))
     ))
 
 ;; -----------------------------------------
@@ -101,8 +101,8 @@
   [game]
   (reset! eval-counter 0)
   (let [turn (game/current-turn game)
-        hard-mode? (focus-human-player? (:scores turn))
-        ai ((if hard-mode? make-cheating-ai make-ai) (:player turn))
+        hard-mode? (focus-human-player? (:scores (turn/turn->info turn)))
+        ai ((if hard-mode? make-cheating-ai make-ai) (:player (turn/turn->info turn)))
         coord (time (best-move ai turn))]  ;; TODO - Remove time + find a way to correlate with moves + sort then and take best
     (js/console.log @eval-counter)
     coord))
@@ -115,5 +115,5 @@
 (defn benchmark []
   (let [g (game/new-game)]
     (time (dotimes [i 10]
-            (time (play-best-move g))
+            (time (find-best-move g))
             ))))
