@@ -43,15 +43,46 @@
 ;; Generators
 ;; ----------------------------------------------------------------------------
 
-(def coord-gen (s/gen ::board/coord))
+(def coordinate-gen
+  "Generating random coordinates inside the board"
+  (s/gen ::board/coord))
 
-(def initial-empty-cell-count
+(def max-number-of-turn-by-game
+  "The maximum number of moves that can be played in a game"
   (- (* board/width board/height) (* 4 cst/init-block-count)))
+
+(defn valid-coordinate-gen
+  "Generate a valid coordinate that can be played at by the current player"
+  [game]
+  (let [transitions (turn/transitions (game/current-turn game))]
+    (if (empty? transitions)
+      (gen/return nil)
+      (gen/elements (keys transitions)))))
 
 (def game-gen
   (gen/fmap
     (fn [coord] (play-moves (game/new-game) coord))
-    (gen/vector coord-gen 0 initial-empty-cell-count)))
+    (gen/vector coordinate-gen 0 max-number-of-turn-by-game)))
+
+(defn play-n-moves-gen
+  "Play `n` random moves on the initial `game` provided as parameter"
+  [game n]
+  (if (zero? n)
+    (gen/return game)
+    (gen/bind
+      (valid-coordinate-gen game)
+      (fn play-coord [coord]
+        (if (nil? coord)
+          (gen/return game)
+          (play-n-moves-gen (game/play-at game coord) (dec n)))
+        ))
+    ))
+
+(def valid-game-gen
+  "Generate a valid game, where each move is valid"
+  (gen/bind
+    (gen/elements (range (inc max-number-of-turn-by-game)))
+    #(play-n-moves-gen (game/new-game) %)))
 
 
 ;; ----------------------------------------------------------------------------
@@ -68,7 +99,7 @@
 
 (defn game-move-properties
   [old-game]
-  (prop/for-all [coord coord-gen]
+  (prop/for-all [coord coordinate-gen]
     (let [new-game (game/play-at old-game coord)]
       (or
         (= old-game new-game)                               ;; TODO - test contained in empty cells
@@ -77,7 +108,7 @@
 
 #_(defn game-undo-properties
     [old-game]
-    (prop/for-all [coord coord-gen]
+    (prop/for-all [coord coordinate-gen]
       (let [new-game (game/play-at old-game coord)]
         (or
           (= old-game new-game)
