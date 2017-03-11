@@ -38,11 +38,6 @@
   [score]
   (transduce (map second) + score))
 
-(defn check-spec-test
-  [spec-res]
-  (let [res (stest/summarize-results spec-res)]
-    (= (:total res) (:check-passed res))))
-
 
 ;; ----------------------------------------------------------------------------
 ;; Generators
@@ -62,19 +57,6 @@
 ;; ----------------------------------------------------------------------------
 ;; Property based tests
 ;; ----------------------------------------------------------------------------
-
-#_(
-    (deftest board-test
-      (is (check-spec-test (stest/check `board/empty-cells)))
-      (is (check-spec-test (stest/check `board/to-seq))))
-
-    (deftest scores-test
-      (is (check-spec-test (stest/check `scores/update-scores))))
-
-    (deftest move-test
-      (is (check-spec-test (stest/check `move/all-available-moves)))
-      (is (check-spec-test (stest/check `move/apply-conversion))))
-    )
 
 (defn valid-game-transition?
   [old-game new-game move]
