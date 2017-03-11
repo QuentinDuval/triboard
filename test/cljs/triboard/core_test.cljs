@@ -64,19 +64,23 @@
     (fn [coord] (play-moves (game/new-game) coord))
     (gen/vector coordinate-gen 0 max-number-of-turn-by-game)))
 
+(defn repeat-m
+  [f input n]
+  (if (pos? n)
+    (recur f (gen/bind input f) (dec n))
+    input))
+
+(defn next-game-gen
+  [game]
+  (gen/fmap
+    (fn [coord]
+      (if (nil? coord) game (game/play-at game coord)))
+    (valid-coordinate-gen game)))
+
 (defn play-n-moves-gen
   "Play `n` random moves on the initial `game` provided as parameter"
   [game n]
-  (if (zero? n)
-    (gen/return game)
-    (gen/bind
-      (valid-coordinate-gen game)
-      (fn play-coord [coord]
-        (if (nil? coord)
-          (gen/return game)
-          (play-n-moves-gen (game/play-at game coord) (dec n)))
-        ))
-    ))
+  (repeat-m next-game-gen (gen/return game) n))
 
 (def valid-game-gen
   "Generate a valid game, where each move is valid"
