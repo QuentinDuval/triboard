@@ -1,6 +1,6 @@
 (ns ^:figwheel-always triboard.test-runner
   (:require
-    [cljs.test]
+    [cljs.test :refer [run-tests]]
     ))
 
-(cljs.test/run-all-tests #"triboard.*test")
+(run-tests 'triboard.core-test)
