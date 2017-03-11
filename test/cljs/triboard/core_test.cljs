@@ -17,7 +17,6 @@
     [triboard.logic.player :as player]
     [triboard.logic.scores :as scores]
     [triboard.logic.turn :as turn]
-    [triboard.utils.algo :as algo]
     ))
 
 
@@ -58,15 +57,6 @@
   (gen/fmap
     (fn [coord] (play-moves (game/new-game) coord))
     (gen/vector coord-gen 0 initial-empty-cell-count)))
-
-
-;; ----------------------------------------------------------------------------
-;; SCORE
-;; ----------------------------------------------------------------------------
-
-(deftest score-todo-test
-  (testing "trivial assumption"
-    (is (= 1 1))))
 
 
 ;; ----------------------------------------------------------------------------
