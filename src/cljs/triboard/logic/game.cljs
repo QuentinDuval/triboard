@@ -6,7 +6,8 @@
     [triboard.logic.turn :as turn]))
 
 
-(s/def ::game (s/coll-of ::turn/turn))
+(s/def ::game
+  (s/coll-of ::turn/turn))
 
 (s/fdef current-turn
   :args (s/cat :game ::game)

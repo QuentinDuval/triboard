@@ -52,7 +52,9 @@
 ;; Public API
 ;; -----------------------------------------
 
-(s/def ::turn
+(s/def ::turn #(satisfies? ITurn %))
+
+(s/def ::turn-data
   (s/keys :req-un
     [::board/board
      ::player/player
@@ -65,6 +67,10 @@
 (s/fdef transitions
   :args (s/cat :turn ::turn)
   :ret (s/map-of ::transition/destination ::transition/transition))
+
+(s/fdef turn->info
+  :args (s/cat :turn ::turn)
+  :ret ::turn-data)
 
 ;; -----------------------------------------
 

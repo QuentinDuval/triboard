@@ -45,7 +45,7 @@
 (defn- min-max-step-by
   [key-fn ai turn on-transition]
   (min-max-step-with
-    (partial min-key key-fn) ;; Lambda does not work here
+    (partial min-key key-fn)                                ;; Lambda does not work here
     (partial max-key key-fn)
     ai turn on-transition))
 
@@ -56,12 +56,13 @@
 ;; -----------------------------------------
 
 (defn- leaf-score
-  [ai {:keys [scores] :as turn}]
+  [ai turn]
   (swap! eval-counter inc)
-  (min-max-step ai turn
-    (fn look-ahead [_ transition]
-      (optimized-score ai (scores/update-scores scores transition))
-      )))
+  (let [scores (-> turn turn/turn->info :scores)]
+    (min-max-step ai turn
+      (fn look-ahead [_ transition]
+        (optimized-score ai (scores/update-scores scores transition))
+        ))))
 
 (defn- tree-score
   [ai turn depth]
@@ -103,7 +104,7 @@
   (let [turn (game/current-turn game)
         hard-mode? (focus-human-player? (:scores (turn/turn->info turn)))
         ai ((if hard-mode? make-cheating-ai make-ai) (:player (turn/turn->info turn)))
-        coord (time (best-move ai turn))]  ;; TODO - Remove time + find a way to correlate with moves + sort then and take best
+        coord (time (best-move ai turn))]                   ;; TODO - Remove time + find a way to correlate with moves + sort then and take best
     (js/console.log @eval-counter)
     coord))
 
