@@ -3,4 +3,6 @@
     [cljs.test :refer [run-tests]]
     ))
 
-(run-tests 'triboard.core-test)
+(run-tests
+  'triboard.algo-test
+  'triboard.core-test)
