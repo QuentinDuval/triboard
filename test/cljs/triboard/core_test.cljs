@@ -85,7 +85,8 @@
 (def valid-game-gen
   "Generate a valid game, where each move is valid"
   (gen/bind
-    (gen/elements (range (inc max-number-of-turn-by-game)))
+    #_(gen/elements (range (inc max-number-of-turn-by-game)))
+    (gen/such-that #(< % 30) gen/int)  ;; 30 before stack overflow
     #(play-n-moves-gen (game/new-game) %)))
 
 
