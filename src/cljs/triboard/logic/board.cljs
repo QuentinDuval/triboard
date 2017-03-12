@@ -59,7 +59,7 @@
     (conj player/all :wall)
     (algo/randomly-pick-n-of-each cst/init-block-count coordinates)
     (reduce
-      (fn [board [coord owner]] (convert-cell board coord owner))
+      (fn [board [coord owner]] (assoc-in board coord owner))
       empty-board)))
 
 (def get-owner-at get-in)
