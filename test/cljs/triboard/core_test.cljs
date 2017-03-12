@@ -38,6 +38,12 @@
   [score]
   (transduce (map second) + score))
 
+(defn repeat-m
+  [f input n]
+  (if (pos? n)
+    (recur f (gen/bind input f) (dec n))
+    input))
+
 
 ;; ----------------------------------------------------------------------------
 ;; Generators
@@ -51,6 +57,20 @@
   "The maximum number of moves that can be played in a game"
   (- (* board/width board/height) (* 4 cst/init-block-count)))
 
+(def game-gen
+  (gen/fmap
+    (fn [coord] (play-moves (game/new-game) coord))
+    (gen/vector coordinate-gen 0 max-number-of-turn-by-game)))
+
+(defn next-turn-gen
+  "Generator for a valid next turn from a previous valid turn"
+  [turn]
+  (gen/fmap
+    #(turn/next-turn turn %)
+    (gen/elements (vals (turn/transitions turn)))))
+
+;; (gen/sample (next-turn-gen (turn/new-init-turn)) 1)
+
 (defn valid-coordinate-gen
   "Generate a valid coordinate that can be played at by the current player"
   [game]
@@ -59,18 +79,8 @@
       (gen/return nil)
       (gen/elements (keys transitions)))))
 
-(def game-gen
-  (gen/fmap
-    (fn [coord] (play-moves (game/new-game) coord))
-    (gen/vector coordinate-gen 0 max-number-of-turn-by-game)))
-
-(defn repeat-m
-  [f input n]
-  (if (pos? n)
-    (recur f (gen/bind input f) (dec n))
-    input))
-
 (defn next-game-gen
+  "Generate a game from the current game, by selecting a random transition"
   [game]
   (gen/fmap
     (fn [coord]
@@ -88,6 +98,9 @@
     #_(gen/elements (range (inc max-number-of-turn-by-game)))
     (gen/such-that #(< % 30) gen/int)  ;; 30 before stack overflow
     #(play-n-moves-gen (game/new-game) %)))
+
+(def board-gen
+  (s/gen ::board/board))
 
 
 ;; ----------------------------------------------------------------------------
