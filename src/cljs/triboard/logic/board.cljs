@@ -27,7 +27,10 @@
   :ret ::board)
 
 (s/fdef convert-cell
-  :args (s/cat :board ::board :coord ::coord :owner ::player/player)
+  :args (s/cat
+          :board ::board
+          :coord ::coord
+          :owner ::player/player)
   :ret ::board)
 
 (s/fdef get-owner-at
@@ -59,7 +62,7 @@
     (conj player/all :wall)
     (algo/randomly-pick-n-of-each cst/init-block-count coordinates)
     (reduce
-      (fn [board [coord owner]] (convert-cell board coord owner))
+      (fn [board [coord owner]] (assoc-in board coord owner))
       empty-board)))
 
 (def get-owner-at get-in)

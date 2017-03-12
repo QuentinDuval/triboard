@@ -39,6 +39,9 @@
      ::player/player
      ::scores/scores]))
 
+(s/fdef new-init-turn
+  :ret ::turn)
+
 (s/fdef next-turn
   :args (s/cat :turn ::turn :transition ::transition/transition)
   :ret ::turn)

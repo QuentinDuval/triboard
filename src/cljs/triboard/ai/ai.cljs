@@ -115,5 +115,5 @@
 (defn benchmark []
   (let [g (game/new-game)]
     (time (dotimes [i 10]
-            (time (play-best-move g))
+            (time (find-best-move g))
             ))))
