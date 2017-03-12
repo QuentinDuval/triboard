@@ -20,13 +20,11 @@
    * Wait 500ms to start (animation might be frozen otherwise)
    * Wait 1s to play the move (avoid moves being played too fast)"
   [game]
-  (let [out-chan (chan 1)]
-    (go
-      (<! (async/timeout animation-delay))
-      (let [ai-chan (go (ai/find-best-move game))]
-        (<! (async/timeout ai-move-delay))
-        (>! out-chan (<! ai-chan))))
-    out-chan))
+  (go
+    (<! (async/timeout animation-delay))
+    (let [ai-chan (go (ai/find-best-move game))]
+      (<! (async/timeout ai-move-delay))
+      (<! ai-chan))))
 
 (defn player-moves-chan
   []
