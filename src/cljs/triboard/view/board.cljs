@@ -9,6 +9,9 @@
 ;; Private
 ;; ----------------------------------------------------------------------------
 
+;; TODO - Constants
+;; TODO - Square SVG Board utils
+
 (defn- rect-cell
   [[x y] player options]
   [:rect.cell

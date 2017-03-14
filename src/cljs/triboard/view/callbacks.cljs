@@ -1,6 +1,8 @@
 (ns triboard.view.callbacks)
 
 
+;; TODO - Rename callbacks
+
 (defprotocol CallBacks
   "A protocol for the interactions that can be triggered from the GUI"
   (on-new-game [this] "Send a new game command")

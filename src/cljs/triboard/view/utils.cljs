@@ -1,7 +1,6 @@
 (ns triboard.view.utils
   (:require
-    [goog.dom :as dom]
-    ))
+    [goog.dom :as dom]))
 
 
 (defn- special-char

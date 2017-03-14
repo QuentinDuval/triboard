@@ -30,7 +30,7 @@
      (player->score-text player score)]
     ))
 
-(defn- top-panel-button
+(defn- make-button
   [on-click txt]
   [:button.help-button {:on-click on-click} txt])
 
@@ -45,9 +45,9 @@
    * The main commands"
   [scores current-player cb]
   [:div.scores
-   [top-panel-button #(cb/on-new-game cb) vutils/star]
-   [top-panel-button #(cb/on-toogle-help cb) "?"]
+   [make-button #(cb/on-new-game cb) vutils/star]
+   [make-button #(cb/on-toogle-help cb) "?"]
    (show-scores scores #(= % current-player))
-   [top-panel-button #(cb/on-restart cb) vutils/circle-arrow]
-   [top-panel-button #(cb/on-undo cb) vutils/back-arrow]
+   [make-button #(cb/on-restart cb) vutils/circle-arrow]
+   [make-button #(cb/on-undo cb) vutils/back-arrow]
    ])
