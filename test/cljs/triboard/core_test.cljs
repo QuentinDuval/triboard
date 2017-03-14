@@ -96,7 +96,7 @@
   "Generate a valid game, where each move is valid"
   (gen/bind
     #_(gen/elements (range (inc max-number-of-turn-by-game)))
-    (gen/such-that #(< % 30) gen/int)  ;; 30 before stack overflow
+    (gen/such-that #(< % 30) gen/int)                       ;; 30 before stack overflow
     #(play-n-moves-gen (game/new-game) %)))
 
 (def board-gen
@@ -150,3 +150,35 @@
 ;; (cljs.spec.test/unstrument)
 
 ;; (test/run-tests)
+
+
+#_(
+    (s/def ::left ::bad-binary-tree)
+    (s/def ::right ::bad-binary-tree)
+    (s/def ::bad-binary-tree
+      (s/cat
+        :value any?
+        :children (s/keys :opt [::left ::right])))
+
+    (s/def ::branches #{:left :right})
+
+    (s/def ::binary-tree
+      (s/or
+        :leaf int?
+        :node (s/map-of ::branches ::binary-tree)))
+
+    (s/def ::binary-tree-2
+      (s/cat
+        :value int?
+        :children (s/map-of #{:left :right} (s/nilable ::binary-tree-2))))
+
+    (s/def ::all-scores
+      (s/map-of #{:blue :red :green} int?))
+
+    (s/def ::blue int?)
+    (s/def ::red int?)
+    (s/def ::green int?)
+
+    (s/def ::all-scores-2
+      (s/keys :req-un [::blue ::red ::green]))
+    )
