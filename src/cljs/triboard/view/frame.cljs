@@ -6,10 +6,10 @@
     [triboard.view.callbacks :as cb]
     [triboard.view.panel :as panel]))
 
-#_(s/fdef main-frame
+(s/fdef main-frame
   :args (s/cat
           :turn ::turn/turn
-          :suggestions fn?
+          :suggestions any?
           :callbacks #(satisfies? cb/CallBacks %)))
 
 (defn main-frame
