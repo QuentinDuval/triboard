@@ -3,7 +3,7 @@
     [reagent.core :as reagent]
     [triboard.game-loop :as loop]
     [triboard.store :as store]
-    [triboard.view.callbacks :as view]
+    [triboard.view.interactions :as view]
     [triboard.view.frame :as frame]))
 
 ;; (cljs.spec.test/instrument)

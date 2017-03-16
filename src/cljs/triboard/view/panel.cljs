@@ -2,7 +2,7 @@
   (:require
     [clojure.string :as str]
     [triboard.logic.player :as player]
-    [triboard.view.callbacks :as cb]
+    [triboard.view.interactions :as cb]
     [triboard.view.utils :as vutils]
     ))
 

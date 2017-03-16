@@ -1,7 +1,7 @@
 (ns triboard.view.board
   (:require
     [triboard.logic.board :as board]
-    [triboard.view.callbacks :as cb]
+    [triboard.view.interactions :as cb]
     [triboard.view.utils :as vutils]))
 
 

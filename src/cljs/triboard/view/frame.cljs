@@ -3,7 +3,7 @@
     [cljs.spec :as s]
     [triboard.logic.turn :as turn]
     [triboard.view.board :as board]
-    [triboard.view.callbacks :as cb]
+    [triboard.view.interactions :as cb]
     [triboard.view.panel :as panel]))
 
 (s/fdef main-frame
