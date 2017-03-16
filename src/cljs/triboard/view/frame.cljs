@@ -10,7 +10,7 @@
   :args (s/cat
           :turn ::turn/turn
           :suggestions any?
-          :callbacks #(satisfies? cb/CallBacks %)))
+          :callbacks #(satisfies? cb/IUserInteractions %)))
 
 (defn main-frame
   [turn suggestions callbacks]

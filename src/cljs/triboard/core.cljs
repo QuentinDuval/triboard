@@ -10,12 +10,9 @@
 ;; (enable-console-print!)
 ;; (set! *assert* false)
 
-;; TODO - Extract the parts that are related to costmetic: Help
-;; TODO - Rework the game loop to be a state machine (beware of consuming messages)
-
 (defn run-game []
   (frame/main-frame @store/current-turn @store/suggestions
-    (reify view/CallBacks
+    (reify view/IUserInteractions
       (on-new-game [_] (loop/sent-menu-event! [:new-game]))
       (on-toogle-help [_] (loop/sent-menu-event! [:toggle-help]))
       (on-restart [_] (loop/sent-menu-event! [:restart]))
