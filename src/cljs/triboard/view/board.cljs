@@ -9,16 +9,18 @@
 ;; Private
 ;; ----------------------------------------------------------------------------
 
-;; TODO - Constants
 ;; TODO - Square SVG Board utils
+
+(def relative-size 0.9)
+(def border-size (/ (- 1 relative-size) 2))
 
 (defn- rect-cell
   [[x y] player options]
   [:rect.cell
    (merge
      {:class (str "cell--" (name player))
-      :x (+ 0.05 x) :width 0.9
-      :y (+ 0.05 y) :height 0.9}
+      :x (+ border-size x) :width relative-size
+      :y (+ border-size y) :height relative-size}
      options)])
 
 (defn- empty-cell
