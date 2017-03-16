@@ -4,7 +4,7 @@
     [triboard.logic.turn :as turn]
     [triboard.view.board :as board]
     [triboard.view.interactions :as cb]
-    [triboard.view.panel :as panel]))
+    [triboard.view.menu :as panel]))
 
 (s/fdef main-frame
   :args (s/cat
@@ -15,6 +15,6 @@
 (defn main-frame
   [turn suggestions callbacks]
   [:div.game-panel
-   [panel/show-top-panel (:scores turn) (:player turn) callbacks]
+   [panel/show-top-menu (:scores turn) (:player turn) callbacks]
    [board/render-board (:board turn) suggestions callbacks]
    ])

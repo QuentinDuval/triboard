@@ -1,4 +1,4 @@
-(ns triboard.view.panel
+(ns triboard.view.menu
   (:require
     [clojure.string :as str]
     [triboard.logic.player :as player]
@@ -39,8 +39,8 @@
 ;; Public
 ;; ----------------------------------------------------------------------------
 
-(defn show-top-panel
-  "Show the top panel of the game that contains
+(defn show-top-menu
+  "Show the top menu of the game that contains
    * The player scores
    * The main commands"
   [scores current-player cb]
