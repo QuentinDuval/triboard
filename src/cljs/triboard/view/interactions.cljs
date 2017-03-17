@@ -7,4 +7,4 @@
   (on-toogle-help [this] "Send a toggle help command")
   (on-restart [this] "Send a restart command")
   (on-undo [this] "Send an undo command")
-  (on-player-move [this x y] "Send a command to player at [x y]"))
+  (on-player-move [this x y] "Send a play command at [x y]"))
