@@ -34,8 +34,10 @@
 
 ;; -----------------------------------------
 
-(defn- min-max-step-with
-  [min-fn max-fn ai turn on-transition]
+(defn- min-max-step
+  [ai turn on-transition
+   & {:keys [max-fn min-fn]
+      :or {max-fn max, min-fn min}}]
   (apply
     (if (maximizing-turn? ai turn) max-fn min-fn)
     (map
@@ -44,14 +46,11 @@
 
 (defn- min-max-step-by
   [key-fn ai turn on-transition]
-  (min-max-step-with
-    (partial min-key key-fn) ;; Lambda does not work here
-    (partial max-key key-fn)
-    ai turn on-transition))
+  (min-max-step
+    ai turn on-transition
+    :min-fn (partial min-key key-fn) ;; Lambda does not work here
+    :max-fn (partial max-key key-fn)))
 
-(defn- min-max-step
-  [ai turn on-transition]
-  (min-max-step-with min max ai turn on-transition))
 
 ;; -----------------------------------------
 
