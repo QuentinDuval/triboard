@@ -2,6 +2,7 @@
   (:require
     [cljs.spec :as s]
     [reagent.core :as reagent]
+    [triboard.logic.board :as board]
     [triboard.logic.game :as game]
     [triboard.logic.player :as player]
     [triboard.logic.turn :as turn])
@@ -37,6 +38,18 @@
 ;; -----------------------------------------
 ;; Public API (updates)
 ;; -----------------------------------------
+
+(s/def ::store-event
+  (s/or
+    :new-game (s/tuple #{:new-game})
+    :toggle-help (s/tuple #{:toggle-help})
+    :restart (s/tuple #{:restart})
+    :undo (s/tuple #{:undo})
+    :play-at (s/tuple #{:play-at} ::board/coord)
+    ))
+
+(s/fdef send-event!
+  :args (s/cat :event ::store-event))
 
 (defn- send-event!
   [msg]
