@@ -8,10 +8,6 @@
     ))
 
 
-;; -----------------------------------------
-;; GAME LOOP
-;; -----------------------------------------
-
 (def animation-delay 500)
 (def ai-move-delay 1000)
 
@@ -26,18 +22,17 @@
       (<! (async/timeout ai-move-delay))
       (<! ai-chan))))
 
-(defn player-moves-chan
-  []
-  (chan 1 (filter #(not @store/ai-player?))))
 
 (defn start-game-loop
   "Manage transitions between player moves, ai moves, and generic game events"
   []
-  (let [player-moves (player-moves-chan)
+  (let [player-moves (chan 1 (filter #(not @store/ai-player?)))
         menu-events (chan 1)]
     (go
       (while true
-        (let [play-chan (if @store/ai-player? (ai-computation @store/game) player-moves)]
+        (let [play-chan (if @store/ai-player?
+                          (ai-computation @store/game)
+                          player-moves)]
           (alt!
             menu-events ([msg] (store/send-event! msg))
             play-chan ([coord] (store/send-event! [:play-at coord]))
