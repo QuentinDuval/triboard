@@ -44,7 +44,7 @@
   (case (first msg)
     :new-game (swap! app-state assoc :game (game/new-game))
     :toggle-help (swap! app-state update :help not)
-    :restart (swap! app-state update :game #(take-last 1 %))
+    :restart (swap! app-state update :game game/restart-game)
     :undo (swap! app-state update :game game/undo-player-move)
     :play-at (swap! app-state update :game game/play-at (second msg))
     ))

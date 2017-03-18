@@ -48,3 +48,8 @@
     (if (empty? new-game)
       (take-last 1 game)
       new-game)))
+
+(defn restart-game
+  "Restart the game, back to the first turn of the game"
+  [game]
+  (take-last 1 game))
