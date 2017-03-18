@@ -34,7 +34,10 @@
 
 ;; -----------------------------------------
 
-(defn- min-max-step
+(defn- minimax-step
+  "One stage of the minimax algorithm:
+   * Apply the maximizing or mininizing step to all transitions of the turn
+   * Evaluate the lower level using the on-transition function"
   [ai turn on-transition
    & {:keys [max-fn min-fn]
       :or {max-fn max, min-fn min}}]
@@ -45,9 +48,9 @@
       (fn [[coord transition]] (on-transition coord transition))
       (turn/transitions turn))))
 
-(defn- min-max-step-by
+(defn- minimax-step-by
   [key-fn ai turn on-transition]
-  (min-max-step
+  (minimax-step
     ai turn on-transition
     :min-fn (partial min-key key-fn) ;; Lambda does not work here
     :max-fn (partial max-key key-fn)))
@@ -56,17 +59,22 @@
 ;; -----------------------------------------
 
 (defn- leaf-score
+  "Evaluate the score of a leaf turn by looking at its transition
+   In effect, it will look the score one level after"
   [ai {:keys [scores] :as turn}]
-  (min-max-step ai turn
+  (minimax-step ai turn
     (fn [_ transition]
       (eval-score ai (scores/update-scores scores transition))
       )))
 
 (defn- tree-score
+  "Implements the minimax recursion:
+   * Call the leaf node evaluation if the depth is zero
+   * Otherwise goes one level deeper"
   [ai turn depth]
   (if (zero? depth)
     (leaf-score ai turn)
-    (min-max-step ai turn
+    (minimax-step ai turn
       (fn [_ transition]
         (tree-score ai
           (turn/next-turn turn transition)
@@ -74,9 +82,12 @@
     ))
 
 (defn- best-move
+  "The top level of the minimax algorithm
+   * Triggers lower level minimax evaluations
+   * Keeps the transition that led to the max"
   [ai turn]
   (first
-    (min-max-step-by
+    (minimax-step-by
       second ai turn
       (fn [coord transition]
         (let [new-turn (turn/next-turn turn transition)]
@@ -84,6 +95,7 @@
       )))
 
 (defn- focus-human-player?
+  "High level AI to decude whether the AI ally against the human player"
   [{:keys [blue red green] :as scores}]
   (let [human-score (* 1.1 blue)]
     (and (< red human-score) (< green human-score))))
@@ -97,6 +109,7 @@
   :ret ::board/coord)
 
 (defn find-best-move
+  "Find the best available move for the current player"
   [game]
   (reset! eval-counter 0)
   (let [turn (game/current-turn game)
