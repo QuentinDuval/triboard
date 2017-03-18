@@ -10,7 +10,7 @@
 ;; (enable-console-print!)
 ;; (set! *assert* false)
 
-(defn run-game []
+(defn triboard []
   (frame/main-frame @store/current-turn @store/suggestions
     (reify view/IUserInteractions
       (on-new-game [_] (loop/sent-menu-event! [:new-game]))
@@ -20,5 +20,5 @@
       (on-player-move [_ x y] (loop/send-game-event! [x y]))
       )))
 
-(reagent/render [run-game]
+(reagent/render [triboard]
   (js/document.getElementById "app"))
