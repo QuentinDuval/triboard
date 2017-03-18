@@ -41,12 +41,8 @@
 
 (s/def ::store-event
   (s/or
-    :new-game (s/tuple #{:new-game})
-    :toggle-help (s/tuple #{:toggle-help})
-    :restart (s/tuple #{:restart})
-    :undo (s/tuple #{:undo})
-    :play-at (s/tuple #{:play-at} ::board/coord)
-    ))
+    :menu-event (s/tuple #{:new-game :toggle-help :restart :undo :play-at})
+    :play-event (s/cat :event #{:play-at} :coord ::board/coord)))
 
 (s/fdef send-event!
   :args (s/cat :event ::store-event))
