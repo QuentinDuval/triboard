@@ -38,6 +38,7 @@
   [ai turn on-transition
    & {:keys [max-fn min-fn]
       :or {max-fn max, min-fn min}}]
+  (swap! eval-counter inc)
   (apply
     (if (maximizing? ai turn) max-fn min-fn)
     (map
@@ -56,7 +57,6 @@
 
 (defn- leaf-score
   [ai {:keys [scores] :as turn}]
-  (swap! eval-counter inc)
   (min-max-step ai turn
     (fn [_ transition]
       (eval-score ai (scores/update-scores scores transition))
