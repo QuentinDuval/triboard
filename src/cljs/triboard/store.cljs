@@ -31,7 +31,7 @@
 (def suggestions
   (reaction
     (if (and (:help @app-state) (not @ai-player?))
-      (turn/transitions @current-turn)
+      #(contains? (turn/transitions @current-turn) %)
       {})))
 
 
