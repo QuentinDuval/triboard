@@ -136,9 +136,14 @@ body
 .credits
 {
 	background-color: #222;
-	color: #c0c0c0;
 	text-align: center;
 	width: 100%;
 	position: fixed;
 	bottom: 0;
+}
+
+.github-link
+{
+	color: #c0c0c0;
+	text-decoration: none;
 }

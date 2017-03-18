@@ -1,6 +1,9 @@
 (ns triboard.view.footer)
 
+(def github-link
+  "https://github.com/QuentinDuval/triboard")
+
 (defn credits
   []
   [:div.credits
-   [:a "https://github.com/QuentinDuval/triboard"]])
+   [:a.github-link {:href github-link} github-link]])
