@@ -15,21 +15,21 @@
 (def eval-counter (atom 0))
 
 (defprotocol AIStrategy
-  (optimized-score [this scores] "Extract data from the score to compare")
-  (maximizing-turn? [this turn] "Indicates whether we are in min or max"))
+  (eval-score [this scores] "Heuristic to score the value of a turn")
+  (maximizing? [this turn] "Tell whether we are in min or max step"))
 
 (defn- make-ai
   [player]
   (reify AIStrategy
-    (optimized-score [_ scores] (get scores player))
-    (maximizing-turn? [_ turn] (= (:player turn) player))
+    (eval-score [_ scores] (get scores player))
+    (maximizing? [_ turn] (= (:player turn) player))
     ))
 
 (defn- make-cheating-ai
   [player]
   (reify AIStrategy
-    (optimized-score [_ scores] (+ (:red scores) (:green scores)))
-    (maximizing-turn? [_ turn] (not= (:player turn) :blue))
+    (eval-score [_ scores] (+ (:red scores) (:green scores)))
+    (maximizing? [_ turn] (not= (:player turn) :blue))
     ))
 
 ;; -----------------------------------------
@@ -39,7 +39,7 @@
    & {:keys [max-fn min-fn]
       :or {max-fn max, min-fn min}}]
   (apply
-    (if (maximizing-turn? ai turn) max-fn min-fn)
+    (if (maximizing? ai turn) max-fn min-fn)
     (map
       (fn [[coord transition]] (on-transition coord transition))
       (turn/transitions turn))))
@@ -58,16 +58,16 @@
   [ai {:keys [scores] :as turn}]
   (swap! eval-counter inc)
   (min-max-step ai turn
-    (fn look-ahead [_ transition]
-      (optimized-score ai (scores/update-scores scores transition))
+    (fn [_ transition]
+      (eval-score ai (scores/update-scores scores transition))
       )))
 
 (defn- tree-score
   [ai turn depth]
-  (if (= 0 depth)
+  (if (zero? depth)
     (leaf-score ai turn)
     (min-max-step ai turn
-      (fn look-lower [_ transition]
+      (fn [_ transition]
         (tree-score ai
           (turn/next-turn turn transition)
           (dec depth))))
