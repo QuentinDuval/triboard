@@ -32,7 +32,7 @@
   (reaction
     (if (and (:help @app-state) (not @ai-player?))
       #(contains? (turn/transitions @current-turn) %)
-      {})))
+      (constantly false))))
 
 
 ;; -----------------------------------------
