@@ -2,7 +2,7 @@
   (:require
     [clojure.string :as str]
     [triboard.logic.player :as player]
-    [triboard.view.interactions :as cb]
+    [triboard.view.interactions :as i]
     [triboard.view.utils :as vutils]
     ))
 
@@ -43,11 +43,11 @@
   "Show the top menu of the game that contains
    * The player scores
    * The main commands"
-  [scores current-player cb]
+  [scores current-player interactions]
   [:div.scores
-   [make-button #(cb/on-new-game cb) vutils/star]
-   [make-button #(cb/on-toogle-help cb) "?"]
+   [make-button #(i/on-new-game interactions) vutils/star]
+   [make-button #(i/on-toogle-help interactions) "?"]
    (show-scores scores #(= % current-player))
-   [make-button #(cb/on-restart cb) vutils/circle-arrow]
-   [make-button #(cb/on-undo cb) vutils/back-arrow]
+   [make-button #(i/on-restart interactions) vutils/circle-arrow]
+   [make-button #(i/on-undo interactions) vutils/back-arrow]
    ])
