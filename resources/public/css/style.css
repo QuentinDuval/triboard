@@ -10,11 +10,17 @@ body
   	font-weight: 100;
   	font-size: 2.2vw;
   	margin: 0px 0px;
+  	min-height: 100%;
+  	position: relative;
 }
 
 .board
 {
-	margin: 10px 10px;
+	margin-left: auto;
+	margin-right: auto;
+	margin-top: 10px;
+	max-width: 100%;
+	display: block;
 }
 
 .cell
@@ -125,4 +131,14 @@ body
 .help-button:hover
 {
     color: white;
+}
+
+.credits
+{
+	background-color: #222;
+	color: #c0c0c0;
+	text-align: center;
+	width: 100%;
+	position: fixed;
+	bottom: 0;
 }

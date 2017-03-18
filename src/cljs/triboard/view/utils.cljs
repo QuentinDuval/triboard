@@ -12,7 +12,12 @@
 (def circle-arrow (special-char "&#x21bb;"))
 (def back-arrow (special-char "&larr;"))
 
+(defn max-board-width
+  "Reach the DOM to get the maximum width"
+  []
+  (* (-> (dom/getWindow) dom/getViewportSize .-width) 0.95))
+
 (defn max-board-height
   "Reach the DOM to get the maximum height"
   []
-  (* (-> (dom/getWindow) dom/getViewportSize .-height) 0.85))
+  (* (-> (dom/getWindow) dom/getViewportSize .-height) 0.80))

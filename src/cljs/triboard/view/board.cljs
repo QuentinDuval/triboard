@@ -29,7 +29,9 @@
 (defn- empty-svg-board []
   [:svg.board
    {:view-box (str "0 0 " board/width " " board/height)
-    :style {:max-height (str (vutils/max-board-height) "px")}}])
+    :style {:max-width (str (vutils/max-board-width) "px")
+            :max-height (str (vutils/max-board-height) "px")}
+    }])
 
 
 ;; ----------------------------------------------------------------------------

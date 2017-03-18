@@ -4,8 +4,10 @@
     [triboard.logic.board :as board-model]
     [triboard.logic.turn :as turn]
     [triboard.view.board :as board]
+    [triboard.view.footer :as footer]
     [triboard.view.interactions :refer [IUserInteractions]]
-    [triboard.view.menu :as menu]))
+    [triboard.view.menu :as menu]
+    ))
 
 (s/fdef main-frame
   :args (s/cat
@@ -18,4 +20,4 @@
   [:div.game-panel
    [menu/show-top-menu (:scores turn) (:player turn) interactions]
    [board/render-board (:board turn) suggestions interactions]
-   ])
+   [footer/credits]])
