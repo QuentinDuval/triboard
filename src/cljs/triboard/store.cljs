@@ -39,6 +39,14 @@
 ;; Public API (updates)
 ;; -----------------------------------------
 
+(defn swap-game!
+  [update-fn & args]
+  (apply swap! app-state update :game update-fn args))
+
+(defn toggle-help!
+  []
+  (swap! app-state update :help not))
+
 (s/def ::store-event
   (s/or
     :menu-event (s/tuple #{:new-game :toggle-help :restart :undo :play-at})
@@ -50,9 +58,9 @@
 (defn- send-event!
   [msg]
   (case (first msg)
-    :new-game (swap! app-state assoc :game (game/new-game))
-    :toggle-help (swap! app-state update :help not)
-    :restart (swap! app-state update :game game/restart-game)
-    :undo (swap! app-state update :game game/undo-player-move)
-    :play-at (swap! app-state update :game game/play-at (second msg))
+    :toggle-help (toggle-help!)
+    :new-game (swap-game! (fn [_] (game/new-game)))
+    :restart (swap-game! game/restart-game)
+    :undo (swap-game! game/undo-player-move)
+    :play-at (swap-game! game/play-at (second msg))
     ))
