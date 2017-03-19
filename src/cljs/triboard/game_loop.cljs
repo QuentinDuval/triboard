@@ -2,6 +2,7 @@
   (:require
     [cljs.core.async :as async :refer [put! chan <! >!]]
     [triboard.ai.ai :as ai]
+    [triboard.logic.game :as game]
     [triboard.store :as store])
   (:require-macros
     [cljs.core.async.macros :refer [go go-loop alt!]]
@@ -22,6 +23,14 @@
       (<! (async/timeout ai-move-delay))
       (<! ai-chan))))
 
+(defn handle-menu-event!
+  "Handle the menu event"
+  [msg]
+  (case msg
+    :toggle-help (store/toggle-help!)
+    :new-game (store/swap-game! (fn [_] (game/new-game)))
+    :restart (store/swap-game! game/restart-game)
+    :undo (store/swap-game! game/undo-player-move)))
 
 (defn start-game-loop
   "Manage transitions between player moves, ai moves, and generic game events"
@@ -34,8 +43,8 @@
                           (ai-computation @store/game)
                           player-moves)]
           (alt!
-            menu-events ([msg] (store/send-event! msg))
-            play-chan ([coord] (store/send-event! [:play-at coord]))
+            menu-events ([msg] (handle-menu-event! msg))
+            play-chan ([coord] (store/swap-game! game/play-at coord))
             ))))
     {:game-events player-moves
      :menu-events menu-events}))

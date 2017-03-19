@@ -2,7 +2,6 @@
   (:require
     [cljs.spec :as s]
     [reagent.core :as reagent]
-    [triboard.logic.board :as board]
     [triboard.logic.game :as game]
     [triboard.logic.player :as player]
     [triboard.logic.turn :as turn])
@@ -46,21 +45,3 @@
 (defn toggle-help!
   []
   (swap! app-state update :help not))
-
-(s/def ::store-event
-  (s/or
-    :menu-event (s/tuple #{:new-game :toggle-help :restart :undo :play-at})
-    :play-event (s/cat :event #{:play-at} :coord ::board/coord)))
-
-(s/fdef send-event!
-  :args (s/cat :event ::store-event))
-
-(defn- send-event!
-  [msg]
-  (case (first msg)
-    :toggle-help (toggle-help!)
-    :new-game (swap-game! (fn [_] (game/new-game)))
-    :restart (swap-game! game/restart-game)
-    :undo (swap-game! game/undo-player-move)
-    :play-at (swap-game! game/play-at (second msg))
-    ))
