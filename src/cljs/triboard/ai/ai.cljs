@@ -65,6 +65,8 @@
   (minimax-step ai turn
     (fn [_ transition]
       ;; TODO - Plug other ways to score (like counting available transitions)
+      ;; * The high level AI will select the available transitions in early game
+      ;; * The high level AI will select the score for the late game
       (eval-score ai (scores/update-scores scores transition))
       )))
 
