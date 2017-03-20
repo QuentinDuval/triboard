@@ -34,19 +34,19 @@
 (defn- start-game-loop
   "Manage transitions between player moves, ai moves, and generic game events"
   []
-  (let [player-moves (chan 1 (filter #(not @store/ai-player?)))
-        menu-events (chan 1)]
+  (let [play-events (chan 1 (filter #(not @store/ai-player?)))
+        game-events (chan 1)]
     (go
       (while true
         (let [play-chan (if @store/ai-player?
                           (ai-computation @store/game)
-                          player-moves)]
+                          play-events)]
           (alt!
-            menu-events ([msg] (handle-menu-event! msg))
+            game-events ([msg] (handle-menu-event! msg))
             play-chan ([coord] (store/swap-game! game/play-at coord))
             ))))
-    {:game-events player-moves
-     :menu-events menu-events}))
+    {:play-events play-events
+     :game-events game-events}))
 
 
 ;; -----------------------------------------
@@ -54,5 +54,5 @@
 ;; -----------------------------------------
 
 (defonce game-loop (start-game-loop))
+(defn send-play-event! [e] (put! (game-loop :play-events) e))
 (defn send-game-event! [e] (put! (game-loop :game-events) e))
-(defn sent-menu-event! [e] (put! (game-loop :menu-events) e))
