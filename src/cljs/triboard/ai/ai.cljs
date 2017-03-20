@@ -64,6 +64,7 @@
   [ai {:keys [scores] :as turn}]
   (minimax-step ai turn
     (fn [_ transition]
+      ;; TODO - Plug other ways to score (like counting available transitions)
       (eval-score ai (scores/update-scores scores transition))
       )))
 
