@@ -25,11 +25,11 @@
 (defn- handle-menu-event!
   "Handle the menu event"
   [msg]
-  (case msg
-    :toggle-help (store/toggle-help!)
-    :new-game (store/swap-game! (fn [_] (game/new-game)))
-    :restart (store/swap-game! game/restart-game)
-    :undo (store/swap-game! game/undo-player-move)))
+  (store/swap-game!
+    (case msg
+      :new-game (fn [_] (game/new-game))
+      :restart game/restart-game
+      :undo game/undo-player-move)))
 
 (defn- start-game-loop
   "Manage transitions between player moves, ai moves, and generic game events"
