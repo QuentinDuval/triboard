@@ -22,8 +22,7 @@
       (<! (async/timeout ai-move-delay))
       (<! ai-chan))))
 
-(defn- handle-menu-event!
-  "Handle the menu event"
+(defn- handle-game-event!
   [msg]
   (store/swap-game!
     (case msg
@@ -42,7 +41,7 @@
                           (ai-computation @store/game)
                           play-events)]
           (alt!
-            game-events ([msg] (handle-menu-event! msg))
+            game-events ([msg] (handle-game-event! msg))
             play-chan ([coord] (store/swap-game! game/play-at coord))
             ))))
     {:play-events play-events
