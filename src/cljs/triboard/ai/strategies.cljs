@@ -4,6 +4,12 @@
     ))
 
 
+;; TODO - For the AI sensible to the number of moves
+;; We do not care about transitions or new scores
+;; This is one level lower and we want to keep the
+;; available moves for each player
+;; This means we want something different for leaf score
+
 (defn score-sensible-ai
   [player]
   (reify minimax/AIStrategy
