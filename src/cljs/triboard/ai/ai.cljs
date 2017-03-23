@@ -17,22 +17,6 @@
 ;; Private
 ;; -----------------------------------------
 
-;; TODO - Most of this can be moved in minimax since we extracted the leaf-score into interface
-
-(defn- tree-score
-  "Implements the minimax recursion:
-   * Call the leaf node evaluation if the depth is zero
-   * Otherwise goes one level deeper"
-  [ai turn depth]
-  (if (zero? depth)
-    (ai-algo/leaf-score ai turn)
-    (ai-algo/minimax-step ai turn
-      (fn [_ transition]
-        (tree-score ai
-          (turn/next-turn turn transition)
-          (dec depth))))
-    ))
-
 (defn- best-move
   "The top level of the minimax algorithm
    * Triggers lower level minimax evaluations
@@ -43,7 +27,7 @@
       second ai turn
       (fn [coord transition]
         (let [new-turn (turn/next-turn turn transition)]
-          [coord (tree-score ai new-turn 1)]))
+          [coord (ai-algo/minimax ai new-turn 1)]))
       )))
 
 (defn- focus-human-player?

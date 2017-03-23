@@ -21,8 +21,23 @@
       (turn/transitions turn))))
 
 (defn minimax-step-by
+  "One stage of the minimax algorithm, with custom comparison functions"
   [key-fn ai turn on-transition]
   (minimax-step
     ai turn on-transition
     :min-fn (partial min-key key-fn) ;; Lambda does not work here
     :max-fn (partial max-key key-fn)))
+
+(defn minimax
+  "Implements the minimax recursion:
+   * Call the leaf node evaluation if the depth is zero
+   * Otherwise goes one level deeper"
+  [ai turn depth]
+  (if (zero? depth)
+    (leaf-score ai turn)
+    (minimax-step ai turn
+      (fn [_ transition]
+        (minimax ai
+          (turn/next-turn turn transition)
+          (dec depth))))
+    ))
