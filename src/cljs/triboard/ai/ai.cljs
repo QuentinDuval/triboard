@@ -8,11 +8,6 @@
     [triboard.logic.turn :as turn]))
 
 
-;; TODO - Plug other ways to score (like counting available transitions)
-;; * The high level AI will select the available transitions in early game
-;; * The high level AI will select the score for the late game
-
-
 ;; -----------------------------------------
 ;; Private
 ;; -----------------------------------------
@@ -31,16 +26,21 @@
       )))
 
 (defn- focus-human-player?
-  "High level AI to decude whether the AI ally against the human player"
   [{:keys [blue red green] :as scores}]
   (let [human-score (* 1.1 blue)]
     (and (< red human-score) (< green human-score))))
 
-(defn- high-level-ai
+(defn- limited-move-options?
   [turn]
+  (< (count (turn/transitions turn)) 5))
+
+(defn- high-level-ai
+  "High level AI: choose the right evaluation function to play"
+  [{:keys [player scores] :as turn}]
   (cond
-    (focus-human-player? (:scores turn)) (strategies/allied-against-player-ai)
-    :else (strategies/score-sensible-ai (:player turn))
+    (focus-human-player? scores) (strategies/allied-against-player-ai)
+    (limited-move-options? turn) (strategies/like-freedom-ai player)
+    :else (strategies/score-sensible-ai player)
     ))
 
 ;; -----------------------------------------
