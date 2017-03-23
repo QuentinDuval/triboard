@@ -2,6 +2,7 @@
   (:require
     [triboard.ai.minimax :as minimax]
     [triboard.logic.scores :as scores]
+    [triboard.logic.transition :as transition]
     ))
 
 
@@ -29,4 +30,12 @@
   (reify minimax/AIStrategy
     (leaf-score [this turn] (eval-leaf-score this turn #(+ (:red %) (:green %))))
     (maximizing? [_ turn] (not= (:player turn) :blue))
+    ))
+
+(defn like-freedom-ai
+  [player]
+  (reify minimax/AIStrategy
+    (leaf-score [_ turn]
+      (get (transition/all-transitions (:board turn)) player))
+    (maximizing? [_ turn] (= (:player turn) player))
     ))

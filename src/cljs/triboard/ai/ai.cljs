@@ -54,9 +54,11 @@
 (defn find-best-move
   "Find the best available move for the current player"
   [game]
+  (reset! ai-algo/eval-counter 0)
   (let [turn (game/current-turn game)
         ai (high-level-ai turn)
         coord (time (best-move ai turn))]  ;; TODO - Remove time + find a way to correlate with moves + sort then and take best
+    (js/console.log @ai-algo/eval-counter)
     coord))
 
 
