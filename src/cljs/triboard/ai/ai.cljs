@@ -2,6 +2,7 @@
   (:require
     [cljs.spec :as s :include-macros true]
     [triboard.ai.minimax :as ai-algo]
+    [triboard.ai.strategies :as strategies]
     [triboard.logic.board :as board]
     [triboard.logic.game :as game]
     [triboard.logic.scores :as scores]
@@ -15,23 +16,6 @@
 
 ;; -----------------------------------------
 ;; Private
-;; -----------------------------------------
-
-(defn- make-ai
-  [player]
-  (reify ai-algo/AIStrategy
-    (eval-score [_ scores] (get scores player))
-    (maximizing? [_ turn] (= (:player turn) player))
-    ))
-
-(defn- make-cheating-ai
-  [player]
-  (reify ai-algo/AIStrategy
-    (eval-score [_ scores] (+ (:red scores) (:green scores)))
-    (maximizing? [_ turn] (not= (:player turn) :blue))
-    ))
-
-
 ;; -----------------------------------------
 
 (defn- leaf-score
@@ -89,7 +73,7 @@
   [game]
   (let [turn (game/current-turn game)
         hard-mode? (focus-human-player? (:scores turn))
-        ai ((if hard-mode? make-cheating-ai make-ai) (:player turn))
+        ai ((if hard-mode? strategies/allied-against-player-ai strategies/score-sensible-ai) (:player turn))
         coord (time (best-move ai turn))]  ;; TODO - Remove time + find a way to correlate with moves + sort then and take best
     coord))
 
