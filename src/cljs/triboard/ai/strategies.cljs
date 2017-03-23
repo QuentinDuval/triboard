@@ -36,6 +36,6 @@
   [player]
   (reify minimax/AIStrategy
     (leaf-score [_ turn]
-      (get (transition/all-transitions (:board turn)) player))
+      (count (get (transition/all-transitions (:board turn)) player)))
     (maximizing? [_ turn] (= (:player turn) player))
     ))
