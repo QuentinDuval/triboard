@@ -60,6 +60,13 @@
   (let [human-score (* 1.1 blue)]
     (and (< red human-score) (< green human-score))))
 
+(defn- high-level-ai
+  [turn]
+  (cond
+    (focus-human-player? (:scores turn)) (strategies/allied-against-player-ai)
+    :else (strategies/score-sensible-ai (:player turn))
+    ))
+
 ;; -----------------------------------------
 ;; Public API
 ;; -----------------------------------------
@@ -72,8 +79,7 @@
   "Find the best available move for the current player"
   [game]
   (let [turn (game/current-turn game)
-        hard-mode? (focus-human-player? (:scores turn))
-        ai ((if hard-mode? strategies/allied-against-player-ai strategies/score-sensible-ai) (:player turn))
+        ai (high-level-ai turn)
         coord (time (best-move ai turn))]  ;; TODO - Remove time + find a way to correlate with moves + sort then and take best
     coord))
 

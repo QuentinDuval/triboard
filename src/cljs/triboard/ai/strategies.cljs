@@ -12,7 +12,7 @@
     ))
 
 (defn allied-against-player-ai
-  [player]
+  []
   (reify minimax/AIStrategy
     (eval-score [_ scores] (+ (:red scores) (:green scores)))
     (maximizing? [_ turn] (not= (:player turn) :blue))
