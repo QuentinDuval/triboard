@@ -1,12 +1,6 @@
 (ns triboard.ai.minimax
-  (:require
-    [triboard.logic.turn :as turn]
-    ))
+  (:require [triboard.logic.turn :as turn]))
 
-
-;; TODO - Plug other ways to score (like counting available transitions)
-;; * The high level AI will select the available transitions in early game
-;; * The high level AI will select the score for the late game
 
 (defprotocol AIStrategy
   (eval-score [this scores] "Heuristic to score the value of a turn")
