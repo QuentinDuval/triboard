@@ -17,8 +17,7 @@
 ;; Private
 ;; -----------------------------------------
 
-;; TODO - Most of this can be moved in minimax since
-;; We extracted the leaf-score into interface
+;; TODO - Most of this can be moved in minimax since we extracted the leaf-score into interface
 
 (defn- tree-score
   "Implements the minimax recursion:

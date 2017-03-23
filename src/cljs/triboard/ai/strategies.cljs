@@ -6,10 +6,7 @@
 
 
 ;; TODO - For the AI sensible to the number of moves
-;; We do not care about transitions or new scores
-;; This is one level lower and we want to keep the
-;; available moves for each player
-;; This means we want something different for leaf score
+;; We want to count the number of transitions available for the player
 
 (defn- eval-leaf-score
   "Evaluate the score of a leaf turn by looking at its transition
