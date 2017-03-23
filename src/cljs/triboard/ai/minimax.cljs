@@ -3,7 +3,7 @@
 
 
 (defprotocol AIStrategy
-  (eval-score [this scores] "Heuristic to score the value of a turn")
+  (leaf-score [this turn] "Heuristic to score the value of a leaf")
   (maximizing? [this turn] "Tell whether we are in min or max step"))
 
 

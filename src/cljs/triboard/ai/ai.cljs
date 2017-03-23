@@ -5,7 +5,6 @@
     [triboard.ai.strategies :as strategies]
     [triboard.logic.board :as board]
     [triboard.logic.game :as game]
-    [triboard.logic.scores :as scores]
     [triboard.logic.turn :as turn]))
 
 
@@ -18,14 +17,8 @@
 ;; Private
 ;; -----------------------------------------
 
-(defn- leaf-score
-  "Evaluate the score of a leaf turn by looking at its transition
-   In effect, it will look the score one level after"
-  [ai {:keys [scores] :as turn}]
-  (ai-algo/minimax-step ai turn
-    (fn [_ transition]
-      (ai-algo/eval-score ai (scores/update-scores scores transition))
-      )))
+;; TODO - Most of this can be moved in minimax since
+;; We extracted the leaf-score into interface
 
 (defn- tree-score
   "Implements the minimax recursion:
@@ -33,7 +26,7 @@
    * Otherwise goes one level deeper"
   [ai turn depth]
   (if (zero? depth)
-    (leaf-score ai turn)
+    (ai-algo/leaf-score ai turn)
     (ai-algo/minimax-step ai turn
       (fn [_ transition]
         (tree-score ai
