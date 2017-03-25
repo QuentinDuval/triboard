@@ -6,10 +6,6 @@
     [triboard.view.interactions :as view]
     [triboard.view.frame :as frame]))
 
-;; (cljs.spec.test/instrument)
-;; (enable-console-print!)
-;; (set! *assert* false)
-
 (defn triboard []
   (frame/main-frame @store/current-turn @store/suggestions
     (reify view/IUserInteractions

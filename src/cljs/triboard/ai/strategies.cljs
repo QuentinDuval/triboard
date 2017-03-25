@@ -6,9 +6,6 @@
     ))
 
 
-;; TODO - For the AI sensible to the number of moves
-;; We want to count the number of transitions available for the player
-
 (defn- eval-next-score-of
   "Perform a last minimax step on the next scores following the turn
    * Allows to see one level deeper for simple scoring strategies
