@@ -3,7 +3,7 @@
 
 
 (defprotocol AIStrategy
-  (leaf-score [this turn] "Heuristic to score the value of a leaf")
+  (eval-turn [this turn] "Heuristic to score the value of a leaf")
   (maximizing? [this turn] "Tell whether we are in min or max step"))
 
 
@@ -37,7 +37,7 @@
    * Otherwise goes one level deeper"
   [ai turn depth]
   (if (zero? depth)
-    (leaf-score ai turn)
+    (eval-turn ai turn)
     (minimax-step ai turn
       (fn [_ transition]
         (minimax ai

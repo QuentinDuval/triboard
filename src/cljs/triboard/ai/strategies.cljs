@@ -21,21 +21,21 @@
 (defn score-sensible-ai
   [player]
   (reify minimax/AIStrategy
-    (leaf-score [this turn] (eval-leaf-score this turn #(get % player)))
+    (eval-turn [this turn] (eval-leaf-score this turn #(get % player)))
     (maximizing? [_ turn] (= (:player turn) player))
     ))
 
 (defn allied-against-player-ai
   []
   (reify minimax/AIStrategy
-    (leaf-score [this turn] (eval-leaf-score this turn #(+ (:red %) (:green %))))
+    (eval-turn [this turn] (eval-leaf-score this turn #(+ (:red %) (:green %))))
     (maximizing? [_ turn] (not= (:player turn) :blue))
     ))
 
 (defn like-freedom-ai
   [player]
   (reify minimax/AIStrategy
-    (leaf-score [_ turn]
+    (eval-turn [_ turn]
       (count (get (transition/all-transitions (:board turn)) player)))
     (maximizing? [_ turn] (= (:player turn) player))
     ))
