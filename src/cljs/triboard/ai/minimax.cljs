@@ -3,8 +3,8 @@
 
 
 (defprotocol AIStrategy
-  (eval-turn [this turn] "Heuristic to score the value of a leaf")
-  (maximizing? [this turn] "Tell whether we are in min or max step"))
+  (eval-turn [this turn] "Heuristic to score the value of a turn")
+  (maximizing? [this turn] "Whether the turn should minimize or maximize the transitions"))
 
 
 (defonce eval-counter (atom 0))
