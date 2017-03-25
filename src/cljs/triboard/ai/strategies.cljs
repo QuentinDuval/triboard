@@ -9,26 +9,27 @@
 ;; TODO - For the AI sensible to the number of moves
 ;; We want to count the number of transitions available for the player
 
-(defn- eval-leaf-score
+(defn- eval-next-score-of
   "Evaluate the score of a leaf turn by looking at its transition
    In effect, it will look the score one level after"
-  [ai {:keys [scores] :as turn} eval-score]
+  [ai {:keys [scores] :as turn} players]
   (minimax/minimax-step ai turn
     (fn [_ transition]
-      (eval-score (scores/update-scores scores transition))
+      (let [scores (scores/update-scores scores transition)]
+        (apply + (map #(get scores %) players)))
       )))
 
 (defn optimize-own-score-ai
   [player]
   (reify minimax/AIStrategy
-    (eval-turn [this turn] (eval-leaf-score this turn #(get % player)))
+    (eval-turn [this turn] (eval-next-score-of this turn [player]))
     (maximizing? [_ turn] (= (:player turn) player))
     ))
 
 (defn optmize-ai-scores-ai
   []
   (reify minimax/AIStrategy
-    (eval-turn [this turn] (eval-leaf-score this turn #(+ (:red %) (:green %))))
+    (eval-turn [this turn] (eval-next-score-of this turn [:red :green]))
     (maximizing? [_ turn] (not= (:player turn) :blue))
     ))
 
