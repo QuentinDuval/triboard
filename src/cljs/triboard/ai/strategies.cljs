@@ -10,8 +10,9 @@
 ;; We want to count the number of transitions available for the player
 
 (defn- eval-next-score-of
-  "Evaluate the score of a leaf turn by looking at its transition
-   In effect, it will look the score one level after"
+  "Perform a last minimax step on the next scores following the turn
+   * Allows to see one level deeper for simple scoring strategies
+   * While being fast (the transition does not need to be followed)"
   [ai {:keys [scores] :as turn} players]
   (minimax/minimax-step ai turn
     (fn [_ transition]
