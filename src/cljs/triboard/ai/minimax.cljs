@@ -7,8 +7,6 @@
   (maximizing? [this turn] "Whether the turn should minimize or maximize the transitions"))
 
 
-(defonce eval-counter (atom 0))
-
 (defn minimax-step
   "One stage of the minimax algorithm:
    * Apply the maximizing or mininizing step to all transitions of the turn
@@ -16,7 +14,6 @@
   [ai turn on-transition
    & {:keys [max-fn min-fn]
       :or {max-fn max, min-fn min}}]
-  (swap! eval-counter inc)
   (apply
     (if (maximizing? ai turn) max-fn min-fn)
     (map
