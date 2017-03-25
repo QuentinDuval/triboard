@@ -21,6 +21,7 @@
       )))
 
 (defn optimize-own-score-ai
+  "Create an AI strategy to optmize its own score: good late game play"
   [player]
   (reify minimax/AIStrategy
     (eval-turn [this turn] (eval-next-score-of this turn [player]))
@@ -28,6 +29,7 @@
     ))
 
 (defn optmize-ai-scores-ai
+  "Create an AI strategy to optmize the AI scores: good cheat when the player wins"
   []
   (reify minimax/AIStrategy
     (eval-turn [this turn] (eval-next-score-of this turn [:red :green]))
@@ -35,6 +37,7 @@
     ))
 
 (defn optimize-own-choices-ai
+  "Create an AI strategy to optmize the AI choices: avoid being trapped with no moves left"
   [player]
   (reify minimax/AIStrategy
     (eval-turn [_ turn]
