@@ -38,9 +38,9 @@
   "High level AI: choose the right evaluation function to play"
   [{:keys [player scores] :as turn}]
   (cond
-    (focus-human-player? scores) (strategies/allied-against-player-ai)
-    (limited-move-options? turn) (strategies/like-freedom-ai player)
-    :else (strategies/score-sensible-ai player)
+    (focus-human-player? scores) (strategies/optmize-ai-scores-ai)
+    (limited-move-options? turn) (strategies/optimize-own-choices-ai player)
+    :else (strategies/optimize-own-score-ai player)
     ))
 
 ;; -----------------------------------------
