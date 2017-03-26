@@ -34,11 +34,18 @@
   [turn]
   (< (count (turn/transitions turn)) 5))
 
+(defn- in-late-game?
+  [scores]
+  (let [max-score (count board/coordinates)
+        sum-score (apply + (vals scores))]
+    (< (- max-score sum-score) 20)))
+
 (defn- high-level-ai
   "High level AI: choose the right evaluation function to play"
   [{:keys [player scores] :as turn}]
   (cond
     (focus-human-player? scores) (strategies/optmize-ai-scores-ai)
+    (in-late-game? scores) (strategies/optimize-own-score-ai player)
     (limited-move-options? turn) (strategies/optimize-own-choices-ai player)
     :else (strategies/optimize-own-score-ai player)
     ))
