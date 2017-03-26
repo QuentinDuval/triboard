@@ -26,7 +26,8 @@
   (let [transitions (transition/all-transitions board)
         next-player (first (who-can-play player transitions))]
     (merge turn
-      {:transitions (get transitions next-player) :player next-player})))
+      {:transitions (get transitions next-player)
+       :player next-player})))
 
 
 ;; -----------------------------------------
@@ -71,3 +72,9 @@
   "Return the transitions available for the next player"
   [turn]
   (:transitions turn))
+
+(defn game-over?
+  "Return whether the game is over at this turn
+   This only happens if there are no transitions available"
+  [turn]
+  (nil? (:player turn)))

@@ -33,7 +33,7 @@
    * Call the leaf node evaluation if the depth is zero
    * Otherwise goes one level deeper"
   [ai turn depth]
-  (if (zero? depth)
+  (if (or (zero? depth) (turn/game-over? turn))
     (eval-turn ai turn)
     (minimax-step ai turn
       (fn [_ transition]
