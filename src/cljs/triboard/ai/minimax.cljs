@@ -11,20 +11,20 @@
   "One stage of the minimax algorithm:
    * Apply the maximizing or mininizing step to all transitions of the turn
    * Evaluate the lower level using the on-transition function"
-  [ai turn on-transition
+  [ai turn open-recur
    & {:keys [max-fn min-fn]
       :or {max-fn max, min-fn min}}]
   (apply
     (if (maximizing? ai turn) max-fn min-fn)
     (map
-      (fn [[coord transition]] (on-transition coord transition))
+      (fn [[coord transition]] (open-recur coord transition))
       (turn/transitions turn))))
 
 (defn minimax-step-by
   "One stage of the minimax algorithm, with custom comparison functions"
-  [key-fn ai turn on-transition]
+  [key-fn ai turn open-recur]
   (minimax-step
-    ai turn on-transition
+    ai turn open-recur
     :min-fn (partial min-key key-fn) ;; Lambda does not work here
     :max-fn (partial max-key key-fn)))
 
@@ -39,5 +39,4 @@
       (fn [_ transition]
         (minimax ai
           (turn/next-turn turn transition)
-          (dec depth))))
-    ))
+          (dec depth))))))
