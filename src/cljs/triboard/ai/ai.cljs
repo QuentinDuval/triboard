@@ -12,10 +12,10 @@
 ;; Private
 ;; -----------------------------------------
 
-(defn- best-move
+(defn- move-tree-search
   "The top level of the minimax algorithm
-   * Triggers lower level minimax evaluations
-   * Keeps the transition that led to the max"
+   * Trigger sub-game-trees minimax evaluations
+   * Remember the transition that led to the max"
   [ai turn]
   (first
     (ai-algo/minimax-step-by
@@ -25,7 +25,7 @@
           [coord (ai-algo/minimax ai new-turn 1)]))
       )))
 
-(defn- focus-human-player?
+(defn- human-player-winning?
   [{:keys [blue red green] :as scores}]
   (let [human-score (* 1.1 blue)]
     (and (< red human-score) (< green human-score))))
@@ -44,7 +44,7 @@
   "High level AI: choose the right evaluation function to play"
   [{:keys [player scores] :as turn}]
   (cond
-    (focus-human-player? scores) (strategies/optmize-ai-scores-ai)
+    (human-player-winning? scores) (strategies/optmize-ai-scores-ai)
     (in-late-game? scores) (strategies/optimize-own-score-ai player)
     (limited-move-options? turn) (strategies/optimize-own-choices-ai player)
     :else (strategies/optimize-own-score-ai player)
@@ -63,4 +63,4 @@
   [game]
   (let [turn (game/current-turn game)
         ai (high-level-ai turn)]
-    (best-move ai turn)))
+    (move-tree-search ai turn)))

@@ -25,7 +25,7 @@
   [key-fn ai turn open-recur]
   (minimax-step
     ai turn open-recur
-    :min-fn (partial min-key key-fn) ;; Lambda does not work here
+    :min-fn (partial min-key key-fn)
     :max-fn (partial max-key key-fn)))
 
 (defn minimax
