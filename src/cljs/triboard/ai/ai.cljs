@@ -16,13 +16,13 @@
   "The top level of the minimax algorithm
    * Trigger sub-game-trees minimax evaluations
    * Remember the transition that led to the max"
-  [ai turn]
+  [ai turn depth]
   (first
     (ai-algo/minimax-step-by
       second ai turn
       (fn [coord transition]
         (let [new-turn (turn/next-turn turn transition)]
-          [coord (ai-algo/minimax ai new-turn 1)]))
+          [coord (ai-algo/minimax ai new-turn depth)]))
       )))
 
 (defn- human-player-winning?
@@ -63,4 +63,4 @@
   [game]
   (let [turn (game/current-turn game)
         ai (high-level-ai turn)]
-    (move-tree-search ai turn)))
+    (move-tree-search ai turn 1)))
