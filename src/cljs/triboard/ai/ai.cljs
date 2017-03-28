@@ -12,7 +12,7 @@
 ;; Private
 ;; -----------------------------------------
 
-(defn- move-tree-search
+(defn- game-tree-search
   "The top level of the minimax algorithm
    * Trigger sub-game-trees minimax evaluations
    * Remember the transition that led to the max"
@@ -63,4 +63,4 @@
   [game]
   (let [turn (game/current-turn game)
         ai (high-level-ai turn)]
-    (move-tree-search ai turn 1)))
+    (game-tree-search ai turn 1)))
